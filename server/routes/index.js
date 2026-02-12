@@ -6,5 +6,6 @@ router.get('/', (req, res) => {
 });
 
 router.use('/animals', require('../features/animals/animals.routes'));
+router.use('/medicalLogs', require('../features/medicalLogs/medicalLogs.routes'));
 
 module.exports = router;
