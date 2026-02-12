@@ -1,0 +1,10 @@
+const express = require('express');
+const router = express.Router();
+
+router.get('/', (req, res) => {
+  res.status(200).json({ message: "Welcome to the Animal Shelter API" });
+});
+
+router.use('/animals', require('../features/animals/animals.routes'));
+
+module.exports = router;
