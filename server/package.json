@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "@prisma/adapter-pg": "^7.4.0",
+    "@prisma/client": "^7.4.0",
     "cors": "^2.8.6",
     "dotenv": "^17.2.4",
     "express": "^5.2.1",
@@ -7,7 +9,8 @@
     "pg": "^8.18.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.11",
+    "prisma": "^7.4.0"
   },
   "name": "animal-shelter-server",
   "version": "1.0.0",
