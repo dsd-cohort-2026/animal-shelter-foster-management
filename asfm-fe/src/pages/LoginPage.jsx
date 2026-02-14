@@ -14,7 +14,7 @@ export default function LoginPage() {
   return (
     <section className="flex flex-col ">
       <div className="w-full flex flex-col items-center">
-        <img src={shelterLogo} alt="Shelter Logo" className="max-w-[500px]" />
+        <img src={shelterLogo} alt="Shelter Logo" className="w-full md:max-w-[500px]" />
       </div>
       <div className="flex flex-col items-center w-full">
         <Card className="w-full max-w-[700px]">
