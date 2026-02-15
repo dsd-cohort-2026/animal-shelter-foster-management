@@ -1,0 +1,16 @@
+model MedicalLog {
+  id               Int      @id @default(autoincrement())
+  foster_user_id   Int      // FK
+  animal_id        Int      // FK
+  assignment_id    Int      // FK
+  logged_at        DateTime @default(now())
+  category         Log_Type @default(MEDICAL) //corrent name?
+  general_notes    String
+  behavior_notes   String
+  medicine_id      Int      // FK
+  qty_administered Float
+  dose             String
+  administered_at  DateTime @default(now()) //date only?
+  prescription     String
+  documents        String
+}
