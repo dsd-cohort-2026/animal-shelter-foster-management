@@ -1,4 +1,4 @@
-const medicalLogRepository = require('./medicalLogs.repository');
+const medicalLogRepository = require('./medical-logs.repository');
 
 exports.getAllMedicalLogs = async () => {
   const medicalLogs = await medicalLogRepository.findAll();

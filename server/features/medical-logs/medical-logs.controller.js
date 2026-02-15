@@ -1,4 +1,4 @@
-const medicalLogService = require('./medicalLogs.service');
+const medicalLogService = require('./medical-logs.service');
 
 exports.getAllMedicalLogs = async (req, res) => {
   try {

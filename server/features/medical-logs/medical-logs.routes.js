@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const medicalLogController = require('./medicalLogs.controller');
+const medicalLogController = require('./medical-logs.controller');
 
 router.get('/', medicalLogController.getAllMedicalLogs);
 
