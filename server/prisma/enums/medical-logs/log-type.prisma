@@ -1,0 +1,5 @@
+enum Log_Type{
+  MEDICAL
+  BEHAVIORAL
+  VETERINARIAL
+}
