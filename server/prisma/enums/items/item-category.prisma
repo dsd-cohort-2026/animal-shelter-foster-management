@@ -1,0 +1,5 @@
+enum Item_Category{
+  MEDICINE
+  FOOD
+  CRATE
+}
