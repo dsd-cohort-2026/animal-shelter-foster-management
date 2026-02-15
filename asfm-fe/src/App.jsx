@@ -6,7 +6,7 @@ function App() {
 
   return (
     <>
-    <Button className="bg-secondary text-secondary-foreground font-montserrat">
+    <Button className="bg-secondary text-secondary-foreground font-montserrat text-h2 px-xl py-xl">
       Testing ShadeCn Config
     </Button>
     </>
