@@ -28,6 +28,19 @@ const seedMany = async () => {
         role: "USER",
       },
     ],
+    skipDuplicates: true,
   });
 };
-seedMany();
+
+const main = async () => {
+  try {
+    await seedMany();
+  } catch (seedUserError) {
+    console.log("Error while deleting users: ", { seedUserError });
+    process.exitCode = 1;
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+main();
