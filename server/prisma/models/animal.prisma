@@ -1,0 +1,18 @@
+model Animal {
+  id            String        @id @default(uuid())
+  name          String
+  chip_number   Int           @unique
+  created_at    DateTime      @default(now())
+  dob           DateTime
+  sex           Sex
+  species       Species
+  foster_status Animal_Status
+  kennel_id     Int
+  altered       Boolean
+  weight        Float
+  last_modified DateTime      @updatedAt
+  // FK fields
+  user_id       Int 
+  // relationship fields
+  modified_by   User          @relation(fields: [user_id], references: [id])
+}

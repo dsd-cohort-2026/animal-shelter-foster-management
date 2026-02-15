@@ -7,4 +7,6 @@ model User {
   address     String
   role        Role      @default(USER)
   created_at  DateTime  @default(now())
+  
+  modified_animals Animal[]
 }
