@@ -8,6 +8,11 @@ function App() {
 
 
   return (
+    <>
+    <Button className="bg-secondary text-secondary-foreground font-montserrat text-h2 px-xl py-xl">
+      Testing ShadeCn Config
+    </Button>
+    </>
     <div className="flex items-center justify-center h-screen gap-4">
       <Button variant="outline" onClick={() => addPet({ name: "Dog", type: "dog" })}>Add Dog</Button>
       <Button variant="outline" onClick={() => addPet({ name: "Cat", type: "cat" })}>Add Cat</Button>
