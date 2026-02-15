@@ -1,5 +1,5 @@
 model Animal {
-  id            String           @id @default(uuid())
+  id            String        @id @default(uuid())
   name          String
   chip_number   Int           @unique
   created_at    DateTime      @default(now())
@@ -12,7 +12,7 @@ model Animal {
   weight        Float
   last_modified DateTime      @updatedAt
   // FK fields
-  user_id Int 
+  user_id       Int 
   // relationship fields
-  modified_by User @relation(fields: [user_id], references: [id])
+  modified_by   User          @relation(fields: [user_id], references: [id])
 }
