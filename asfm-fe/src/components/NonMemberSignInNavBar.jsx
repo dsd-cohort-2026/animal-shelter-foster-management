@@ -3,6 +3,11 @@ import { useAuthStore } from "../hooks/useAuthStore";
 
 function TopNavBar() {
   const { isAuthenticated, login, logout } = useAuthStore();
+  // Create an user object with isAdmin property
+  const user = {
+    isAdmin: false, // Change this to true to test admin view
+  };
+
   return (
     <nav className="bg-secondary p-4 flex justify-between">
       <div className="flex flex-grid items-center gap-4">
@@ -10,7 +15,8 @@ function TopNavBar() {
          <div  className="rounded-md-10  text-secondary-foreground border-black-400 px-4 py-2">Logo</div>
         <Button variant="outline" className="rounded-full border border-secondary-foreground hover:bg-secondary-foreground hover:text-secondary">Home</Button>
         {/* is status it not guess add animal div */}
-        {isAuthenticated && <Button variant="outline" className="rounded-full border border-secondary-foreground hover:bg-secondary-foreground hover:text-secondary">Animal</Button>}
+        {isAuthenticated && user.isAdmin && <Button variant="outline" className="rounded-full border border-secondary-foreground hover:bg-secondary-foreground hover:text-secondary">Animal</Button>}
+        {isAuthenticated && !user.isAdmin && <Button variant="outline" className="rounded-full border border-secondary-foreground hover:bg-secondary-foreground hover:text-secondary">Admin Portal</Button>}
       </div>
       <div className="flex items-center gap-4">
         {!isAuthenticated ? (
