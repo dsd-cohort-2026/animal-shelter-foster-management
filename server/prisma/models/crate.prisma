@@ -1,0 +1,6 @@
+model Crate {
+  id      String @id @default(uuid())
+  item_id String
+
+  item Item @relation(fields: [item_id], references: [id])
+}

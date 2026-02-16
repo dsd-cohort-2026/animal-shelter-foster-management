@@ -9,5 +9,6 @@ model Item {
   is_active   Boolean
   created_at  DateTime      @default(now())
   medications Medication[]
-  food        Food[]
+  foods       Food[]
+  crates      Crate[]
 }
