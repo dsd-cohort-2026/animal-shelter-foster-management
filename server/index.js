@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const globalErrorHandler = require("./middleware/global-error-handler");
+const routeNotFoundHandler = require("./middleware/route-not-found");
 require("dotenv").config();
 
 const app = express();
@@ -33,6 +35,10 @@ app.use("/api", require("./routes/index"));
 app.get("/health", (req, res) => {
   res.status(200).json({ message: "Server is healthy" });
 });
+
+// keep these AFTER all routes, and in this order
+app.use(routeNotFoundHandler);
+app.use(globalErrorHandler);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
