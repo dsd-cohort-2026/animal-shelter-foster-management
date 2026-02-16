@@ -9,6 +9,7 @@ router.use('/animals', require('../features/animals/animals.routes'));
 router.use('/medical-logs', require('../features/medical-logs/medical-logs.routes'));
 router.use('/users', require('../features/users/users.routes'));
 router.use('/inventory', require('../features/inventory/inventory.routes'));
+router.use('/inventory-transactions', require('../features/inventory-transaction/inventory-transaction.routes'));
 
 
 module.exports = router;
