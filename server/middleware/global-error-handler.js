@@ -4,7 +4,6 @@ module.exports = globalErrorHandler = (err, req, res, next) => {
 
   const errorDetails = {
     message: err.message,
-    // stack: err.stack,
     route: req.originalUrl,
     method: req.method,
     time: new Date(),
