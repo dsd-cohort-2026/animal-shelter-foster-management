@@ -1,5 +1,6 @@
 import { Button } from "./ui/button";
 import { useAuthStore } from "../hooks/useAuthStore";
+import { useNavigate, useRouter } from '@tanstack/react-router'
 
 function TopNavBar() {
   const { isAuthenticated, login, logout } = useAuthStore();
@@ -7,7 +8,14 @@ function TopNavBar() {
   const user = {
     isAdmin: false, // Change this to true to test admin view
   };
-
+  const navigate = useNavigate();
+  const router = useRouter()
+  
+  const handleAdminPortalClick = () => {
+    navigate({ to: 'adminPortal' }); // Replace with your actual admin portal route
+  };
+  // Debug: Log all routes
+  console.log('Available routes:', router)
   return (
     <nav className="bg-secondary p-4 flex justify-between">
       <div className="flex flex-grid items-center gap-4">
@@ -16,7 +24,7 @@ function TopNavBar() {
         <Button variant="outline" className="rounded-full border border-secondary-foreground hover:bg-secondary-foreground hover:text-secondary">Home</Button>
         {/* is status it not guess add animal div */}
         {isAuthenticated && user.isAdmin && <Button variant="outline" className="rounded-full border border-secondary-foreground hover:bg-secondary-foreground hover:text-secondary">Animal</Button>}
-        {isAuthenticated && !user.isAdmin && <Button variant="outline" className="rounded-full border border-secondary-foreground hover:bg-secondary-foreground hover:text-secondary">Admin Portal</Button>}
+        {isAuthenticated && !user.isAdmin && <Button variant="outline" className="rounded-full border border-secondary-foreground hover:bg-secondary-foreground hover:text-secondary" onClick={handleAdminPortalClick}>Admin Portal</Button>}
       </div>
       <div className="flex items-center gap-4">
         {!isAuthenticated ? (
@@ -26,7 +34,9 @@ function TopNavBar() {
           </>
         ) : (
           <div className="flex items-center gap-4">
-            <Button variant="outline" className="text-secondary-foreground">Profile</Button>
+            <div>
+              <div className="bg-gray-200 px-4 py-2 rounded-2xl"> UserName</div>
+            </div>
             <Button variant="outline" className="text-secondary-foreground" onClick={logout}>Logout</Button>
           </div>
         )}
