@@ -8,6 +8,7 @@ model User {
   role       Role     @default(USER)
   created_at DateTime @default(now())
 
+  // Relationship fields
   modified_animals  Animal[]
   user_assignments  AnimalAssignment[] @relation("User")
   staff_assignments AnimalAssignment[] @relation("Staff")

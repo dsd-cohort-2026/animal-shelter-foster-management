@@ -8,7 +8,9 @@ model Item {
   unit        String
   is_active   Boolean
   created_at  DateTime      @default(now())
-  medications Medication[]
-  foods       Food[]
-  crates      Crate[]
+
+  // Relationship fields
+  medication Medication?
+  food       Food?
+  crate      Crate?
 }

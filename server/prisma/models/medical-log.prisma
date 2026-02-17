@@ -1,5 +1,14 @@
 model MedicalLog {
-  id String @id @default(uuid())
+  id               String    @id @default(uuid())
+  logged_at        DateTime  @default(now())
+  category         Log_Type
+  general_notes    String?
+  behavior_notes   String?
+  qty_administered Float?
+  dose             String?
+  administered_at  DateTime?
+  prescription     String?
+  documents        String?
 
   // FK fields
   foster_user_id String
@@ -11,15 +20,5 @@ model MedicalLog {
   foster_user User             @relation(fields: [foster_user_id], references: [id])
   animal      Animal           @relation(fields: [animal_id], references: [id])
   assignment  AnimalAssignment @relation(fields: [assignment_id], references: [id])
-  medicine    Medication       @relation(fields: [medicine_id], references: [id])
-
-  logged_at        DateTime  @default(now())
-  category         Log_Type
-  general_notes    String?
-  behavior_notes   String?
-  qty_administered Float?
-  dose             String?
-  administered_at  DateTime?
-  prescription     String?
-  documents        String?
+  medicine    Medication?      @relation(fields: [medicine_id], references: [id])
 }
