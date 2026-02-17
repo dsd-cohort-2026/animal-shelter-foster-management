@@ -1,0 +1,20 @@
+model InventoryTransaction {
+  id         String             @id @default(uuid())
+  created_at DateTime           @default(now())
+  quantity   Int
+  status     Transaction_Status
+  type       Transaction_Type
+  notes      String
+
+  // FK fields
+  foster_user_id           String?
+  created_by_staff_user_id String
+  item_id                  String
+  inventory_id             String
+
+  // Relationship fields
+  foster_user User?     @relation("User", fields: [foster_user_id], references: [id])
+  staff_user  User      @relation("Staff", fields: [created_by_staff_user_id], references: [id])
+  item        Item      @relation(fields: [item_id], references: [id])
+  inventory   Inventory @relation(fields: [inventory_id], references: [id])
+}

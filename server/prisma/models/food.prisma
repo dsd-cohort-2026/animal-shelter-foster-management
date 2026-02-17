@@ -1,0 +1,10 @@
+model Food {
+  id         String     @id @default(uuid())
+  life_stage Life_Stage
+
+  // FK fields
+  item_id String @unique
+
+  // Relationship fields
+  item Item @relation(fields: [item_id], references: [id])
+}

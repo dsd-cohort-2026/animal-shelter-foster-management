@@ -1,0 +1,5 @@
+enum Life_Stage {
+  ADOLESCENT
+  ADULT
+  SENIOR
+}

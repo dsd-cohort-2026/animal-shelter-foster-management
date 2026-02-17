@@ -1,0 +1,11 @@
+model Crate {
+  id String @id @default(uuid())
+  size Size
+  status Crate_Status
+
+  // FK fields
+  item_id String @unique
+
+  // Relationship fields
+  item Item @relation(fields: [item_id], references: [id])
+}

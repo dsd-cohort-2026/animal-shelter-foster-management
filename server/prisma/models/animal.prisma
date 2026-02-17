@@ -1,7 +1,7 @@
 model Animal {
   id            String        @id @default(uuid())
   name          String
-  chip_number   Int           @unique
+  chip_id       Int           @unique
   created_at    DateTime      @default(now())
   dob           DateTime
   sex           Sex
@@ -11,8 +11,13 @@ model Animal {
   altered       Boolean
   weight        Float
   last_modified DateTime      @updatedAt
+  picture       String
+
   // FK fields
-  user_id       Int 
+  user_id String
+
   // relationship fields
-  modified_by   User          @relation(fields: [user_id], references: [id])
+  modified_by        User               @relation(fields: [user_id], references: [id])
+  animal_assignments AnimalAssignment[]
+  medical_logs       MedicalLog[]
 }

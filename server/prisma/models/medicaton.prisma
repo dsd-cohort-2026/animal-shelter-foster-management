@@ -1,0 +1,13 @@
+model Medication {
+  id                   String @id @default(uuid())
+  recommended_dose     String
+  side_effects         String
+  administration_route String
+
+  // FK fields
+  item_id String @unique
+
+  // Relationship fields
+  item        Item         @relation(fields: [item_id], references: [id])
+  medicalLogs MedicalLog[]
+}
