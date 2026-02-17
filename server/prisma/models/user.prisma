@@ -13,4 +13,6 @@ model User {
   user_assignments  AnimalAssignment[] @relation("User")
   staff_assignments AnimalAssignment[] @relation("Staff")
   medical_logs      MedicalLog[]
+  user_inventory_transactions InventoryTransaction[] @relation("User")
+  staff_inventory_transactions InventoryTransaction[] @relation("Staff")
 }

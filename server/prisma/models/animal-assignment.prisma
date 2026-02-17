@@ -4,7 +4,7 @@ model AnimalAssignment {
   end_date    DateTime
   status      Assignment_Status
   created_at  DateTime          @default(now())
-  medicalLogs MedicalLog[]
+  medical_logs MedicalLog[]
 
   // FK fields
   animal_id            String

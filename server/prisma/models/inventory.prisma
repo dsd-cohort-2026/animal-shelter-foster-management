@@ -8,4 +8,5 @@ model Inventory {
 
   // Relationship fields
   item Item @relation(fields: [item_id], references: [id])
+  inventory_transactions InventoryTransaction[]
 }

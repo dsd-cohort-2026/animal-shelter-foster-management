@@ -17,6 +17,6 @@ model Animal {
 
   // relationship fields
   modified_by       User               @relation(fields: [user_id], references: [id])
-  animalAssignments AnimalAssignment[]
-  medicalLogs       MedicalLog[]
+  animal_assignments AnimalAssignment[]
+  medical_logs       MedicalLog[]
 }

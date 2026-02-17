@@ -1,4 +1,5 @@
 enum Transaction_Type{
   DISTRIBUTION
   LOAN
+  INTAKE
 }
