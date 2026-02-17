@@ -14,7 +14,7 @@ const { isAuthenticated, login, logout } = useAuthStore();
 
   // Debug: Log all routes
   return (
-    <nav className="bg-secondary p-4 flex justify-between w-fit">
+    <nav className="bg-secondary p-4 flex justify-between">
       <div className="flex  items-center gap-4">
         {/* Create the logo */}
          <div  className="rounded-md  text-secondary-foreground border-black px-4 py-2">Logo</div>
