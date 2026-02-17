@@ -1,0 +1,18 @@
+model AnimalAssignments {
+  id                        String            @id @default(uuid())
+
+  // FK fields
+  animal_id                 String
+  foster_user_id            String
+  assigned_by_staff_id      String
+
+  // Relation fields
+  animal                    Animal            @relation(fields: [animal_id], references: [id])
+  foster_user               User              @relation("User", fields: [foster_user_id], references: [id])
+  assigned_by_staff         User              @relation("Staff", fields: [assigned_by_staff_id], references: [id])
+
+  start_date                DateTime
+  end_date                  DateTime
+  status                    Assignment_Status
+  created_at                DateTime          @default(now())
+}

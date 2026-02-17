@@ -7,7 +7,6 @@ function App() {
   const pets = usePetStore((state) => state.pets)
   const addPet= usePetStore((state) => state.addPet)
 
-
   return (
 
     <div>

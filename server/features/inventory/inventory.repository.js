@@ -25,17 +25,17 @@ exports.findAll = async () => {
 
 exports.update = async (id, data) => {
   const index = inventoryData.findIndex(item => item.id === id);
-
   if (index === -1) {
     return null;
   }
-
   const updatedRecord = {
     ...inventoryData[index],
     ...data,
   };
-
   inventoryData[index] = updatedRecord;
-
   return updatedRecord;
+};
+
+exports.findById = async (id) => {
+  return inventoryData.find(item => item.id === id);
 };
