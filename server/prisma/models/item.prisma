@@ -10,7 +10,8 @@ model Item {
   created_at  DateTime      @default(now())
 
   // Relationship fields
-  medication Medication?
-  food       Food?
-  crate      Crate?
+  medication Medication[]
+  food       Food[]
+  crate      Crate[]
+  inventory  Inventory[]
 }
