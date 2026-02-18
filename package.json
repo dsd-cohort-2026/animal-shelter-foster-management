@@ -1,0 +1,20 @@
+{
+  "name": "animal-shelter-foster-management",
+  "private": true,
+  "scripts": {
+    "lint": "eslint \"asfm-fe/**/*.{js,jsx}\" \"server/**/*.js\"",
+    "lint:fix": "npm run lint -- --fix",
+    "format": "prettier --write \"asfm-fe/**/*.{js,jsx,css,html,json,md}\" \"server/**/*.js\" \"server/**/*.json\" \".github/workflows/*.{yml,yaml}\"",
+    "format:check": "prettier --check \"asfm-fe/**/*.{js,jsx,css,html,json,md}\" \"server/**/*.js\" \"server/**/*.json\" \".github/workflows/*.{yml,yaml}\"",
+    "build:frontend": "npm --prefix asfm-fe run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "prettier": "^3.2.5"
+  }
+}

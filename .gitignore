@@ -23,12 +23,10 @@ dist-ssr/
 # Coverage
 coverage/
 
-# Prettier
-.prettier*
-
 # Misc
 *.local
 *.cache
+.prettier-cache
 
 # Editor directories and files
 .vscode/*

@@ -1,0 +1,7 @@
+node_modules
+asfm-fe/node_modules
+server/node_modules
+dist
+build
+coverage
+server/generated
