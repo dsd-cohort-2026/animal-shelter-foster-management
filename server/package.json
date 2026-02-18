@@ -16,7 +16,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "postinstall": "prisma generate",
     "test": "echo \"No tests specified\" && exit 0",
+    "start": "node index.js",
     "dev": "nodemon index.js",
     "migrate": "npx prisma migrate dev --name"
   },

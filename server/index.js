@@ -6,25 +6,37 @@ require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || 8080;
-// Configure allowed CORS origins via environment variable (comma-separated), defaulting to localhost for development
-const allowedOrigins = (
-  process.env.CORS_ALLOWED_ORIGINS || "http://localhost:3000"
-)
+const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || "")
   .split(",")
   .map((origin) => origin.trim())
   .filter((origin) => origin.length > 0);
+const isProduction = process.env.NODE_ENV === "production";
+
+function isLocalDevOrigin(origin) {
+  try {
+    const url = new URL(origin);
+    return (
+      (url.hostname === "localhost" || url.hostname === "127.0.0.1") &&
+      (url.protocol === "http:" || url.protocol === "https:")
+    );
+  } catch {
+    return false;
+  }
+}
 
 // Middleware
 app.use(
   cors({
     origin: function (origin, callback) {
       // Allow requests with no origin (e.g., mobile apps, curl) or if origin is explicitly allowed
-      if (!origin || allowedOrigins.includes(origin)) {
+      const isExplicitlyAllowed = allowedOrigins.includes(origin);
+      const isAllowedLocalDevOrigin = !isProduction && isLocalDevOrigin(origin);
+
+      if (!origin || isExplicitlyAllowed || isAllowedLocalDevOrigin) {
         return callback(null, true);
       }
       return callback(new Error("Not allowed by CORS"));
     },
-    origin: "http://localhost:3000",
     credentials: true,
   }),
 );

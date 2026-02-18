@@ -1,0 +1,76 @@
+name: Validation
+
+on:
+  pull_request:
+    paths:
+      - "asfm-fe/**"
+      - "server/**"
+      - ".github/workflows/**"
+  push:
+    branches:
+      - main
+    paths:
+      - "asfm-fe/**"
+      - "server/**"
+      - ".github/workflows/**"
+
+permissions:
+  contents: read
+
+jobs:
+  frontend-ci:
+    name: Frontend lint and build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: asfm-fe
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: asfm-fe/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+  backend-ci:
+    name: Backend install and smoke checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    env:
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/postgres
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Syntax check
+        run: node --check index.js
+
+      - name: Run tests
+        run: npm test
