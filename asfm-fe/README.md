@@ -2,6 +2,30 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## Project Commands
+
+Run these from the repository root (`animal-shelter-foster-management/`):
+
+```bash
+npm install
+npm run format
+npm run lint
+```
+
+Check-only commands (no file changes):
+
+```bash
+npm run format:check
+npm run lint
+```
+
+Run frontend locally:
+
+```bash
+npm --prefix asfm-fe install
+npm --prefix asfm-fe run dev
+```
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh

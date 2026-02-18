@@ -1,4 +1,4 @@
-module.exports = globalErrorHandler = (err, req, res, next) => {
+const globalErrorHandler = (err, req, res, next) => {
   // immediately make visible in the server
   console.error("Global error handler caught:", err);
 
@@ -29,3 +29,5 @@ module.exports = globalErrorHandler = (err, req, res, next) => {
 
   res.status(statusCode).json({ success: false, message });
 };
+
+module.exports = globalErrorHandler;

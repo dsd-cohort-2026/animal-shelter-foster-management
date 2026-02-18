@@ -47,6 +47,23 @@ server/
    npm install
    ```
 
+### Linting and Formatting
+
+Run these commands from the repository root (`animal-shelter-foster-management/`):
+
+```bash
+npm install
+npm run format
+npm run lint
+```
+
+Check-only commands (no file changes):
+
+```bash
+npm run format:check
+npm run lint
+```
+
 ### Running the Server
 
 Start the development server:
