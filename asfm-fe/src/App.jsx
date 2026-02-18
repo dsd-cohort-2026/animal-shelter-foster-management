@@ -1,27 +1,20 @@
 import './App.css'
 import { Button } from './components/ui/button'
 import { usePetStore } from './hooks/useStore'
+import  TopNavBar  from './components/NonMemberSignInNavBar'
 
 function App() {
   const pets = usePetStore((state) => state.pets)
   const addPet= usePetStore((state) => state.addPet)
 
   return (
+
     <>
+      <TopNavBar/>
+      <div className="flex items-center justify-center h-screen gap-4">
       <Button className="bg-secondary text-secondary-foreground font-montserrat text-h2 px-xl py-xl">
         Testing ShadeCn Config
       </Button>
-      <div className="flex items-center justify-center h-screen gap-4">
-        <Button variant="outline" onClick={() => addPet({ name: "Dog", type: "dog" })}>Add Dog</Button>
-        <Button variant="outline" onClick={() => addPet({ name: "Cat", type: "cat" })}>Add Cat</Button>
-        <div>
-          {pets.map((pet) => (
-            <div key={pet.id} className="p-4 border rounded">
-              <h3 className="text-lg font-semibold">{pet.name}</h3>
-              <p className="text-sm text-gray-500">{pet.type}</p>
-            </div>
-          ))}
-        </div>
       </div>
     </>
   )
