@@ -1,4 +1,4 @@
 enum Assignment_Status{
-  PENDING
-  APPROVED
+  ACTIVE
+  COMPLETE
 }
