@@ -1,0 +1,12 @@
+model AnimalModification{
+  id          String   @id @default(uuid())
+  created_at  DateTime @default(now())
+
+  // FK fields
+  animal_id       String
+  staff_user_id   String
+
+  // Relation fields
+  animal      Animal @relation(fields: [animal_id], references: [id])
+  staff_user  User   @relation(fields: [staff_user_id], references: [id])
+}
