@@ -16,7 +16,7 @@ module.exports = authMiddleware = async (req, res, next) => {
   });
 
   if (user.role !== 'STAFF' && user.role !== 'USER') {
-    const err = new Error('You are not authorized to do this!');
+    const err = new Error('You must sign in!');
     err.statusCode = 401;
     return next(err);
   }
