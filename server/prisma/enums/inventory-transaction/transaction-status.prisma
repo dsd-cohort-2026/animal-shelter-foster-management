@@ -1,6 +1,4 @@
 enum Transaction_Status{
-  PENDING
   COMPLETE
   ACTIVE
-  RETURNED
 }

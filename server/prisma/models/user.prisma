@@ -9,10 +9,10 @@ model User {
   created_at DateTime @default(now())
 
   // Relationship fields
-  modified_animals             Animal[]
   user_assignments             AnimalAssignment[]     @relation("User")
   staff_assignments            AnimalAssignment[]     @relation("Staff")
   medical_logs                 MedicalLog[]
   user_inventory_transactions  InventoryTransaction[] @relation("User")
   staff_inventory_transactions InventoryTransaction[] @relation("Staff")
+  staff_animal_changes         AnimalModification[]
 }

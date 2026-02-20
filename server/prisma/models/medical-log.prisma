@@ -11,14 +11,14 @@ model MedicalLog {
   documents        String?
 
   // FK fields
-  foster_user_id String
+  foster_user_id String?
   animal_id      String
-  assignment_id  String
-  medication_id  String
+  assignment_id  String?
+  medication_id  String?
 
   // Relation fields
-  foster_user User             @relation(fields: [foster_user_id], references: [id])
-  animal      Animal           @relation(fields: [animal_id], references: [id])
-  assignment  AnimalAssignment @relation(fields: [assignment_id], references: [id])
-  medication  Medication?      @relation(fields: [medication_id], references: [id])
+  foster_user User?             @relation(fields: [foster_user_id], references: [id])
+  animal      Animal            @relation(fields: [animal_id], references: [id])
+  assignment  AnimalAssignment? @relation(fields: [assignment_id], references: [id])
+  medication  Medication?       @relation(fields: [medication_id], references: [id])
 }
