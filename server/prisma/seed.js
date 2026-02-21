@@ -586,6 +586,44 @@ main();
 const item1 = await prisma.item.create({
   data: {
     category: 'FOOD',
+    name: 'Wet Cat Food',
+    brand: 'Fancy Feast',
+    description: 'Fancy Feast Chicken Pate',
+    species: 'CAT',
+    unit: 'can',
+    is_active: true,
+    inventory: {
+      create: {
+        quantity: 40,
+        expiration_date: new Date('November 11 2028'),
+      },
+    },
+    food: { create: { life_stage: 'ADULT' } },
+  },
+});
+
+const item2 = await prisma.item.create({
+  data: {
+    category: 'FOOD',
+    name: 'Dog Food 28 lb.',
+    brand: 'Blue Buffalo',
+    description: 'Blue Buffalo Life Protection Dog food 28 lb.',
+    species: 'DOG',
+    unit: 'LB',
+    is_active: true,
+    inventory: {
+      create: {
+        quantity: 12,
+        expiration_date: new Date('August 11 2026'),
+      },
+    },
+    food: { create: { life_stage: 'SENIOR' } },
+  },
+});
+
+const item3 = await prisma.item.create({
+  data: {
+    category: 'FOOD',
     name: 'Dog Food 14 lb.',
     brand: 'Iams',
     description: 'Iams Dog Food 14 lb.',
@@ -598,22 +636,207 @@ const item1 = await prisma.item.create({
         expiration_date: new Date('July 16 2026'),
       },
     },
-    medication: {
+    food: { create: { life_stage: 'ADULT' } },
+  },
+});
+
+const item4 = await prisma.item.create({
+  data: {
+    category: 'FOOD',
+    name: 'Cat Food 10 lb.',
+    brand: 'Iams',
+    description: 'Iams Proactive Health Indoor Cat Food 10 lb.',
+    species: 'CAT',
+    unit: 'LB',
+    is_active: true,
+    inventory: {
       create: {
-        recommended_dose: '8 oz., 2 Times / Day',
-        side_effects: 'drowsiness',
-        administration_route: `i'm not sure what this means`,
+        quantity: 8,
+        expiration_date: new Date('May 13 2026'),
       },
     },
+    food: { create: { life_stage: 'SENIOR' } },
+  },
+});
 
-    // food: { create: { life_stage: 'ADULT' } },
+const item5 = await prisma.item.create({
+  data: {
+    category: 'MEDICINE',
+    name: 'Flea & Tick Treatment 3 ct.',
+    brand: 'Frontline Plus',
+    description: 'Frontline Plus Flea & Tick Treatment for Dogs 3 ct.',
+    species: 'DOG',
+    unit: 'CT',
+    is_active: true,
+    inventory: {
+      create: {
+        quantity: 45,
+        expiration_date: new Date('January 10 2028'),
+      },
+    },
+    medication: {
+      create: {
+        recommended_dose: '1 dose monthly (three month supply)',
+        side_effects: 'skin irritation at application site; itching, lethargy',
+        administration_route: 'topical',
+      },
+    },
+  },
+});
 
-    // crate: {
+const item6 = await prisma.item.create({
+  data: {
+    category: 'MEDICINE',
+    name: 'Heartgard Plus Chewables 6 ct.',
+    brand: 'Heartgard',
+    description: 'Heartgard Plus Heartwork Prevention Chewables 6 ct.',
+    species: 'DOG',
+    unit: 'CT',
+    is_active: true,
+    inventory: {
+      create: {
+        quantity: 20,
+        expiration_date: new Date('November 16 2028'),
+      },
+    },
+    medication: {
+      create: {
+        recommended_dose: '1 chew monthly (six month supply)',
+        side_effects: 'vomiting; diarrhea; decreased appetite',
+        administration_route: 'oral',
+      },
+    },
+  },
+});
+
+const item7 = await prisma.item.create({
+  data: {
+    category: 'MEDICINE',
+    name: 'Hairball Remedy Gel 4.4 oz.',
+    brand: 'Lexatone',
+    description: 'Lexatone Hairball Remedy Gel 4.4 oz.',
+    species: 'CAT',
+    unit: 'OZ',
+    is_active: true,
+    inventory: {
+      create: {
+        quantity: 5,
+        expiration_date: new Date('January 20 2027'),
+      },
+    },
+    medication: {
+      create: {
+        recommended_dose: 'gel administered as needed',
+        side_effects: 'soft stool; lack of appetite',
+        administration_route: 'oral',
+      },
+    },
+  },
+});
+
+const item8 = await prisma.item.create({
+  data: {
+    category: 'MEDICINE',
+    name: 'Calming Diffuser Refill 1 ct.',
+    brand: 'Feliway',
+    description: 'Feliway Classic Calming Diffuser Refill 1 ct.',
+    species: 'CAT',
+    unit: 'CT',
+    is_active: true,
+    inventory: {
+      create: {
+        quantity: 8,
+        expiration_date: new Date('January 16 2029'),
+      },
+    },
+    medication: {
+      create: {
+        recommended_dose: 'plug in diffuser and use continuously; replace when empty',
+        side_effects: 'mild sneezing',
+        administration_route: 'inhalation',
+      },
+    },
+  },
+});
+
+const item9 = await prisma.item.create({
+  data: {
+    category: 'CRATE',
+    name: 'Wire Dog Crate 42 in.',
+    brand: 'Midwest',
+    description: 'Midwest Double Door Wire Dog Crate 42 in.',
+    species: 'DOG',
+    unit: 'IN',
+    is_active: true,
+    inventory: {
+      create: {
+        quantity: 4,
+      },
+    },
+      crate: {
+        create: {
+          size: 'LARGE',
+          status: 'AVAILABLE',
+        },
+      },
+  },
+});
+
+const item10 = await prisma.item.create({
+  data: {
+    category: 'CRATE',
+    name: 'Cat Carrier 19 in.',
+    brand: 'Petmate',
+    description: 'Petmate Two Door Top Load Cat Carrier 19 in.',
+    species: 'CAT',
+    unit: 'IN',
+    is_active: true,
+    inventory: {
+      create: {
+        quantity: 8,
+      },
+    },
+      crate: {
+        create: {
+          size: 'SMALL',
+          status: 'AVAILABLE',
+        },
+      },
+  },
+});
+
+// Item template if still needed
+const item11 = await prisma.item.create({
+  data: {
+    category: 'FOOD',
+    name: 'Dog Food 14 lb.',
+    brand: 'Iams',
+    description: 'Iams Dog Food 14 lb.',
+    species: 'DOG',
+    unit: 'LB',
+    is_active: true,
+    inventory: {
+      create: {
+        quantity: 20,
+        expiration_date: new Date('July 16 2026'),
+      },
+    },
+    // medication: {
     //   create: {
-    //     size: 'LARGE',
-    //     status: 'LOANED',
+    //     recommended_dose: '8 oz., 2 Times / Day',
+    //     side_effects: 'drowsiness',
+    //     administration_route: `i'm not sure what this means`,
     //   },
     // },
+
+      food: { create: { life_stage: 'ADULT' } },
+
+      // crate: {
+      //   create: {
+      //     size: 'LARGE',
+      //     status: 'LOANED',
+      //   },
+      // },
   },
 });
 
