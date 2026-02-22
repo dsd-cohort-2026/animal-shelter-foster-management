@@ -7,9 +7,9 @@ import {
   TableRow as ShadcnTableRow,
 } from "@/components/ui/table";
 
-export function ReusableTable({ columns , data , headerClassName="" , tablebodyRowClassName="" }) {
+export function ReusableTable({ columns , data , headerClassName="" , tablebodyRowClassName="" , containerClassName=""}) {
   return (
-    <div className="overflow-auto max-h-150 rounded-lg border border-pale-sky shadow-sm">
+    <div className={containerClassName}>
       <Table>
         <ShadcnTableHeader className={`sticky top-0 z-10 ${headerClassName}`}>
             <ShadcnTableRow>
