@@ -3,10 +3,29 @@ import FilterSelect from './components/custom/FilterSelect'
 import { Button } from './components/ui/button'
 import { usePetStore } from './hooks/useStore'
 import  TopNavBar  from './components/NonMemberSignInNavBar'
+import {ReusableTable} from './components/table_components'
+import {mockLoanedItems} from './features/mockLoanedItems'
 
 function App() {
   const pets = usePetStore((state) => state.pets)
   const addPet= usePetStore((state) => state.addPet)
+  // src/features/loaned-items/loanedItemsColumns.js
+ const loanedItemsColumns = [
+    {
+      accessorKey: "itemDescription",
+      header: "Item Description",
+      textSize: "md",
+      headClassName: "min-w-[160px]",
+    },
+    {
+      accessorKey: "userId",
+      header: "User ID",
+      textSize: "sm",
+      headClassName: "w-[120px] text-center",
+      cellClassName: "text-center",
+    },
+  ]
+
 
   return (
 
@@ -17,6 +36,7 @@ function App() {
         Testing ShadeCn Config
       </Button>
       <FilterSelect selectTriggerClassName="w-[300px]" selectItems={["approved", "pending", "denied"]} />
+      <ReusableTable columns={loanedItemsColumns} data={mockLoanedItems} headerClassName="bg-secondary text-primary-foreground sticky top-0 z-0" />
       </div>
     </>
   )
