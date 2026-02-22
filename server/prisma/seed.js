@@ -789,6 +789,164 @@ const seedTheBase = async () => {
         inventory_id: item10.inventory.id,
       },
     });
+
+    const medicalLog1 = await tx.medicalLog.create({
+      data: {
+        category: 'MEDICAL',
+        general_notes: "he's a good boy",
+        behavioral_notes: 'refer to the general notes',
+        quantity_administered: '30 capsules prescribed',
+        dose: '1 capsule / day',
+        administered_at: new Date(),
+        prescription: '30 capsules taken by mouth, 1 / day',
+        documents: 'not really sure what will go here',
+
+        foster_user_id: user2.id,
+        animal_id: animal1,
+        assignment_id: animal1.animal_assignments.id,
+        medication_id: item5.medication.id,
+      },
+    });
+
+    const medicalLog2 = await tx.medicalLog.create({
+      data: {
+        category: 'MEDICAL',
+        general_notes: "Gave monthly preventative with food",
+        behavioral_notes: 'Slightly restless for 30 minutes after handling',
+        quantity_administered: 'one chew administered',
+        dose: '1 chew',
+        administered_at: new Date(),
+        prescription: 'Administer one chew by mouth once monthly with a meal',
+        documents: 'not really sure what will go here',
+
+        foster_user_id: user2.id,
+        animal_id: animal1,
+        assignment_id: animal1.animal_assignments.id,
+        medication_id: item6.medication.id,
+      },
+    });
+
+    const medicalLog3 = await tx.medicalLog.create({
+      data: {
+        category: 'MEDICAL',
+        general_notes: "Administered dose with meal.",
+        quantity_administered: '1 capsule administered (day 1 of 30)',
+        dose: '1 capsule / day',
+        administered_at: new Date(),
+        prescription: '30 capsules taken by mouth, 1 / day, with food',
+        documents: 'not really sure what will go here',
+
+        foster_user_id: user2.id,
+        animal_id: animal1,
+        assignment_id: animal1.animal_assignments.id,
+        medication_id: item7.medication.id,
+      },
+    });
+
+    const medicalLog4 = await tx.medicalLog.create({
+      data: {
+        category: 'BEHAVIORAL',
+        general_notes: "Lethargic and sleeping a lot",
+        behavioral_notes: 'refer to the general notes',
+        quantity_administered: '30 capsules prescribed',
+
+        foster_user_id: user2.id,
+        animal_id: animal1,
+        assignment_id: animal1.animal_assignments.id,
+        medication_id: item1.medication.id,
+      },
+    });
+
+    const medicalLog5 = await tx.medicalLog.create({
+      data: {
+        category: 'VETERINARY',
+        general_notes: "Gaining weight",
+        behavioral_notes: 'Less lethargic',
+        documents: 'not really sure what will go here',
+
+        foster_user_id: user2.id,
+        animal_id: animal1,
+        assignment_id: animal1.animal_assignments.id,
+        medication_id: item1.medication.id,
+      },
+    });
+
+    const medicalLog6 = await tx.medicalLog.create({
+      data: {
+        category: 'MEDICAL',
+        general_notes: "he's a good boy",
+        behavioral_notes: 'refer to the general notes',
+        quantity_administered: '30 capsules prescribed',
+        dose: '1 capsule / day',
+        administered_at: new Date(),
+        prescription: '30 capsules taken by mouth, 1 / day',
+        documents: 'not really sure what will go here',
+
+        foster_user_id: user4.id,
+        animal_id: animal1.id,
+        assignment_id: animal1.animal_assignments.id,
+        medication_id: item5.medication.id,
+      },
+    });
+
+    const medicalLog7 = await tx.medicalLog.create({
+      data: {
+        category: 'MEDICAL',
+        general_notes: "he's a good boy",
+        behavioral_notes: 'refer to the general notes',
+        quantity_administered: '30 capsules prescribed',
+        dose: '1 capsule / day',
+        administered_at: new Date(),
+        prescription: '30 capsules taken by mouth, 1 / day',
+        documents: 'not really sure what will go here',
+
+        foster_user_id: user7.id,
+        animal_id: animal5.id,
+        assignment_id: animal5.animal_assignments.id,
+        medication_id: item7.medication.id,
+      },
+    });
+
+    const medicalLog8 = await tx.medicalLog.create({
+      data: {
+        category: 'BEHAVIORAL',
+        general_notes: 'tempered demeanor',
+        behavioral_notes: 'laaaaaaaiiiiiddd back',
+
+        animal_id: animal9.id,
+      },
+    });
+
+    const medicalLog9 = await tx.medicalLog.create({
+      data: {
+        category: 'BEHAVIORAL',
+        general_notes: "we've got a biter",
+        behavioral_notes: 'strong jaw',
+        documents: 'not really sure what will go here',
+
+        foster_user_id: user9.id,
+        animal_id: animal1.id,
+        assignment_id: animal1.animal_assignments.id,
+      },
+    });
+
+    const medicalLog10 = await tx.medicalLog.create({
+      data: {
+        category: 'VETERINARY',
+        general_notes: 'routine checkup, renwe prescription',
+        behavioral_notes: 'no notes',
+        quantity_administered: '30 capsules prescribed',
+        dose: '1 capsule / day',
+        administered_at: new Date(),
+        prescription: '30 capsules taken by mouth, 1 / day',
+        documents: 'not really sure what will go here',
+
+        foster_user_id: user4.id,
+        animal_id: animal4.id,
+        assignment_id: animal4.animal_assignments.id,
+        medication_id: item8.medication.id,
+      },
+    });
   });
 };
 
@@ -805,83 +963,3 @@ const main = async () => {
 
 main();
 
-const medicalLog1 = await tx.medicalLog.create({
-  data: {
-    category: 'MEDICAL',
-    general_notes: "he's a good boy",
-    behavioral_notes: 'refer to the general notes',
-    quantity_administered: '30 capsules prescribed',
-    dose: '1 capsule / day',
-    administered_at: new Date(),
-    prescription: '30 capsules taken by mouth, 1 / day',
-    documents: 'not really sure what will go here',
-
-    foster_user_id: user2.id,
-    animal_id: animal1,
-    assignment_id: animal1.animal_assignments.id,
-    medication_id: item5.medication.id,
-  },
-});
-
-const medicalLog2 = await tx.medicalLog.create({
-  data: {
-    category: 'MEDICAL',
-    general_notes: "Gave monthly preventative with food",
-    behavioral_notes: 'Slightly restless for 30 minutes after handling',
-    quantity_administered: 'one chew administered',
-    dose: '1 chew',
-    administered_at: new Date(),
-    prescription: 'Administer one chew by mouth once monthly with a meal',
-    documents: 'not really sure what will go here',
-
-    foster_user_id: user2.id,
-    animal_id: animal1,
-    assignment_id: animal1.animal_assignments.id,
-    medication_id: item6.medication.id,
-  },
-});
-
-const medicalLog3 = await tx.medicalLog.create({
-  data: {
-    category: 'MEDICAL',
-    general_notes: "Administered dose with meal.",
-    quantity_administered: '1 capsule administered (day 1 of 30)',
-    dose: '1 capsule / day',
-    administered_at: new Date(),
-    prescription: '30 capsules taken by mouth, 1 / day, with food',
-    documents: 'not really sure what will go here',
-
-    foster_user_id: user2.id,
-    animal_id: animal1,
-    assignment_id: animal1.animal_assignments.id,
-    medication_id: item7.medication.id,
-  },
-});
-
-const medicalLog4 = await tx.medicalLog.create({
-  data: {
-    category: 'BEHAVIORAL',
-    general_notes: "Lethargic and sleeping a lot",
-    behavioral_notes: 'refer to the general notes',
-    quantity_administered: '30 capsules prescribed',
-
-    foster_user_id: user2.id,
-    animal_id: animal1,
-    assignment_id: animal1.animal_assignments.id,
-    medication_id: item1.medication.id,
-  },
-});
-
-const medicalLog5 = await tx.medicalLog.create({
-  data: {
-    category: 'VETERINARY',
-    general_notes: "Gaining weight",
-    behavioral_notes: 'Less lethargic',
-    documents: 'not really sure what will go here',
-
-    foster_user_id: user2.id,
-    animal_id: animal1,
-    assignment_id: animal1.animal_assignments.id,
-    medication_id: item1.medication.id,
-  },
-});
