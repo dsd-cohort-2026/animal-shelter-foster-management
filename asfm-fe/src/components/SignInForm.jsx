@@ -48,6 +48,9 @@ function SignInForm() {
               <FieldGroup>
                 <form.Field
                   name="email"
+                  validators={{
+                    onSubmit: ({ value }) => (value === '' ? 'Email is required' : undefined),
+                  }}
                   children={(field) => {
                     const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                     return (
@@ -64,6 +67,9 @@ function SignInForm() {
                           aria-invalid={isInvalid}
                         />
                         {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                        {field.state.meta.errorMap['onSubmit'] ? (
+                          <FieldError>{field.state.meta.errorMap['onSubmit']}</FieldError>
+                        ) : null}
                       </Field>
                     );
                   }}
