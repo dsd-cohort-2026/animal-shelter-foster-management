@@ -4,7 +4,7 @@ model AnimalModification{
 
   // FK fields
   animal_id       String
-  staff_user_id   String
+  staff_user_id   String  @db.Uuid
 
   // Relation fields
   animal      Animal @relation(fields: [animal_id], references: [id])

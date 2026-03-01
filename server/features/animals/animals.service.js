@@ -3,11 +3,9 @@ const animalRepository = require('./animals.repository');
 exports.getAllAnimals = async () => {
   const animals = await animalRepository.findAll();
 
-  const formattedAnimals = animals.map(animal => {
+  const formattedAnimals = animals.map((animal) => {
     const name = typeof animal.name === 'string' ? animal.name : '';
-    const formattedName = name.length > 0
-      ? name.slice(0, 1).toUpperCase() + name.slice(1)
-      : name;
+    const formattedName = name.length > 0 ? name.slice(0, 1).toUpperCase() + name.slice(1) : name;
 
     return {
       id: animal.id,
@@ -23,19 +21,17 @@ exports.getAllAnimals = async () => {
       weight: animal.weight,
       last_modified: animal.last_modified,
       picture: animal.picture,
-      user_id: animal.user_id
+      user_id: animal.user_id,
     };
   });
   return formattedAnimals;
-}
+};
 
 exports.getAnimalById = async (id) => {
   const animal = await animalRepository.findById(id);
   const name = typeof animal.name === 'string' ? animal.name : '';
 
-  const formattedName = name.length > 0
-    ? name.slice(0, 1).toUpperCase() + name.slice(1)
-    : name;
+  const formattedName = name.length > 0 ? name.slice(0, 1).toUpperCase() + name.slice(1) : name;
 
   return {
     id: animal.id,
@@ -51,6 +47,22 @@ exports.getAnimalById = async (id) => {
     weight: animal.weight,
     last_modified: animal.last_modified,
     picture: animal.picture,
-    user_id: animal.user_id
+    user_id: animal.user_id,
   };
-}
+};
+
+exports.createAnimal = async (body) => {
+  // json doesnt like dates, zod doesnt like json, prisma just wants a Date
+  //    - safest(?) place to convert is below
+  try {
+    const newAnimal = await animalRepository.createAnimal({
+      ...body,
+      dob: new Date(body.dob),
+      last_modified: new Date(body.last_modified),
+    });
+    return newAnimal;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};

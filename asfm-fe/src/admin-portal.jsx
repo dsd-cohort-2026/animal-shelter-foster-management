@@ -1,7 +1,11 @@
-import BasicNavBar from "@/components/basicNavBar";
 function AdminPortal() {
     return (
-        <BasicNavBar/>
+        // Admin portal page content goes here
+        <div className='flex justify-center pt-2'>
+            <div className='flex justify-center pt-2'>
+                Admin Portal
+            </div>
+        </div>
     );
 }
 

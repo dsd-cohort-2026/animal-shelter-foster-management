@@ -13,123 +13,20 @@ const seedTheBase = async () => {
   await prisma.crate.deleteMany({});
   await prisma.inventory.deleteMany({});
   await prisma.item.deleteMany({});
-  await prisma.user.deleteMany({});
   await prisma.animal.deleteMany({});
+
+  // leave users since theyre created via auth on the front-end
+  // await prisma.user.deleteMany({});
+
+  // get and filter staff vs reg users
+  const users = await prisma.user.findMany();
+  const [user1, user2] = users.filter((user) => user.role === 'USER');
+  const [staff1] = users.filter((user) => user.role === 'STAFF');
+  console.log({ user1, user2, staff1 });
 
   // wrap all seeding in $transaction ["atomic" -> all or nothing]
   const result = await prisma.$transaction(
     async (tx) => {
-      // 10 total users: users: 1-3 (STAFF), users: 4-10 (USER)
-      const user1 = await tx.user.create({
-        data: {
-          first_name: 'Bob',
-          last_name: 'Jenkinson',
-          email: 'b.jenkinson@gmail.com',
-          phone: '123-456-7890',
-          address: 'New York',
-          role: 'STAFF',
-        },
-      });
-
-      const user2 = await tx.user.create({
-        data: {
-          first_name: 'Midge',
-          last_name: 'Weston',
-          email: 'weston@gmail.com',
-          phone: '098-765-4321',
-          address: 'Wyoming',
-          role: 'STAFF',
-        },
-      });
-
-      const user3 = await tx.user.create({
-        data: {
-          first_name: 'Glenn',
-          last_name: 'Pritcher',
-          email: 'pritcher@hotmail.com',
-          phone: '555-555-5555',
-          address: 'California',
-          role: 'STAFF',
-        },
-      });
-
-      const user4 = await tx.user.create({
-        data: {
-          first_name: 'Sara',
-          last_name: 'Dunmore',
-          email: 's.dunmore@gmail.com',
-          phone: '312-847-9021',
-          address: 'Illinois',
-          role: 'USER',
-        },
-      });
-
-      // missing: defined role (default)
-      const user5 = await tx.user.create({
-        data: {
-          first_name: 'Carlos',
-          last_name: 'Vega',
-          email: 'c.vega@yahoo.com',
-          phone: '713-204-5678',
-          address: 'Texas',
-        },
-      });
-
-      const user6 = await tx.user.create({
-        data: {
-          first_name: 'Priya',
-          last_name: 'Nair',
-          email: 'p.nair@gmail.com',
-          phone: '404-339-1122',
-          address: 'Georgia',
-          role: 'USER',
-        },
-      });
-
-      const user7 = await tx.user.create({
-        data: {
-          first_name: 'Tommy',
-          last_name: 'Halbert',
-          email: 'thalbert@outlook.com',
-          phone: '206-778-4490',
-          address: 'Washington',
-          role: 'USER',
-        },
-      });
-
-      const user8 = await tx.user.create({
-        data: {
-          first_name: 'Dana',
-          last_name: 'Osei',
-          email: 'd.osei@gmail.com',
-          phone: '617-552-8834',
-          address: 'Massachusetts',
-          role: 'USER',
-        },
-      });
-
-      const user9 = await tx.user.create({
-        data: {
-          first_name: 'Kenji',
-          last_name: 'Morrow',
-          email: 'k.morrow@hotmail.com',
-          phone: '503-491-7763',
-          address: 'Oregon',
-          role: 'USER',
-        },
-      });
-
-      const user10 = await tx.user.create({
-        data: {
-          first_name: 'Lena',
-          last_name: 'Hartwell',
-          email: 'lhartwell@gmail.com',
-          phone: '702-883-2215',
-          address: 'Nevada',
-          role: 'USER',
-        },
-      });
-
       const animal1 = await tx.animal.create({
         data: {
           name: 'Drogo',
@@ -148,11 +45,11 @@ const seedTheBase = async () => {
               start_date: new Date(),
               end_date: new Date('March 31 2026'),
               status: 'ACTIVE',
-              foster_user_id: user9.id,
-              assigned_by_staff_id: user1.id,
+              foster_user_id: user1.id,
+              assigned_by_staff_id: staff1.id,
             },
           },
-          modified_by: { create: { staff_user_id: user1.id } },
+          modified_by: { create: { staff_user_id: staff1.id } },
         },
         include: { animal_assignments: true },
       });
@@ -175,11 +72,11 @@ const seedTheBase = async () => {
               start_date: new Date(),
               end_date: new Date('May 31 2031'),
               status: 'ACTIVE',
-              foster_user_id: user9.id,
-              assigned_by_staff_id: user1.id,
+              foster_user_id: user2.id,
+              assigned_by_staff_id: staff1.id,
             },
           },
-          modified_by: { create: { staff_user_id: user1.id } },
+          modified_by: { create: { staff_user_id: staff1.id } },
         },
         include: { animal_assignments: true },
       });
@@ -202,11 +99,11 @@ const seedTheBase = async () => {
             create: {
               start_date: new Date(),
               status: 'ACTIVE',
-              foster_user_id: user4.id,
-              assigned_by_staff_id: user2.id,
+              foster_user_id: user2.id,
+              assigned_by_staff_id: staff1.id,
             },
           },
-          modified_by: { create: { staff_user_id: user2.id } },
+          modified_by: { create: { staff_user_id: staff1.id } },
         },
         include: { animal_assignments: true },
       });
@@ -229,11 +126,11 @@ const seedTheBase = async () => {
               start_date: new Date(),
               end_date: new Date('October 21 2029'),
               status: 'ACTIVE',
-              foster_user_id: user4.id,
-              assigned_by_staff_id: user2.id,
+              foster_user_id: user1.id,
+              assigned_by_staff_id: staff1.id,
             },
           },
-          modified_by: { create: { staff_user_id: user2.id } },
+          modified_by: { create: { staff_user_id: staff1.id } },
         },
         include: { animal_assignments: true },
       });
@@ -256,11 +153,11 @@ const seedTheBase = async () => {
               start_date: new Date(),
               end_date: new Date('February 21 2027'),
               status: 'ACTIVE',
-              foster_user_id: user7.id,
-              assigned_by_staff_id: user3.id,
+              foster_user_id: user2.id,
+              assigned_by_staff_id: staff1.id,
             },
           },
-          modified_by: { create: { staff_user_id: user2.id } },
+          modified_by: { create: { staff_user_id: staff1.id } },
         },
         include: { animal_assignments: true },
       });
@@ -283,11 +180,11 @@ const seedTheBase = async () => {
               start_date: new Date(),
               end_date: new Date('December 1 2026'),
               status: 'ACTIVE',
-              foster_user_id: user10.id,
-              assigned_by_staff_id: user1.id,
+              foster_user_id: user1.id,
+              assigned_by_staff_id: staff1.id,
             },
           },
-          modified_by: { create: { staff_user_id: user3.id } },
+          modified_by: { create: { staff_user_id: staff1.id } },
         },
         include: { animal_assignments: true },
       });
@@ -310,11 +207,11 @@ const seedTheBase = async () => {
               start_date: new Date(),
               end_date: new Date('August 12 2028'),
               status: 'ACTIVE',
-              foster_user_id: user5.id,
-              assigned_by_staff_id: user2.id,
+              foster_user_id: user1.id,
+              assigned_by_staff_id: staff1.id,
             },
           },
-          modified_by: { create: { staff_user_id: user2.id } },
+          modified_by: { create: { staff_user_id: staff1.id } },
         },
         include: { animal_assignments: true },
       });
@@ -337,11 +234,11 @@ const seedTheBase = async () => {
               start_date: new Date(),
               end_date: new Date('September 2 2028'),
               status: 'ACTIVE',
-              foster_user_id: user6.id,
-              assigned_by_staff_id: user2.id,
+              foster_user_id: user1.id,
+              assigned_by_staff_id: staff1.id,
             },
           },
-          modified_by: { create: { staff_user_id: user3.id } },
+          modified_by: { create: { staff_user_id: staff1.id } },
         },
         include: { animal_assignments: true },
       });
@@ -360,7 +257,7 @@ const seedTheBase = async () => {
           weight: 77.8,
           last_modified: new Date(),
           picture: 'big-dog.jpeg',
-          modified_by: { create: { staff_user_id: user1.id } },
+          modified_by: { create: { staff_user_id: staff1.id } },
         },
         include: { animal_assignments: true },
       });
@@ -378,7 +275,7 @@ const seedTheBase = async () => {
           weight: 57.5,
           last_modified: new Date(),
           picture: 'puffy-dog2.jpeg',
-          modified_by: { create: { staff_user_id: user1.id } },
+          modified_by: { create: { staff_user_id: staff1.id } },
         },
         include: { animal_assignments: true },
       });
@@ -621,8 +518,8 @@ const seedTheBase = async () => {
           status: 'COMPLETE',
           type: 'DISTRIBUTION',
           notes: '90 lbs. of food dispersed',
-          foster_user: { connect: { id: user4.id } },
-          staff_user: { connect: { id: user1.id } },
+          foster_user: { connect: { id: user1.id } },
+          staff_user: { connect: { id: staff1.id } },
           item: { connect: { id: item1.id } },
           inventory: { connect: { id: item1.inventory[0].id } },
         },
@@ -634,7 +531,7 @@ const seedTheBase = async () => {
           status: 'COMPLETE',
           type: 'INTAKE',
           notes: 'no damages',
-          staff_user: { connect: { id: user1.id } },
+          staff_user: { connect: { id: staff1.id } },
           item: { connect: { id: item2.id } },
           inventory: { connect: { id: item2.inventory[0].id } },
         },
@@ -646,8 +543,8 @@ const seedTheBase = async () => {
           status: 'COMPLETE',
           type: 'DISTRIBUTION',
           notes: 'paid in full',
-          foster_user: { connect: { id: user8.id } },
-          staff_user: { connect: { id: user2.id } },
+          foster_user: { connect: { id: user2.id } },
+          staff_user: { connect: { id: staff1.id } },
           item: { connect: { id: item3.id } },
           inventory: { connect: { id: item3.inventory[0].id } },
         },
@@ -659,8 +556,8 @@ const seedTheBase = async () => {
           status: 'ACTIVE',
           type: 'LOAN',
           notes: 'no payment necessary',
-          foster_user: { connect: { id: user8.id } },
-          staff_user: { connect: { id: user2.id } },
+          foster_user: { connect: { id: user1.id } },
+          staff_user: { connect: { id: staff1.id } },
           item: { connect: { id: item4.id } },
           inventory: { connect: { id: item4.inventory[0].id } },
         },
@@ -672,8 +569,8 @@ const seedTheBase = async () => {
           status: 'COMPLETE',
           type: 'LOAN',
           notes: 'no payment necessary',
-          foster_user: { connect: { id: user7.id } },
-          staff_user: { connect: { id: user3.id } },
+          foster_user: { connect: { id: user2.id } },
+          staff_user: { connect: { id: staff1.id } },
           item: { connect: { id: item5.id } },
           inventory: { connect: { id: item5.inventory[0].id } },
         },
@@ -685,8 +582,8 @@ const seedTheBase = async () => {
           status: 'COMPLETE',
           type: 'DISTRIBUTION',
           notes: 'half paid',
-          foster_user: { connect: { id: user6.id } },
-          staff_user: { connect: { id: user3.id } },
+          foster_user: { connect: { id: user2.id } },
+          staff_user: { connect: { id: staff1.id } },
           item: { connect: { id: item6.id } },
           inventory: { connect: { id: item6.inventory[0].id } },
         },
@@ -698,7 +595,7 @@ const seedTheBase = async () => {
           status: 'COMPLETE',
           type: 'INTAKE',
           notes: 'paid on receipt',
-          staff_user: { connect: { id: user2.id } },
+          staff_user: { connect: { id: staff1.id } },
           item: { connect: { id: item7.id } },
           inventory: { connect: { id: item7.inventory[0].id } },
         },
@@ -710,8 +607,8 @@ const seedTheBase = async () => {
           status: 'COMPLETE',
           type: 'DISTRIBUTION',
           notes: 'paid',
-          foster_user: { connect: { id: user10.id } },
-          staff_user: { connect: { id: user1.id } },
+          foster_user: { connect: { id: user1.id } },
+          staff_user: { connect: { id: staff1.id } },
           item: { connect: { id: item8.id } },
           inventory: { connect: { id: item8.inventory[0].id } },
         },
@@ -723,8 +620,8 @@ const seedTheBase = async () => {
           status: 'ACTIVE',
           type: 'LOAN',
           notes: 'no payment',
-          foster_user: { connect: { id: user4.id } },
-          staff_user: { connect: { id: user3.id } },
+          foster_user: { connect: { id: user2.id } },
+          staff_user: { connect: { id: staff1.id } },
           item: { connect: { id: item9.id } },
           inventory: { connect: { id: item9.inventory[0].id } },
         },
@@ -736,8 +633,8 @@ const seedTheBase = async () => {
           status: 'COMPLETE',
           type: 'DISTRIBUTION',
           notes: 'paid in full',
-          foster_user: { connect: { id: user5.id } },
-          staff_user: { connect: { id: user2.id } },
+          foster_user: { connect: { id: user1.id } },
+          staff_user: { connect: { id: staff1.id } },
           item: { connect: { id: item10.id } },
           inventory: { connect: { id: item10.inventory[0].id } },
         },
@@ -833,7 +730,7 @@ const seedTheBase = async () => {
           prescription: '30 capsules taken by mouth, 1 / day',
           documents: 'not really sure what will go here',
 
-          foster_user_id: user4.id,
+          foster_user_id: user1.id,
           animal_id: animal1.id,
           assignment_id: animal1.animal_assignments[0].id,
           medication_id: item5.medication.id,
@@ -851,7 +748,7 @@ const seedTheBase = async () => {
           prescription: '30 capsules taken by mouth, 1 / day',
           documents: 'not really sure what will go here',
 
-          foster_user_id: user7.id,
+          foster_user_id: user2.id,
           animal_id: animal5.id,
           assignment_id: animal5.animal_assignments[0].id,
           medication_id: item7.medication.id,
@@ -875,7 +772,7 @@ const seedTheBase = async () => {
           behavior_notes: 'strong jaw',
           documents: 'not really sure what will go here',
 
-          foster_user_id: user9.id,
+          foster_user_id: user2.id,
           animal_id: animal1.id,
           assignment_id: animal1.animal_assignments[0].id,
         },
@@ -892,7 +789,7 @@ const seedTheBase = async () => {
           prescription: '30 capsules taken by mouth, 1 / day',
           documents: 'not really sure what will go here',
 
-          foster_user_id: user4.id,
+          foster_user_id: user1.id,
           animal_id: animal4.id,
           assignment_id: animal4.animal_assignments[0].id,
           medication_id: item8.medication.id,

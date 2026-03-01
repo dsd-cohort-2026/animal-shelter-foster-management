@@ -7,8 +7,8 @@ model AnimalAssignment {
 
   // FK fields
   animal_id            String
-  foster_user_id       String
-  assigned_by_staff_id String
+  foster_user_id       String  @db.Uuid
+  assigned_by_staff_id String  @db.Uuid
 
   // Relation fields
   animal            Animal       @relation(fields: [animal_id], references: [id])

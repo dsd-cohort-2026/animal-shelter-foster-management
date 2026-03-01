@@ -11,7 +11,7 @@ model MedicalLog {
   documents        String?
 
   // FK fields
-  foster_user_id String?
+  foster_user_id String?  @db.Uuid
   animal_id      String
   assignment_id  String?
   medication_id  String?

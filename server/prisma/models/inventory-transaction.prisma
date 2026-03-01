@@ -7,8 +7,8 @@ model InventoryTransaction {
   notes      String
 
   // FK fields
-  foster_user_id           String?
-  created_by_staff_user_id String
+  foster_user_id           String?  @db.Uuid
+  created_by_staff_user_id String   @db.Uuid
   item_id                  String
   inventory_id             String
 
