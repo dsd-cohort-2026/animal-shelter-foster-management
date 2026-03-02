@@ -6,6 +6,7 @@ const AuthProvider = ({ children }) => {
   const setSession = useBoundStore((state) => state.setSession);
   const setLoading = useBoundStore((state) => state.setLoading);
   const clearSession = useBoundStore((state) => state.clearSession);
+  const setUserRole = useBoundStore((state) => state.setUserRole);
 
   useEffect(() => {
     // check for existing session
@@ -15,6 +16,7 @@ const AuthProvider = ({ children }) => {
       } = await supabase.auth.getSession();
       if (session) {
         setSession(session);
+        setUserRole();
       } else {
         clearSession();
       }
@@ -28,6 +30,7 @@ const AuthProvider = ({ children }) => {
       setLoading(true);
       if (session) {
         setSession(session);
+        setUserRole();
       } else {
         clearSession();
       }
