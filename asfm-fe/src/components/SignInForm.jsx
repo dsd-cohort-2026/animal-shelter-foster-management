@@ -3,28 +3,30 @@ import { Field, FieldError, FieldGroup, FieldLabel, FieldSet } from '@/component
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { useForm } from '@tanstack/react-form';
-import * as z from 'zod';
 import { useBoundStore } from '@/store';
-
-const formSchema = z.object({
-  email: z.email({
-    message: 'Invalid email address',
-  }),
-  password: z.string().min(1, { message: 'Password is required' }),
-});
+import { useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 
 function SignInForm() {
+  const navigate = useNavigate();
   const signIn = useBoundStore((state) => state.signIn);
+  const [authError, setAuthError] = useState('');
+
   const form = useForm({
     defaultValues: {
       email: '',
       password: '',
     },
-    validators: {
-      onSubmit: formSchema,
-    },
     onSubmit: async ({ value }) => {
-      await signIn(value.email, value.password);
+      setAuthError('');
+      const error = await signIn(value.email, value.password);
+
+      if (error) {
+        setAuthError(error.message);
+        return;
+      }
+
+      navigate({ to: '/' });
     },
   });
 
@@ -38,6 +40,11 @@ function SignInForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {authError && (
+            <div className="bg-destructive/15 border border-destructive/50 text-destructive px-4 py-3 rounded-md mb-4">
+              <p className="text-sm">{authError}</p>
+            </div>
+          )}
           <form
             id="sign-in-form"
             onSubmit={(e) => {
@@ -53,7 +60,8 @@ function SignInForm() {
                     onSubmit: ({ value }) => (value === '' ? 'Email is required' : undefined),
                   }}
                   children={(field) => {
-                    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+                    const error = field.state.meta.errors?.[0];
+                    const isInvalid = field.state.meta.isTouched && !!error;
                     return (
                       <Field data-invalid={isInvalid}>
                         <FieldLabel htmlFor={field.name}>Email</FieldLabel>
@@ -67,18 +75,19 @@ function SignInForm() {
                           placeholder="Email address"
                           aria-invalid={isInvalid}
                         />
-                        {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                        {field.state.meta.errorMap['onSubmit'] ? (
-                          <FieldError>{field.state.meta.errorMap['onSubmit']}</FieldError>
-                        ) : null}
+                        {error && <FieldError>{error}</FieldError>}
                       </Field>
                     );
                   }}
                 />
                 <form.Field
                   name="password"
+                  validators={{
+                    onSubmit: ({ value }) => (value === '' ? 'Password is required' : undefined),
+                  }}
                   children={(field) => {
-                    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+                    const error = field.state.meta.errors?.[0];
+                    const isInvalid = field.state.meta.isTouched && !!error;
                     return (
                       <Field data-invalid={isInvalid}>
                         <FieldLabel htmlFor={field.name}>Password</FieldLabel>
@@ -92,7 +101,7 @@ function SignInForm() {
                           placeholder="Password"
                           aria-invalid={isInvalid}
                         />
-                        {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                        {error && <FieldError>{error}</FieldError>}
                       </Field>
                     );
                   }}
