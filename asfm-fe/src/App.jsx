@@ -1,14 +1,11 @@
 import FilterSelect from './components/custom/FilterSelect';
 import { Button } from './components/ui/button';
-import TopNavBar from './components/NonMemberSignInNavBar';
 import { ReusableTable } from './components/table_components';
 import { mockLoanedItems } from './features/mockLoanedItems';
 import DashboardCard from './components/custom/DashboardCard';
 import { ModalDialog } from './components/ModalDialog';
 import ConfirmationDialog from './components/confirmationDialog';
 import { useState } from 'react';
-import CustomBadge from './components/custom/CustomBadge';
-import { useBoundStore } from './store';
 
 function App() {
   // src/features/loaned-items/loanedItemsColumns.js
@@ -48,19 +45,6 @@ function App() {
   return (
     <>
       <div id="examples" className="flex flex-col items-center h-auto gap-4 mt-17.5">
-        <div>
-          <div className='text-center'>Global State Test</div>
-          <div>
-            <div className='flex flex-col items-center'>
-            {userAnimals.map((animal, index) => (
-              <span key={index} className="pr-2">
-                {animal.name}
-              </span>
-            ))}
-            </div>
-            <Button className="mt-2" onClick={() => addUserAnimal({ name: 'Chewy' })}>Update state and add dog to the list</Button>
-          </div>
-        </div>
         <div className="flex flex-col items-center justify-center gap-4">
           <Button>Default button</Button>
           <Button disabled>Disabled button</Button>
