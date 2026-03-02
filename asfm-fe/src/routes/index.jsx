@@ -1,7 +1,5 @@
 import App from '@/App';
 import { createFileRoute } from '@tanstack/react-router';
-import TopNavBar from '@/components/NonMemberSignInNavBar';
-import SearchBar from '@/components/SearchBar'
 import Layout from '@/components/Layout';
 
 export const Route = createFileRoute('/')({
@@ -10,7 +8,7 @@ export const Route = createFileRoute('/')({
 
 function RouteComponent() {
   return (
-    <Layout navBar={<TopNavBar />}>
+    <Layout>
       <App />
     </Layout>
   );

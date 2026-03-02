@@ -1,5 +1,5 @@
 import { Button } from './ui/button';
-import { useNavigate, useRouter } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import logo from '../assets/logo.png';
 import { useBoundStore } from '@/store';
 
