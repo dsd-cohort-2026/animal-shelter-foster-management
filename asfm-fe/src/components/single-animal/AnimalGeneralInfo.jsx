@@ -36,7 +36,7 @@ export function AnimalGeneralInfo({ isEditing, viewAnimal }) {
                   viewAnimal={viewAnimal}
                   htmlForLabel="age"
                   labelTitle="Age"
-                  prop="age"
+                  prop="dob"
                   unit="yrs"
                 />
                 <AnimalInputGroup
@@ -58,10 +58,10 @@ export function AnimalGeneralInfo({ isEditing, viewAnimal }) {
             </CardDescription>
           </Card>
           <Card className="p-0 w-full ">
-            <div className="relative w-full h-full bg-cover bg-center bg-[url(https://phillypaws.org/wp-content/uploads/2025/03/54324037913_4b1fe29a33_c.jpg)]  rounded-xl">
+            <div className={`relative w-full h-full bg-cover bg-center rounded-xl`} style={{ backgroundImage: `url(${viewAnimal.picture})` }}>
               <div className="absolute backdrop-blur-sm inset-0 rounded-xl"></div>
               <img
-                src="https://phillypaws.org/wp-content/uploads/2025/03/54324037913_4b1fe29a33_c.jpg"
+                src={viewAnimal.picture}
                 className="absolute w-full h-full object-cover max-w-[200px] blur-none top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2"
               />
             </div>
