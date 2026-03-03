@@ -1,7 +1,7 @@
 const { z } = require('zod');
 
 const patchAnimalSchema = z.object({
-  body: z.object({
+  body: z.strictObject({
     name: z.string().optional(),
     chip_id: z.int().optional(),
     dob: z.coerce.date().optional(),
