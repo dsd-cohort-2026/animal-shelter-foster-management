@@ -47,12 +47,17 @@ export default function SingleAnimalPage({id}) {
         throw new Error(`Failed to find the animal's medical logs ${response.status}`);
       }
       const data = await response.json();
+      sortMedicalLogs(data)
       setAnimalLogs(data);
       return data;
     } catch (err) {
       console.error('Failed to fetch animal medical logs', err);
       throw err;
     }
+  }
+
+  function sortMedicalLogs(logs) {
+    logs.sort((a,b) => new Date(b.logged_at) - new Date(a.logged_at))
   }
 
   async function fetchAllAnimalRecords(id) {
