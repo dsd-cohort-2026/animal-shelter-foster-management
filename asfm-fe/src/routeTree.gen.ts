@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as MedicalLogsRouteImport } from './routes/medical-logs'
+import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as SignInRouteImport } from './routes/SignIn'
 import { Route as IndexRouteImport } from './routes/index'
@@ -21,6 +22,11 @@ import { Route as ProtectedAdminPortalRouteImport } from './routes/_protected/ad
 const MedicalLogsRoute = MedicalLogsRouteImport.update({
   id: '/medical-logs',
   path: '/medical-logs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InventoryRoute = InventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProtectedRoute = ProtectedRouteImport.update({
@@ -61,71 +67,74 @@ const ProtectedAdminPortalRoute = ProtectedAdminPortalRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/SignIn': typeof SignInRoute
+  '/inventory': typeof InventoryRoute
   '/medical-logs': typeof MedicalLogsRoute
+  '/admin-portal': typeof ProtectedAdminPortalRoute
   '/animals/$animalId': typeof AnimalsAnimalIdRoute
   '/animals/add': typeof AnimalsAddRoute
   '/animals/': typeof AnimalsIndexRoute
-  '/admin-portal': typeof ProtectedAdminPortalRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/SignIn': typeof SignInRoute
+  '/inventory': typeof InventoryRoute
   '/medical-logs': typeof MedicalLogsRoute
+  '/admin-portal': typeof ProtectedAdminPortalRoute
   '/animals/$animalId': typeof AnimalsAnimalIdRoute
   '/animals/add': typeof AnimalsAddRoute
   '/animals': typeof AnimalsIndexRoute
-  '/admin-portal': typeof ProtectedAdminPortalRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/SignIn': typeof SignInRoute
   '/_protected': typeof ProtectedRouteWithChildren
+  '/inventory': typeof InventoryRoute
   '/medical-logs': typeof MedicalLogsRoute
+  '/_protected/admin-portal': typeof ProtectedAdminPortalRoute
   '/animals/$animalId': typeof AnimalsAnimalIdRoute
   '/animals/add': typeof AnimalsAddRoute
   '/animals/': typeof AnimalsIndexRoute
-  '/_protected/admin-portal': typeof ProtectedAdminPortalRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/SignIn'
-    | '/medical-logs' | '/admin-portal'
+    | '/inventory'
+    | '/medical-logs'
+    | '/admin-portal'
     | '/animals/$animalId'
     | '/animals/add'
     | '/animals/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin-portal'
+    | '/SignIn'
+    | '/inventory'
     | '/medical-logs'
+    | '/admin-portal'
     | '/animals/$animalId'
     | '/animals/add'
     | '/animals'
   id:
     | '__root__'
     | '/'
-    | '/admin-portal'
+    | '/SignIn'
+    | '/_protected'
+    | '/inventory'
     | '/medical-logs'
+    | '/_protected/admin-portal'
     | '/animals/$animalId'
     | '/animals/add'
     | '/animals/'
-  to: '/' | '/SignIn' | '/medical-logs' | '/admin-portal'
-  id:
-    | '__root__'
-    | '/'
-    | '/SignIn'
-    | '/_protected'
-    | '/medical-logs'
-    | '/_protected/admin-portal'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SignInRoute: typeof SignInRoute
   ProtectedRoute: typeof ProtectedRouteWithChildren
+  InventoryRoute: typeof InventoryRoute
   MedicalLogsRoute: typeof MedicalLogsRoute
   AnimalsAnimalIdRoute: typeof AnimalsAnimalIdRoute
   AnimalsAddRoute: typeof AnimalsAddRoute
@@ -139,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/medical-logs'
       fullPath: '/medical-logs'
       preLoaderRoute: typeof MedicalLogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inventory': {
+      id: '/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof InventoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_protected': {
@@ -209,6 +225,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SignInRoute: SignInRoute,
   ProtectedRoute: ProtectedRouteWithChildren,
+  InventoryRoute: InventoryRoute,
   MedicalLogsRoute: MedicalLogsRoute,
   AnimalsAnimalIdRoute: AnimalsAnimalIdRoute,
   AnimalsAddRoute: AnimalsAddRoute,
