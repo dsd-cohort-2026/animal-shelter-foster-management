@@ -67,4 +67,181 @@ const runTests = async () => {
   }
 };
 
+// Test: GET /api/animals with STAFF user (should see all animals)
+const testGetAnimalsAsStaff = async () => {
+  try {
+    const STAFF_TOKEN = await getStaffUserToken();
+    console.log('\n=== TEST: GET /api/animals as STAFF ===');
+    const response = await fetch('http://localhost:8080/api/animals', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${STAFF_TOKEN}`,
+      },
+    });
+    const data = await response.json();
+    console.log(`Status: ${response.status}`);
+    console.log(`Response: ${JSON.stringify(data, null, 2)}`);
+    if (response.status === 200 && Array.isArray(data)) {
+      console.log('✓ STAFF can fetch all animals');
+    } else {
+      console.log('✗ STAFF fetch failed');
+    }
+  } catch (error) {
+    console.log({ error });
+  }
+};
+
+// Test: GET /api/animals with USER (should see only assigned animals)
+const testGetAnimalsAsUser = async () => {
+  try {
+    const USER_TOKEN = await getRegularUserToken();
+    console.log('\n=== TEST: GET /api/animals as USER ===');
+    const response = await fetch('http://localhost:8080/api/animals', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${USER_TOKEN}`,
+      },
+    });
+    const data = await response.json();
+    console.log(`Status: ${response.status}`);
+    console.log(`Response: ${JSON.stringify(data, null, 2)}`);
+    if (response.status === 200 && Array.isArray(data)) {
+      console.log('✓ USER can fetch assigned animals');
+    } else {
+      console.log('✗ USER fetch failed');
+    }
+  } catch (error) {
+    console.log({ error });
+  }
+};
+
+// Test: GET /api/animals with filters (species, foster_status, sex)
+const testGetAnimalsWithFilters = async () => {
+  try {
+    const STAFF_TOKEN = await getStaffUserToken();
+    console.log('\n=== TEST: GET /api/animals with filters ===');
+    const response = await fetch('http://localhost:8080/api/animals?species=DOG&foster_status=SHELTERED&sex=MALE', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${STAFF_TOKEN}`,
+      },
+    });
+    const data = await response.json();
+    console.log(`Status: ${response.status}`);
+    console.log(`Response: ${JSON.stringify(data, null, 2)}`);
+    if (response.status === 200 && Array.isArray(data)) {
+      console.log('✓ Filters work correctly');
+    } else {
+      console.log('✗ Filter test failed');
+    }
+  } catch (error) {
+    console.log({ error });
+  }
+};
+
+// Test: GET /api/animals with search filter
+const testGetAnimalsWithSearch = async () => {
+  try {
+    const STAFF_TOKEN = await getStaffUserToken();
+    console.log('\n=== TEST: GET /api/animals with search ===');
+    const response = await fetch('http://localhost:8080/api/animals?search=buddy', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${STAFF_TOKEN}`,
+      },
+    });
+    const data = await response.json();
+    console.log(`Status: ${response.status}`);
+    console.log(`Response: ${JSON.stringify(data, null, 2)}`);
+    if (response.status === 200 && Array.isArray(data)) {
+      console.log('✓ Search filter works');
+    } else {
+      console.log('✗ Search test failed');
+    }
+  } catch (error) {
+    console.log({ error });
+  }
+};
+
+// Test: GET /api/animals with pagination
+const testGetAnimalsWithPagination = async () => {
+  try {
+    const STAFF_TOKEN = await getStaffUserToken();
+    console.log('\n=== TEST: GET /api/animals with pagination ===');
+    const response = await fetch('http://localhost:8080/api/animals?page=1&limit=5', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${STAFF_TOKEN}`,
+      },
+    });
+    const data = await response.json();
+    console.log(`Status: ${response.status}`);
+    console.log(`Response count: ${data.length}`);
+    if (response.status === 200 && Array.isArray(data)) {
+      console.log('✓ Pagination works');
+    } else {
+      console.log('✗ Pagination test failed');
+    }
+  } catch (error) {
+    console.log({ error });
+  }
+};
+
+// Test: GET /api/animals without token (should return 401)
+const testGetAnimalsNoToken = async () => {
+  try {
+    console.log('\n=== TEST: GET /api/animals without token ===');
+    const response = await fetch('http://localhost:8080/api/animals', {
+      method: 'GET',
+    });
+    const data = await response.json();
+    console.log(`Status: ${response.status}`);
+    console.log(`Response: ${JSON.stringify(data, null, 2)}`);
+    if (response.status === 401) {
+      console.log('✓ 401 returned for missing token');
+    } else {
+      console.log('✗ Expected 401 status');
+    }
+  } catch (error) {
+    console.log({ error });
+  }
+};
+
+// Test: GET /api/animals with invalid query params (should return 400)
+const testGetAnimalsInvalidQuery = async () => {
+  try {
+    const STAFF_TOKEN = await getStaffUserToken();
+    console.log('\n=== TEST: GET /api/animals with invalid query ===');
+    const response = await fetch('http://localhost:8080/api/animals?species=INVALID', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${STAFF_TOKEN}`,
+      },
+    });
+    const data = await response.json();
+    console.log(`Status: ${response.status}`);
+    console.log(`Response: ${JSON.stringify(data, null, 2)}`);
+    if (response.status === 400) {
+      console.log('✓ 400 returned for invalid query');
+    } else {
+      console.log('✗ Expected 400 status');
+    }
+  } catch (error) {
+    console.log({ error });
+  }
+};
+
+const runAllTests = async () => {
+  console.log('Starting route tests...\n');
+  await testGetAnimalsNoToken();
+  await testGetAnimalsInvalidQuery();
+  await testGetAnimalsAsStaff();
+  await testGetAnimalsAsUser();
+  await testGetAnimalsWithFilters();
+  await testGetAnimalsWithSearch();
+  await testGetAnimalsWithPagination();
+  console.log('\n=== All tests completed ===');
+};
+
 runTests();
+runAllTests();
