@@ -66,3 +66,13 @@ exports.createAnimal = async (body) => {
     throw err;
   }
 };
+
+exports.unassignAnimal = async (req) => {
+  try {
+    const animalAssignment = await animalRepository.unassignAnimal(req);
+    return animalAssignment;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
