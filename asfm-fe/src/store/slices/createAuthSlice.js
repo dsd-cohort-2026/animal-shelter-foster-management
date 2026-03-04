@@ -11,8 +11,9 @@ export const createAuthSlice = (set, get) => ({
     const { data: User, error } = await supabase
       .from('User')
       .select('role')
-      .eq('id', state.user.id);
-
+      .eq('id', state.user.id)
+      .single();
+    
     if (error) {
       console.error(error);
       return error;
@@ -68,9 +69,10 @@ export const createAuthSlice = (set, get) => ({
     } = await supabase.auth.getSession();
 
     if (session) {
-      set({ session });
+      get().setSession(session);
+      get().setUserRole();
     } else {
-      set({ session: null, user: null, userRole: null });
+      get().clearSession();
     }
 
     set({ loading: false });
