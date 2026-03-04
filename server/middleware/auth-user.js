@@ -13,13 +13,19 @@ module.exports = authMiddleware = async (req, res, next) => {
 
     const { payload } = await jwtVerify(token, PROJECT_JWKS);
 
+    if (payload.role !== 'authenticated') {
+      const err = new Error('Not Authorized!');
+      err.statusCode = 401;
+      return next(err);
+    }
+
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: payload.sub },
     });
 
     if (user.role !== 'STAFF' && user.role !== 'USER') {
       const err = new Error('You must sign in!');
-      err.statusCode = 401;
+      err.statusCode = 403;
       return next(err);
     }
     next();

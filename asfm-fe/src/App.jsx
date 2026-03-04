@@ -6,6 +6,9 @@ import DashboardCard from './components/custom/DashboardCard';
 import { ModalDialog } from './components/ModalDialog';
 import ConfirmationDialog from './components/confirmationDialog';
 import { useState } from 'react';
+import CustomBadge from './components/custom/CustomBadge';
+import { useBoundStore } from './store';
+import { DatePickerSimple } from './components/dateTimePicker';
 
 function App() {
   // src/features/loaned-items/loanedItemsColumns.js
@@ -41,6 +44,8 @@ function App() {
     setDialogConfig({ type, primaryText, secondaryText, button });
     setShowConfirmation(true);
   };
+  const userAnimals = useBoundStore((state) => state.userAnimals);
+  const addUserAnimal = useBoundStore((state) => state.addUserAnimal);
 
   return (
     <>
@@ -58,6 +63,7 @@ function App() {
           selectTriggerClassName="w-[300px]"
           selectItems={['approved', 'pending', 'denied']}
         />
+        <DatePickerSimple />
         <ModalDialog
           trigger={<Button>Open Modal</Button>}
           title={'Title'}

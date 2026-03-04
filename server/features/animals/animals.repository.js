@@ -83,3 +83,22 @@ exports.createAnimal = async (body) => {
     throw err;
   }
 };
+
+exports.updateAnimalById = async (idAndBody) => {
+  try {
+    const { id, body } = idAndBody;
+    const modified_by = body.modified_by;
+    delete body.modified_by;
+    const updatedAnimal = await prisma.animal.update({
+      where: { id: id },
+      data: {
+        ...body,
+        modified_by: { create: { staff_user_id: modified_by } },
+      },
+    });
+    return updatedAnimal;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};

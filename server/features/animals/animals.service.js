@@ -66,3 +66,28 @@ exports.createAnimal = async (body) => {
     throw err;
   }
 };
+
+exports.updateAnimalById = async (req) => {
+  try {
+    const body = req.body;
+    const id = req.params.id;
+    const parsedBody = {};
+    for (const [prop, val] of Object.entries(body)) {
+      if (prop === 'dob') {
+        parsedBody[prop] = new Date(val);
+      } else if (prop === 'last_modified') {
+        parsedBody[prop] = new Date(val);
+      } else {
+        parsedBody[prop] = val;
+      }
+    }
+    const updatedAnimal = await animalRepository.updateAnimalById({
+      id,
+      body: parsedBody,
+    });
+    return updatedAnimal;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
