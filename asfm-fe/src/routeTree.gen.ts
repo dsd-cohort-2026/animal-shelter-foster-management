@@ -10,18 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as MedicalLogsRouteImport } from './routes/medical-logs'
-import { Route as AdminPortalRouteImport } from './routes/admin-portal'
+import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as SignInRouteImport } from './routes/SignIn'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProtectedAdminPortalRouteImport } from './routes/_protected/admin-portal'
 
 const MedicalLogsRoute = MedicalLogsRouteImport.update({
   id: '/medical-logs',
   path: '/medical-logs',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminPortalRoute = AdminPortalRouteImport.update({
-  id: '/admin-portal',
-  path: '/admin-portal',
+const ProtectedRoute = ProtectedRouteImport.update({
+  id: '/_protected',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignInRoute = SignInRouteImport.update({
@@ -34,38 +34,50 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProtectedAdminPortalRoute = ProtectedAdminPortalRouteImport.update({
+  id: '/admin-portal',
+  path: '/admin-portal',
+  getParentRoute: () => ProtectedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/SignIn': typeof SignInRoute
-  '/admin-portal': typeof AdminPortalRoute
   '/medical-logs': typeof MedicalLogsRoute
+  '/admin-portal': typeof ProtectedAdminPortalRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/SignIn': typeof SignInRoute
-  '/admin-portal': typeof AdminPortalRoute
   '/medical-logs': typeof MedicalLogsRoute
+  '/admin-portal': typeof ProtectedAdminPortalRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/SignIn': typeof SignInRoute
-  '/admin-portal': typeof AdminPortalRoute
+  '/_protected': typeof ProtectedRouteWithChildren
   '/medical-logs': typeof MedicalLogsRoute
+  '/_protected/admin-portal': typeof ProtectedAdminPortalRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/SignIn' | '/admin-portal' | '/medical-logs'
+  fullPaths: '/' | '/SignIn' | '/medical-logs' | '/admin-portal'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/SignIn' | '/admin-portal' | '/medical-logs'
-  id: '__root__' | '/' | '/SignIn' | '/admin-portal' | '/medical-logs'
+  to: '/' | '/SignIn' | '/medical-logs' | '/admin-portal'
+  id:
+    | '__root__'
+    | '/'
+    | '/SignIn'
+    | '/_protected'
+    | '/medical-logs'
+    | '/_protected/admin-portal'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SignInRoute: typeof SignInRoute
-  AdminPortalRoute: typeof AdminPortalRoute
+  ProtectedRoute: typeof ProtectedRouteWithChildren
   MedicalLogsRoute: typeof MedicalLogsRoute
 }
 
@@ -78,11 +90,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MedicalLogsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin-portal': {
-      id: '/admin-portal'
-      path: '/admin-portal'
-      fullPath: '/admin-portal'
-      preLoaderRoute: typeof AdminPortalRouteImport
+    '/_protected': {
+      id: '/_protected'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof ProtectedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/SignIn': {
@@ -99,13 +111,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_protected/admin-portal': {
+      id: '/_protected/admin-portal'
+      path: '/admin-portal'
+      fullPath: '/admin-portal'
+      preLoaderRoute: typeof ProtectedAdminPortalRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
   }
 }
+
+interface ProtectedRouteChildren {
+  ProtectedAdminPortalRoute: typeof ProtectedAdminPortalRoute
+}
+
+const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedAdminPortalRoute: ProtectedAdminPortalRoute,
+}
+
+const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
+  ProtectedRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SignInRoute: SignInRoute,
-  AdminPortalRoute: AdminPortalRoute,
+  ProtectedRoute: ProtectedRouteWithChildren,
   MedicalLogsRoute: MedicalLogsRoute,
 }
 export const routeTree = rootRouteImport

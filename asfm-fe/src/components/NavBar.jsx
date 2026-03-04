@@ -10,8 +10,8 @@ function NavBar() {
   const signOut = useBoundStore((state) => state.signOut);
 
   const handleSignOut = () => {
-    navigate({ to: '/' });
     signOut();
+    navigate({ to: '/' });
   };
 
   return (
@@ -25,13 +25,11 @@ function NavBar() {
         {userRole === 'USER' && <Button variant="outline">My Animals</Button>}
         {userRole === 'STAFF' && (
           <>
-            <Button variant="outline" onClick={() => navigate({ to: 'admin-portal' })}>
+            <Button variant="outline" onClick={() => navigate({ to: '/admin-portal' })}>
               Admin Portal
             </Button>
             <Button variant="outline">All Users</Button>
-            <Button variant="outline" className="text-s">
-              Animals
-            </Button>
+            <Button variant="outline">Animals</Button>
             <Button variant="outline">Inventory</Button>
             <Button variant="outline">Loans</Button>
             <Button variant="outline" onClick={() => navigate({ to: '/medical-logs' })}>

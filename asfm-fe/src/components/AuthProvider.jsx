@@ -9,31 +9,15 @@ const AuthProvider = ({ children }) => {
   const setUserRole = useBoundStore((state) => state.setUserRole);
 
   useEffect(() => {
-    // check for existing session
-    const initializeAuth = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session) {
-        setSession(session);
-        setUserRole();
-      } else {
-        clearSession();
-      }
-      setLoading(false);
-    };
-
-    initializeAuth();
-
     // automatically update session state
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setLoading(true);
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
         setSession(session);
         setUserRole();
       } else {
         clearSession();
       }
+
       setLoading(false);
     });
 

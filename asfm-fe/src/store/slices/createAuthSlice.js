@@ -3,8 +3,7 @@ import { supabase } from '@/lib/supabaseClient';
 export const createAuthSlice = (set, get) => ({
   user: null,
   session: null,
-  // for initial session check on mount
-  loading: true,
+  loading: true, // for loading intial session on AuthProvider mount
   userRole: null,
 
   setUserRole: async () => {
