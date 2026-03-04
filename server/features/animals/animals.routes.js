@@ -1,12 +1,14 @@
 const router = require('express').Router();
 const animalController = require('./animals.controller');
 const staffAuthCheck = require('../../middleware/auth-staff');
+const authUserCheck = require('../../middleware/auth-user');
 const validate = require('../../middleware/validator');
 const createAnimalSchema = require('../../validators/animals/createAnimal.validator');
-const assignAnimalSchema = require('../../validators/animals/assignAnimal.validator');
+const getAllAnimalsSchema = require('../../validators/animals/animals.validator');
 const updateAnimalById = require('../../validators/animals/updateAnimalById.validator');
+const assignAnimalSchema = require('../../validators/animals/assignAnimal.validator');
 
-router.get('/', animalController.getAllAnimals);
+router.get('/', authUserCheck, validate(getAllAnimalsSchema), animalController.getAllAnimals);
 router.get('/:id', animalController.getAnimalById);
 router.post('/create', staffAuthCheck, validate(createAnimalSchema), animalController.createAnimal);
 router.patch(

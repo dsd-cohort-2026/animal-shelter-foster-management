@@ -1,12 +1,13 @@
 const animalService = require('./animals.service');
 
-exports.getAllAnimals = async (req, res) => {
+exports.getAllAnimals = async (req, res, next) => {
   try {
-    const animals = await animalService.getAllAnimals();
+    const filters = req.query || {};
+    const user = req.user;
+    const animals = await animalService.getAllAnimals(filters, user);
     res.status(200).json(animals);
   } catch (error) {
-    console.error('Error fetching animals:', error);
-    res.status(500).json({ message: 'An error occurred while fetching animals' });
+    next(error);
   }
 };
 
