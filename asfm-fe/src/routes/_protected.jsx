@@ -1,10 +1,13 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import { useBoundStore } from '@/store';
 
 export const Route = createFileRoute('/_protected')({
   beforeLoad: async ({ context, location }) => {
-    const { user } = context;
-    // Redirect to login if not authenticated
-    if (!user) {
+    const { initializeAuth, user } = useBoundStore.getState();
+
+    await initializeAuth(); // force beforeLoad to wait for context before redirecting
+
+    if (!context.user && !user) {
       throw redirect({
         to: '/signin',
         search: {
