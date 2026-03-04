@@ -11,8 +11,7 @@ export const createAuthSlice = (set, get) => ({
     const { data: User, error } = await supabase
       .from('User')
       .select('role')
-      .eq('id', state.user.id)
-      .single();
+      .eq('id', state.user.id);
 
     if (error) {
       console.error(error);
@@ -60,5 +59,20 @@ export const createAuthSlice = (set, get) => ({
 
     // state is handled in AuthProvider though listener
     return null;
+  },
+
+  initializeAuth: async () => {
+    set({ loading: true });
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (session) {
+      set({ session });
+    } else {
+      set({ session: null, user: null, userRole: null });
+    }
+
+    set({ loading: false });
   },
 });
