@@ -8,9 +8,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ModalDialog } from '@/components/ModalDialog';
 import ConfirmationDialog from '@/components/confirmationDialog';
 import CustomBadge from '@/components/custom/CustomBadge';
-import AnimalForm from '@/components/animals/AnimalForm';
-import { useBoundStore } from '@/store';
-import { STATUS_COLORS } from '@/constants/animalConstants';
+import AnimalForm from '@/@/components/animals/AnimalForm';
+import { useBoundStore } from '@/@/store';
+import { STATUS_COLORS, formatStatus, formatSpecies, formatSex } from '@/constants/animalConstants';
 
 // TODO: Replace with actual API call to backend
 const SIMULATED_API_DELAY = 600;
@@ -71,7 +71,7 @@ function AnimalDetailPage() {
             </CardHeader>
             <CardContent className="pt-6 space-y-6">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4">
-                {Array.from({ length: 5 }).map((_, i) => (
+                {Array.from({ length: 8 }).map((_, i) => (
                   <div key={i}>
                     <Skeleton className="h-3 w-16 mb-1" />
                     <Skeleton className="h-4 w-24" />
@@ -112,11 +112,15 @@ function AnimalDetailPage() {
   }
 
   const fields = [
-    { label: 'Species', value: animal.species },
-    { label: 'Breed', value: animal.breed || '—' },
-    { label: 'Sex', value: animal.sex },
-    { label: 'Date of Birth', value: animal.dob || '—' },
-    { label: 'Intake Date', value: animal.intakeDate || '—' },
+    { label: 'Chip ID', value: animal.chip_id },
+    { label: 'Species', value: formatSpecies(animal.species) },
+    { label: 'Sex', value: formatSex(animal.sex) },
+    { label: 'Date of Birth', value: animal.dob ? new Date(animal.dob).toLocaleDateString() : '—' },
+    { label: 'Weight', value: animal.weight ? `${animal.weight} lbs` : '—' },
+    { label: 'Kennel ID', value: animal.kennel_id || '—' },
+    { label: 'Spayed/Neutered', value: animal.altered ? 'Yes' : 'No' },
+    { label: 'Created', value: animal.created_at ? new Date(animal.created_at).toLocaleDateString() : '—' },
+    { label: 'Last Modified', value: animal.last_modified ? new Date(animal.last_modified).toLocaleDateString() : '—' },
   ];
 
   return (
@@ -131,8 +135,8 @@ function AnimalDetailPage() {
             <div className="flex items-center gap-3">
               <CardTitle className="text-2xl">{animal.name}</CardTitle>
               <CustomBadge
-                text={animal.status}
-                badgeClassName={STATUS_COLORS[animal.status]}
+                text={formatStatus(animal.foster_status)}
+                badgeClassName={STATUS_COLORS[animal.foster_status]}
               />
             </div>
             <Button onClick={() => { setSubmitError(''); setEditOpen(true); }}>
@@ -144,16 +148,10 @@ function AnimalDetailPage() {
               {fields.map(({ label, value }) => (
                 <div key={label}>
                   <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">{label}</p>
-                  <p className="text-sm font-medium capitalize">{value}</p>
+                  <p className="text-sm font-medium">{value}</p>
                 </div>
               ))}
             </div>
-            {animal.description && (
-              <div className="border-t pt-4">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Description</p>
-                <p className="text-sm leading-relaxed">{animal.description}</p>
-              </div>
-            )}
           </CardContent>
         </Card>
       </div>
