@@ -112,11 +112,9 @@ function AnimalListPage() {
       <div className="space-y-6">
         {/* Dashboard Header Card */}
         <div className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-8">
-          <div className="absolute top-0 right-0 size-64 -translate-y-1/3 translate-x-1/3 rounded-full bg-primary/5" aria-hidden="true" />
-          <div className="absolute bottom-0 left-0 size-40 translate-y-1/2 -translate-x-1/4 rounded-full bg-primary/5" aria-hidden="true" />
           <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-4">
-              <div className="flex items-center justify-center size-12 sm:size-14 rounded-xl bg-primary/10 shrink-0">
+              <div className="flex items-center justify-center size-12 sm:size-14 rounded-xl bg-secondary/20 shrink-0">
                 <PawPrint className="size-6 sm:size-7 text-primary" />
               </div>
               <div>
@@ -145,9 +143,6 @@ function AnimalListPage() {
                       {adoptedCount} adopted
                     </Badge>
                   )}
-                  <Badge variant="outline" className="font-medium">
-                    {speciesCount} species
-                  </Badge>
                 </div>
               </div>
             </div>
