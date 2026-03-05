@@ -1,25 +1,41 @@
 const prisma = require('../../connections/prisma-client');
 
 exports.findAll = async () => {
-  const inventoryData = await prisma.inventory.findMany({
-    include: { item: true },
-  });
-  return inventoryData;
+  try {
+    return await prisma.inventory.findMany({});
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
 };
 
-exports.update = async (id, data) => {
-  const index = inventoryData.findIndex((item) => item.id === id);
-  if (index === -1) {
-    return null;
+exports.updateInventory = async (inventoryAndTransaction) => {
+  try {
+    const { inventory, inventory_transactions } = inventoryAndTransaction;
+    const updatedInventory = await prisma.inventory.update({
+      where: { id: inventory.id },
+      data: {
+        quantity: inventory.quantity,
+        item_id: inventory.item_id,
+        expiration_date: inventory.expiration_date || null,
+        inventory_transactions,
+      },
+      include: { inventory_transactions: true },
+    });
+    return updatedInventory;
+  } catch (err) {
+    console.log(err);
+    throw err;
   }
-  const updatedRecord = {
-    ...inventoryData[index],
-    ...data,
-  };
-  inventoryData[index] = updatedRecord;
-  return updatedRecord;
 };
 
 exports.findById = async (id) => {
-  return inventoryData.find((item) => item.id === id);
+  try {
+    return await prisma.inventory.findUnique({
+      where: { id: id },
+    });
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
 };

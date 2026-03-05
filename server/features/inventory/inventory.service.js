@@ -22,35 +22,33 @@ exports.getInventoryItemById = async (id) => {
   };
 };
 
-exports.updateInventoryItemQuantity = async (inventoryId, newQuantity, userId) => {
-  const currentInventory = await inventoryRepository.findById(inventoryId);
-
-  if (!currentInventory) {
-    throw new Error('Inventory item not found');
+exports.updateInventory = async (req) => {
+  try {
+    const inventory = {
+      id: req.params.id,
+      item_id: req.body.item_id,
+      quantity: req.body.quantity,
+      expiration_date: new Date(req.body.expiration_date) || null,
+    };
+    const inventory_transactions = {};
+    inventory_transactions.create = {
+      quantity: req.body.quantity,
+      status: req.body.status,
+      type: req.body.type,
+      notes: req.body.notes || '-',
+      staff_user: { connect: { id: req.body.staff_user } },
+      item: { connect: { id: req.body.item_id } },
+    };
+    if (req.body.foster_user) {
+      inventory_transactions.create.foster_user = { connect: { id: req.body.foster_user } };
+    }
+    const updatedInventory = await inventoryRepository.updateInventory({
+      inventory,
+      inventory_transactions,
+    });
+    return updatedInventory;
+  } catch (err) {
+    console.log(err);
+    throw err;
   }
-
-  const quantityChange = newQuantity - currentInventory.quantity;
-
-  const updatedInventory = await inventoryRepository.update(inventoryId, {
-    quantity: newQuantity,
-  });
-
-  await inventoryTransactionRepository.create({
-    inventory_id: inventoryId,
-    item_id: currentInventory.item_id,
-    qty_out: Math.abs(quantityChange),
-    status: quantityChange > 0 ? 'received' : 'distributed',
-    type: quantityChange > 0 ? 'restock' : 'distribution',
-    created_by_staff_user_id: userId,
-    foster_user_id: null,
-    notes: null,
-    return_date: null,
-  });
-
-  return {
-    id: updatedInventory.id,
-    item_id: updatedInventory.item_id,
-    quantity: updatedInventory.quantity,
-    expiration_date: updatedInventory.expiration_date,
-  };
 };
