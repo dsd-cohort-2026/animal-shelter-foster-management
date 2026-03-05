@@ -4,8 +4,7 @@ const staffAuthCheck = require('../../middleware/auth-staff');
 const validate = require('../../middleware/validator');
 const usersValidator = require('../../validators/users/users.validator');
 
-// Add staffAuthCheck once auth is complete
-router.get('/', validate(usersValidator.getAll), userController.getAllUsers);
+router.get('/', staffAuthCheck, validate(usersValidator.getAll), userController.getAllUsers);
 router.get('/:id', userController.getUserById);
 
 module.exports = router;

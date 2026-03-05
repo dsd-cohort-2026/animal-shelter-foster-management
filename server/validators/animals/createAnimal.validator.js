@@ -1,7 +1,7 @@
 const { z } = require('zod');
 
 const createAnimalSchema = z.object({
-  body: z.object({
+  body: z.strictObject({
     name: z.string(),
     chip_id: z.int(),
     dob: z.coerce.date(),

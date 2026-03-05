@@ -28,6 +28,7 @@ module.exports = authMiddleware = async (req, res, next) => {
       err.statusCode = 403;
       return next(err);
     }
+    req.user = user;
     next();
   } catch (err) {
     err.statusCode = 401;
