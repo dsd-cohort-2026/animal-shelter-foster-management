@@ -53,3 +53,33 @@ exports.updateAnimalById = async (req, res) => {
     res.status(400).json({ message: 'An error occurred while updating the animal' });
   }
 };
+
+exports.assignAnimal = async (req, res) => {
+  try {
+    const animalAssignment = await animalService.assignAnimal(req);
+    if (!animalAssignment) {
+      return res
+        .status(500)
+        .json({ message: 'Oh no! An error occurred while adding the new animal!' });
+    }
+    res.status(201).json(animalAssignment);
+  } catch (error) {
+    console.error(`There was an error while assigning the animal:`, error);
+    res.status(400).json({ message: 'An error occurred while creating the animal assignment!' });
+  }
+};
+
+exports.unassignAnimal = async (req, res) => {
+  try {
+    const animalAssignment = await animalService.unassignAnimal(req);
+    if (!animalAssignment) {
+      return res
+        .status(500)
+        .json({ message: `Oh no! An error occurred while removing the animal's assignment!` });
+    }
+    res.status(200).json(animalAssignment);
+  } catch (error) {
+    console.error(`There was an error while unassigning the animal:`, error);
+    res.status(500).json({ message: 'An error occurred while removing the animal assignment!' });
+  }
+};

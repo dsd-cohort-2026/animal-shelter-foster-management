@@ -8,6 +8,9 @@ import DashboardCard from './components/custom/DashboardCard';
 import { ModalDialog } from './components/ModalDialog';
 import ConfirmationDialog from './components/confirmationDialog';
 import { useState } from 'react';
+import { DashboardSummaryCard } from './components/DashboardSummaryCard';
+import { DASHBOARD_CARD_CONFIG } from "./config/dashboardCard";
+import { useDashboardSummary } from './hooks/useDashboardSummary';
 import CustomBadge from './components/custom/CustomBadge';
 import { useBoundStore } from './store';
 import { DatePickerSimple } from './components/dateTimePicker';
@@ -27,7 +30,8 @@ function App() {
       cellClassName: 'text-center',
     },
   ];
-
+  // For dashboard summary card example
+  const { data, isloading } = useDashboardSummary();
   // Zustand store - user animals
   const userAnimals = useBoundStore((state) => state.userAnimals);
   const addUserAnimal = useBoundStore((state) => state.addUserAnimal);
@@ -119,8 +123,7 @@ function App() {
           selectTriggerClassName="w-[300px]"
           selectItems={['approved', 'pending', 'denied']}
         />
-        <DatePickerSimple />
-
+        <DatePickerSimple className="w-44"/>
         <ModalDialog
           trigger={<Button>Open Modal</Button>}
           title={'Title'}
@@ -147,17 +150,34 @@ function App() {
         >
           Open Success
         </Button>
-        <Button
-          variant="destructive"
-          onClick={() => openDialog('error', 'Failed', 'Could not add item to inventory.')}
-        >
+        <Button variant="destructive" onClick={() => openDialog('error', 'Failed', 'Could not add item to inventory.')}>
           Open Error
         </Button>
         {showConfirmation && (
-          <ConfirmationDialog {...dialogConfig} onClose={() => setShowConfirmation(false)} />
+          <ConfirmationDialog
+            {...dialogConfig}
+            onClose={() => setShowConfirmation(false)}
+          />
         )}
       </div>
 
+      <div className="flex justify-center">Dashboard Summary Card</div>
+      <div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-full gap-5 px-5">
+            {DASHBOARD_CARD_CONFIG.map((card) => {
+              const Icon = card.icon;
+              return (
+                <DashboardSummaryCard
+                  key={card.id}
+                  title={card.title}
+                  value={isloading ? 'Loading...' : data ? data[card.dataKey] : 'N/A'}
+                  subtitle={card.subtitle}
+                  icon={<Icon className="h-5 w-5" />}
+                />
+              );
+            })}
+        </div>
+      </div>
       <div className="flex justify-center">Admin Dashboard Card</div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 px-5">
         <DashboardCard
