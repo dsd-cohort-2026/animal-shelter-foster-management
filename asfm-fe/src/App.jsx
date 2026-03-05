@@ -15,6 +15,7 @@ import { useDashboardSummary } from './hooks/useDashboardSummary';
 import CustomBadge from './components/custom/CustomBadge';
 import { useBoundStore } from './store';
 import { DatePickerSimple } from './components/dateTimePicker';
+import { Link } from '@tanstack/react-router';
 
 function App() {
   // Loaned items table columns

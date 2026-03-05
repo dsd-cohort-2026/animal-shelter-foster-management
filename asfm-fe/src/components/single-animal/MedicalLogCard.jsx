@@ -15,7 +15,6 @@ export default function MedicalLogCard({log}) {
             throw new Error(`Fetch request error status: ${response.status}`)
         }
         const data = await response.json();
-        console.log('medication data', data)
         if (Object.keys(data).length === 0) {
             return null
         }
@@ -29,7 +28,6 @@ export default function MedicalLogCard({log}) {
             throw new Error(`Fetch request error status: ${response.status}`)
         }
         const data = await response.json();
-        console.log(data)
         setItem(data[0])
     }
 
