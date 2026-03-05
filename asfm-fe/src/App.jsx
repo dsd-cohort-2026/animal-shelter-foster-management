@@ -2,7 +2,6 @@ import FilterBar from './components/FilterBar';
 import SearchBar from './components/SearchBar';
 import FilterSelect from './components/custom/FilterSelect';
 import { Button } from './components/ui/button';
-import TopNavBar from './components/NonMemberSignInNavBar';
 import { ReusableTable } from './components/table_components';
 import { mockLoanedItems } from './features/mockLoanedItems';
 import DashboardCard from './components/custom/DashboardCard';

@@ -1,3 +1,5 @@
+const { ZodError, default: z } = require('zod');
+
 module.exports = globalErrorHandler = (err, req, res, next) => {
   // immediately make visible in the server
   console.error("Global error handler caught:", err);
@@ -25,7 +27,8 @@ module.exports = globalErrorHandler = (err, req, res, next) => {
 
   // provide fallback error code and message
   const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
+  const message =
+    (err instanceof ZodError && z.prettifyError(err)) || err.message || 'Internal Server Error';
 
   res.status(statusCode).json({ success: false, message });
 };

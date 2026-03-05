@@ -19,7 +19,9 @@ exports.getAllUsers = async () => {
 };
 
 exports.getUserById = async (id) => {
-  const user = await userRepository.findUnique(id);
+  const user = await userRepository.findById(id);
+
+  if (user === null) return user; // need this to trigger 404
 
   return {
     id: user.id,

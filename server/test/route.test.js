@@ -292,5 +292,73 @@ const runAllTests = async () => {
   console.log('\n=== All tests completed ===');
 };
 
+const userByIdTest = async () => {
+  try {
+    const STAFF_TOKEN = await getStaffUserToken();
+    const USER_TOKEN = await getRegularUserToken();
+    const user = await getRandomRegularUser();
+
+    // happy path - 200
+    console.log('\n=== TEST: GET /api/user/:id with STAFF token ===');
+    let res = await fetch(`http://localhost:8080/api/users/${user.id}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${STAFF_TOKEN}`
+      }
+    });
+    let data = await res.json()
+    console.log('Status: ', res.status)
+    console.log('response', JSON.stringify(data, null, 2))
+
+    // user token - 403
+    console.log('\n=== TEST: GET /api/user/:id with USER token ===');
+    res = await fetch(`http://localhost:8080/api/users/${user.id}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${USER_TOKEN}`
+      }
+    });
+    data = await res.json()
+    console.log('Status: ', res.status)
+    console.log('response', JSON.stringify(data, null, 2))
+
+    // missing token - 401
+    console.log('\n=== TEST: GET /api/user/:id with missing token ===');
+    res = await fetch(`http://localhost:8080/api/users/${user.id}`, {
+      method: 'GET',
+    });
+    data = await res.json()
+    console.log('Status: ', res.status)
+    console.log('response', JSON.stringify(data, null, 2))
+
+    // non-existent id - 404
+    console.log('\n=== TEST: GET /api/user/:id with non-existent id ===');
+    res = await fetch(`http://localhost:8080/api/users/81720ca2-4ce1-45bc-9ef1-5ff84176dff1`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${STAFF_TOKEN}`,
+      },
+    });
+    data = await res.json()
+    console.log('Status: ', res.status)
+    console.log('response', JSON.stringify(data, null, 2))
+
+    // invalid id - 400
+    console.log('\n=== TEST: GET /api/user/:id with invalid uuid ===');
+    res = await fetch(`http://localhost:8080/api/users/123`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${STAFF_TOKEN}`,
+      },
+    });
+    data = await res.json()
+    console.log('Status: ', res.status)
+    console.log('response', JSON.stringify(data, null, 2))
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 runTests();
 runAllTests();
+userByIdTest();
