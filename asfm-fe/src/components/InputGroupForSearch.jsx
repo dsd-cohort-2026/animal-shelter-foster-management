@@ -3,7 +3,7 @@ import { SearchIcon } from 'lucide-react';
 
 function InputGroupForSearch({ placeholder_text, add_search_icon = false, value, onChange }) {
   return (
-    <InputGroup className="border-highlight">
+    <InputGroup className="flex-1">
       <InputGroupInput
         placeholder={placeholder_text}
         value={value}

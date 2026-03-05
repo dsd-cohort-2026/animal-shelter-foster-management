@@ -1,5 +1,5 @@
 import FilterBar from './components/FilterBar';
-import SearchBar from './components/SearchBar';
+import InputGroupForSearch from './components/InputGroupForSearch';
 import FilterSelect from './components/custom/FilterSelect';
 import { Button } from './components/ui/button';
 import { ReusableTable } from './components/table_components';
@@ -87,10 +87,10 @@ function App() {
           selectTriggerClassName="w-[300px]"
           selectItems={['approved', 'pending', 'denied']}
         />
-        <SearchBar
+        <InputGroupForSearch
+          placeholder_text="Value to Match"
           value={filters.search}
           onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-          placeholder="Value to Match"
         />
       </FilterBar>
 

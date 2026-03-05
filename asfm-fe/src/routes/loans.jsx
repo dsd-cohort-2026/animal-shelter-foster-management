@@ -3,13 +3,15 @@ import Layout from '@/components/Layout'
 import BasicNavBar from '@/components/basicNavBar'
 import { ReusableTable } from '../components/table_components'
 import { useMemo, useState } from 'react'
-import { Edit } from 'lucide-react'
+import { Edit, ClipboardList, Plus } from 'lucide-react'
 import { mockLoanedItems } from '../features/mockLoanedItems'
 import FilterBar from '@/components/FilterBar'
 import FilterSelect from '@/components/custom/FilterSelect'
 import InputGroupForSearch from '@/components/InputGroupForSearch'
 import { ModalDialog } from '@/components/ModalDialog'
 import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 
 const LOAN_TYPES = ['Short-Term', 'Long-Term', 'Medical', 'Seasonal', 'Trial']
 
@@ -171,9 +173,42 @@ function RouteComponent() {
   if (error)
     return <div className="flex justify-center pt-8 text-red-500">{error}</div>
 
+  const totalLoans = allLoans.length
+  const activeCount = allLoans.filter(l => l.loanStatus === 'Active').length
+  const overdueCount = allLoans.filter(l => l.loanStatus === 'Overdue').length
+  const returnedCount = allLoans.filter(l => l.loanStatus === 'Returned').length
+
   return (
     <Layout navBar={<BasicNavBar />}>
-      <div className="flex justify-center py-2">Shelter's Loaned Items</div>
+      <div className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-8 mb-4">
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-4">
+            <div className="flex items-center justify-center size-12 sm:size-14 rounded-xl bg-secondary/20 shrink-0">
+              <ClipboardList className="size-6 sm:size-7 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                Shelter's Loaned Items
+              </h1>
+              <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+                Track and manage all shelter supply loans.
+              </p>
+              <div className="flex items-center gap-3 mt-3 flex-wrap">
+                <Badge variant="secondary" className="font-medium">{totalLoans} total</Badge>
+                {activeCount > 0 && (
+                  <Badge variant="outline" className="font-medium border-emerald-500/30 text-emerald-600 bg-emerald-500/5">{activeCount} active</Badge>
+                )}
+                {overdueCount > 0 && (
+                  <Badge variant="outline" className="font-medium border-red-500/30 text-red-600 bg-red-500/5">{overdueCount} overdue</Badge>
+                )}
+                {returnedCount > 0 && (
+                  <Badge variant="outline" className="font-medium border-blue-500/30 text-blue-600 bg-blue-500/5">{returnedCount} returned</Badge>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <FilterBar
         onFilter={() => {}}
@@ -204,7 +239,7 @@ function RouteComponent() {
         isLoading={loading}
         headerClassName="bg-secondary text-primary-foreground"
         tablebodyRowClassName="bg-white hover:bg-secondary/20"
-        containerClassName="overflow-auto max-h-150 rounded-lg border border-pale-sky shadow-sm relative w-full px-4 lg:px-8"
+        containerClassName="overflow-auto max-h-150 rounded-lg border border-pale-sky shadow-sm relative w-full"
       />
 
       <ModalDialog

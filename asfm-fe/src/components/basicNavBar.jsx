@@ -39,16 +39,11 @@ function BasicNavBar() {
         <Button variant="outline" className="text-s">
           My Animals
         </Button>
-<<<<<<< HEAD
         <Button variant="outline" onClick={handleAnimals}>
           Animals
         </Button>
-        <Button variant="outline">Inventory</Button>
-        <Button variant="outline">Loans</Button>
-=======
         <Button variant="outline" onClick={handleInventory}>Inventory</Button>
         <Button variant="outline" onClick={handleLoans}>Loans</Button>
->>>>>>> 98a2200 (ANIMALS-104-loans, my supplies, and inventory pages in progress)
         <Button variant="outline" onClick={handleMedicalLog}>
           Med Log
         </Button>

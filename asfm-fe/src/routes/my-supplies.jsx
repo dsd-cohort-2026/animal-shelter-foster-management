@@ -4,6 +4,8 @@ import BasicNavBar from '@/components/basicNavBar'
 import { ReusableTable } from '../components/table_components'
 import { useState } from 'react'
 import { mockLoanedItems } from '../features/mockLoanedItems'
+import { Badge } from '@/components/ui/badge'
+import { ShoppingBag } from 'lucide-react'
 
 const formatDate = (dateString) => {
   const date = new Date(dateString)
@@ -132,30 +134,49 @@ function RouteComponent() {
   if (error)
     return <div className="flex justify-center pt-8 text-red-500">{error}</div>
 
+  const activeCount = supplies.filter(s => s.loanStatus === 'Active').length
+  const returnedCount = supplies.filter(s => s.loanStatus === 'Returned').length
+
   return (
     <Layout navBar={<BasicNavBar />}>
-      <div className="flex justify-center py-2">My Supplies</div>
-
-      <div className="overflow-auto max-h-150 rounded-lg border border-pale-sky shadow-sm relative w-full">
-        <div className="flex justify-between items-center px-4 lg:px-8 py-3 bg-white border-b border-pale-sky">
-          <span className="text-sm text-gray-600 font-medium">User ID: {mockUser.userId}</span>
-          <span className="text-sm font-semibold">My Animal's Loaned Items</span>
-        </div>
-
-        {!loading && supplies.length === 0 && (
-          <div className="flex justify-center pt-8 text-gray-500">
-            No supplies currently assigned to you.
+      <div className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-8 mb-4">
+        <div className="flex items-start gap-4">
+          <div className="flex items-center justify-center size-12 sm:size-14 rounded-xl bg-secondary/20 shrink-0">
+            <ShoppingBag className="size-6 sm:size-7 text-primary" />
           </div>
-        )}
-        <ReusableTable
-          columns={suppliesColumns}
-          data={sortedSupplies}
-          isLoading={loading}
-          headerClassName="bg-secondary text-primary-foreground"
-          tablebodyRowClassName="bg-white hover:bg-secondary/20"
-          containerClassName="px-4 lg:px-8 overflow-auto"
-        />
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+              My Supplies
+            </h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+              User ID: {mockUser.userId} — supplies assigned to your foster animals.
+            </p>
+            <div className="flex items-center gap-3 mt-3 flex-wrap">
+              <Badge variant="secondary" className="font-medium">{supplies.length} total</Badge>
+              {activeCount > 0 && (
+                <Badge variant="outline" className="font-medium border-emerald-500/30 text-emerald-600 bg-emerald-500/5">{activeCount} active</Badge>
+              )}
+              {returnedCount > 0 && (
+                <Badge variant="outline" className="font-medium border-blue-500/30 text-blue-600 bg-blue-500/5">{returnedCount} returned</Badge>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
+
+      {!loading && supplies.length === 0 && (
+        <div className="flex justify-center pt-8 text-gray-500">
+          No supplies currently assigned to you.
+        </div>
+      )}
+      <ReusableTable
+        columns={suppliesColumns}
+        data={sortedSupplies}
+        isLoading={loading}
+        headerClassName="bg-secondary text-primary-foreground"
+        tablebodyRowClassName="bg-white hover:bg-secondary/20"
+        containerClassName="overflow-auto max-h-150 rounded-lg border border-pale-sky shadow-sm relative w-full"
+      />
     </Layout>
   )
 }

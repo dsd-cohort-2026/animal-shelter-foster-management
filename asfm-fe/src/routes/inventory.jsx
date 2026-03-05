@@ -9,7 +9,18 @@ import FilterSelect from '@/components/custom/FilterSelect';
 import InputGroupForSearch from '@/components/InputGroupForSearch'
 import { ModalDialog } from '@/components/ModalDialog'
 import { Input } from '@/components/ui/input'
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Package } from 'lucide-react';
+import { Badge } from '@/components/ui/badge'
+import ConfirmationDialog from '@/components/confirmationDialog'
+
+const formatDate = (dateString) => {
+  if (!dateString) return '—'
+  const date = new Date(dateString)
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const year = date.getFullYear()
+  return `${month}/${day}/${year}`
+}
 
 export const Route = createFileRoute('/inventory')({
   component: RouteComponent,
@@ -23,6 +34,10 @@ function RouteComponent() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editItem, setEditItem] = useState(null)
+  const [deleteItem, setDeleteItem] = useState(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
 
   useEffect(() => {
@@ -92,13 +107,18 @@ function RouteComponent() {
   }, [filters, allInventory, sortConfig])
 
   const handleEdit = (inventoryItem) => {
-    // TODO: Implement edit functionality
-    console.log('Edit:', inventoryItem)
+    setEditItem(inventoryItem)
+    setIsEditModalOpen(true)
+  }
+
+  const handleEditSubmit = () => {
+    console.log('Edit inventory item:', editItem)
+    setIsEditModalOpen(false)
   }
 
   const handleDelete = (inventoryItem) => {
-    // TODO: Implement delete functionality
-    console.log('Delete:', inventoryItem)
+    setDeleteItem(inventoryItem)
+    setShowDeleteConfirm(true)
   }
 
   const handleClearFilters = () => {
@@ -157,6 +177,7 @@ function RouteComponent() {
       header: getSortHeader("Expiration Date", "expiration_date"),
       textSize: "sm",
       headClassName: "min-w-[150px]",
+      cell: ({ row }) => formatDate(row.original.expiration_date),
     },
     {
       id: "actions",
@@ -184,10 +205,31 @@ function RouteComponent() {
 
   if (error) return <div className="flex justify-center pt-8 text-red-500">{error}</div>
 
+  const totalItems = allInventory.length
+  const categoryCount = categories.length
+
   return (
     <Layout navBar={<BasicNavBar />}>
-      <div className='flex justify-center py-2'>
-        Inventory
+      <div className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-8 mb-4">
+        <div className="flex items-start gap-4">
+          <div className="flex items-center justify-center size-12 sm:size-14 rounded-xl bg-secondary/20 shrink-0">
+            <Package className="size-6 sm:size-7 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+              Inventory
+            </h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+              Browse and manage shelter supply stock.
+            </p>
+            <div className="flex items-center gap-3 mt-3 flex-wrap">
+              <Badge variant="secondary" className="font-medium">{totalItems} items</Badge>
+              {categoryCount > 0 && (
+                <Badge variant="outline" className="font-medium border-blue-500/30 text-blue-600 bg-blue-500/5">{categoryCount} categories</Badge>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       <FilterBar
@@ -217,7 +259,7 @@ function RouteComponent() {
         isLoading={loading}
         headerClassName="bg-secondary text-primary-foreground"
         tablebodyRowClassName="bg-white hover:bg-secondary/20"
-        containerClassName='overflow-auto max-h-150 rounded-lg border border-pale-sky shadow-sm relative w-full px-4 lg:px-8'
+        containerClassName='overflow-auto max-h-150 rounded-lg border border-pale-sky shadow-sm relative w-full'
       />
 
       <ModalDialog
@@ -264,6 +306,51 @@ function RouteComponent() {
               placeholder="Enter description"
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
               rows="4"
+            />
+          </div>
+        </form>
+      </ModalDialog>
+      {showDeleteConfirm && (
+        <ConfirmationDialog
+          type="error"
+          primaryText="Delete Item"
+          secondaryText={`Are you sure you want to delete "${deleteItem?.item_name}"?`}
+          button="Delete"
+          onClose={() => setShowDeleteConfirm(false)}
+        />
+      )}
+
+      <ModalDialog
+        open={isEditModalOpen}
+        setOpen={setIsEditModalOpen}
+        title="Edit Inventory Item"
+        description="Update the details for this inventory item."
+        formId="editItemForm"
+        submitHandler={handleEditSubmit}
+        trigger={<div />}
+      >
+        <form id="editItemForm" className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Item Name</label>
+            <Input
+              value={editItem?.item_name ?? ''}
+              onChange={(e) => setEditItem({ ...editItem, item_name: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Category</label>
+            <FilterSelect
+              value={editItem?.category ?? ''}
+              onChange={(val) => setEditItem({ ...editItem, category: val })}
+              selectItems={['FOOD', 'MEDICINE', 'CRATE']}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Quantity</label>
+            <Input
+              type="number"
+              value={editItem?.quantity ?? ''}
+              onChange={(e) => setEditItem({ ...editItem, quantity: e.target.value })}
             />
           </div>
         </form>
