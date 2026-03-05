@@ -10,25 +10,33 @@ export default function MedicalLogCard({log}) {
     const url = "http://localhost:3005"; // <-- placeholder
 
     async function fetchMedication() {
-        const response = await fetch(`${url}/medication?id=${log.medication_id}`);
-        if (!response.ok) {
-            throw new Error(`Fetch request error status: ${response.status}`)
+        try {
+            const response = await fetch(`${url}/medication?id=${log.medication_id}`);
+            if (!response.ok) {
+                throw new Error(`Fetch request error status: ${response.status}`)
+            }
+            const data = await response.json();
+            if (Object.keys(data).length === 0) {
+                return null
+            }
+            setMedication(data)
+            return data
+        } catch (err) {
+            console.error(`Failed to fetch medication ${err}`)
         }
-        const data = await response.json();
-        if (Object.keys(data).length === 0) {
-            return null
-        }
-        setMedication(data)
-        return data
     }
 
     async function fetchMedicationItem(itemId) {
-        const response = await fetch(`${url}/items?id=${itemId}`);
-        if (!response.ok) {
-            throw new Error(`Fetch request error status: ${response.status}`)
+        try {
+            const response = await fetch(`${url}/items?id=${itemId}`);
+            if (!response.ok) {
+                throw new Error(`Fetch request error status: ${response.status}`)
+            }
+            const data = await response.json();
+            setItem(data[0])
+        } catch (err) {
+            console.error(`Failed to fetch item from medication id ${err}`)
         }
-        const data = await response.json();
-        setItem(data[0])
     }
 
     async function fetchMedicationInfo() {
@@ -40,8 +48,12 @@ export default function MedicalLogCard({log}) {
     }
 
     useEffect(() => {
-        fetchMedicationInfo(log.medicationId)
-    }, [])
+        const load = async () => {
+            await fetchMedicationInfo()
+        }
+
+        load()
+    }, [log.medication_id])
 
     return (
         <div className='ring-1 p-2 rounded-lg'>
