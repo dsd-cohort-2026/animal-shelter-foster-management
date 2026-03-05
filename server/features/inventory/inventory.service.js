@@ -28,8 +28,10 @@ exports.updateInventory = async (req) => {
       id: req.params.id,
       item_id: req.body.item_id,
       quantity: req.body.quantity,
-      expiration_date: new Date(req.body.expiration_date) || null,
     };
+    if (req.body.expiration_date) {
+      inventory.expiration_date = new Date(req.body.expiration_date);
+    }
     const inventory_transactions = {};
     inventory_transactions.create = {
       quantity: req.body.quantity,
