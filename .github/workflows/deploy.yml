@@ -41,7 +41,7 @@ jobs:
               - ".github/workflows/deploy.yml"
 
   deploy-frontend:
-    name: Deploy frontend to Netlify
+    name: Trigger frontend deploy on Render
     needs: changes
     if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
@@ -51,8 +51,7 @@ jobs:
     env:
       VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
       VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY }}
-      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+      RENDER_FRONTEND_DEPLOY_HOOK_URL: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -75,13 +74,11 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Validate Netlify secrets
-        run: |
-          test -n "$NETLIFY_AUTH_TOKEN"
-          test -n "$NETLIFY_SITE_ID"
+      - name: Validate Render hook secret
+        run: test -n "$RENDER_FRONTEND_DEPLOY_HOOK_URL"
 
-      - name: Deploy
-        run: npx netlify-cli deploy --dir=dist --prod --site "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN"
+      - name: Trigger deploy
+        run: curl --fail --show-error --silent --request POST "$RENDER_FRONTEND_DEPLOY_HOOK_URL"
 
   backend-precheck:
     name: Backend pre-deploy checks
