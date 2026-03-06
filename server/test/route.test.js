@@ -169,12 +169,15 @@ const testGetAnimalsWithFilters = async () => {
   try {
     const STAFF_TOKEN = await getStaffUserToken();
     console.log('\n=== TEST: GET /api/animals with filters ===');
-    const response = await fetch('http://localhost:8080/api/animals?species=DOG&foster_status=SHELTERED&sex=MALE', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${STAFF_TOKEN}`,
+    const response = await fetch(
+      'http://localhost:8080/api/animals?species=DOG&foster_status=SHELTERED&sex=MALE',
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${STAFF_TOKEN}`,
+        },
       },
-    });
+    );
     const data = await response.json();
     console.log(`Status: ${response.status}`);
     console.log(`Response: ${JSON.stringify(data, null, 2)}`);
@@ -303,33 +306,33 @@ const userByIdTest = async () => {
     let res = await fetch(`http://localhost:8080/api/users/${user.id}`, {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${STAFF_TOKEN}`
-      }
+        Authorization: `Bearer ${STAFF_TOKEN}`,
+      },
     });
-    let data = await res.json()
-    console.log('Status: ', res.status)
-    console.log('response', JSON.stringify(data, null, 2))
+    let data = await res.json();
+    console.log('Status: ', res.status);
+    console.log('response', JSON.stringify(data, null, 2));
 
     // user token - 403
     console.log('\n=== TEST: GET /api/user/:id with USER token ===');
     res = await fetch(`http://localhost:8080/api/users/${user.id}`, {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${USER_TOKEN}`
-      }
+        Authorization: `Bearer ${USER_TOKEN}`,
+      },
     });
-    data = await res.json()
-    console.log('Status: ', res.status)
-    console.log('response', JSON.stringify(data, null, 2))
+    data = await res.json();
+    console.log('Status: ', res.status);
+    console.log('response', JSON.stringify(data, null, 2));
 
     // missing token - 401
     console.log('\n=== TEST: GET /api/user/:id with missing token ===');
     res = await fetch(`http://localhost:8080/api/users/${user.id}`, {
       method: 'GET',
     });
-    data = await res.json()
-    console.log('Status: ', res.status)
-    console.log('response', JSON.stringify(data, null, 2))
+    data = await res.json();
+    console.log('Status: ', res.status);
+    console.log('response', JSON.stringify(data, null, 2));
 
     // non-existent id - 404
     console.log('\n=== TEST: GET /api/user/:id with non-existent id ===');
@@ -339,9 +342,9 @@ const userByIdTest = async () => {
         Authorization: `Bearer ${STAFF_TOKEN}`,
       },
     });
-    data = await res.json()
-    console.log('Status: ', res.status)
-    console.log('response', JSON.stringify(data, null, 2))
+    data = await res.json();
+    console.log('Status: ', res.status);
+    console.log('response', JSON.stringify(data, null, 2));
 
     // invalid id - 400
     console.log('\n=== TEST: GET /api/user/:id with invalid uuid ===');
@@ -351,14 +354,245 @@ const userByIdTest = async () => {
         Authorization: `Bearer ${STAFF_TOKEN}`,
       },
     });
-    data = await res.json()
-    console.log('Status: ', res.status)
-    console.log('response', JSON.stringify(data, null, 2))
+    data = await res.json();
+    console.log('Status: ', res.status);
+    console.log('response', JSON.stringify(data, null, 2));
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
-runTests();
-runAllTests();
-userByIdTest();
+// runTests();
+// runAllTests();
+// userByIdTest();
+
+const runAddTransactionPostTests = async () => {
+  try {
+    const STAFF_TOKEN = await getStaffUserToken();
+    const staffUser = await getRandomStaffUser();
+    const regularUser = await getRandomRegularUser();
+    const inventory = await getRandomInventory();
+    const item = await prisma.item.findUnique({ where: { id: inventory.item_id } });
+    let test_number = 0;
+
+    let res = await fetch('http://localhost:8080/api/inventory-transactions/intake', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${STAFF_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quantity: 10,
+        status: 'COMPLETE',
+        staff_user: staffUser.id,
+        item_name: 'Test Food Item',
+        item_brand: 'Test',
+        item_description: 'Food Item',
+        notes: '-',
+        item_category: 'FOOD',
+        item_species: 'CAT',
+        item_unit: 'can',
+        item_is_active: true,
+        item_food_life_stage: 'ADULT',
+      }),
+    });
+    let data = await res.json();
+    if (res.status === 201) console.log('test 1 passed: new item on intake');
+    else console.log('test 1 failed: new item on intake');
+
+    res = await fetch('http://localhost:8080/api/inventory-transactions/intake', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${STAFF_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quantity: 5,
+        status: 'COMPLETE',
+        staff_user: staffUser.id,
+        item_id: item.id,
+        notes: 'Pre-Existing Item',
+      }),
+    });
+    data = await res.json();
+    if (res.status === 201)
+      console.log('test 2 passed: existing item on intake, find inventory by id');
+    else console.log('test 2 failed: existing item on intake, find inventory by id');
+
+    res = await fetch('http://localhost:8080/api/inventory-transactions/intake', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${STAFF_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quantity: 3,
+        status: 'COMPLETE',
+        staff_user: staffUser.id,
+        notes: 'eferenced Specific Inventory',
+        item_id: item.id,
+        inventory_id: inventory.id,
+      }),
+    });
+    data = await res.json();
+    if (res.status === 201) console.log('test 3 passed: existing item, explicit inventory');
+    else console.log('test 3 failed: existing item, explicit inventory');
+
+    res = await fetch('http://localhost:8080/api/inventory-transactions/intake', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${STAFF_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quantity: 5,
+        status: 'COMPLETE',
+        notes: `This won't pass anyways`,
+        staff_user: staffUser.id,
+      }),
+    });
+    data = await res.json();
+    if (res.status === 400)
+      console.log('test 4 passed: rejects lack of BOTH item_id and values to create item');
+    else console.log('test 4 failed: need to supply item_id or values to create item');
+
+    res = await fetch('http://localhost:8080/api/inventory-transactions/intake', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${STAFF_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quantity: 5,
+        status: 'COMPLETE',
+        staff_user: staffUser.id,
+        item_name: 'Missing Stage Food',
+        item_category: 'FOOD',
+        item_species: 'DOG',
+        item_unit: 'bag',
+        item_is_active: true,
+        item_brand: 'Test',
+        item_description: 'Food Item',
+        notes: '-',
+      }),
+    });
+    data = await res.json();
+    if (res.status === 400)
+      console.log('test 5 passed: rejects a new food that misses food properties (life_stage)');
+    else
+      console.log(
+        'test 5 failed: should reject a new food that misses food properties (life_stage)',
+      );
+
+    res = await fetch('http://localhost:8080/api/inventory-transactions/intake', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${STAFF_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quantity: 5,
+        status: 'COMPLETE',
+        item_id: item.id,
+        notes: 'This is here!',
+      }),
+    });
+    data = await res.json();
+    if (res.status === 400)
+      console.log('test 6 passed: rejects a transaction that isnt attributed to a staff_user');
+    else console.log('test 6 failed: should reject the lack of a staff_user');
+
+    res = await fetch('http://localhost:8080/api/inventory-transactions/distribute', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${STAFF_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quantity: 1,
+        type: 'DISTRIBUTION',
+        status: 'COMPLETE',
+        staff_user: staffUser.id,
+        foster_user: regularUser.id,
+        item_id: item.id,
+        notes: 'Passes with no inventory referenced',
+      }),
+    });
+    data = await res.json();
+    if (res.status === 201)
+      console.log('test 7 passed: accepts no inventory_id, finds it based off of item_id');
+    else console.log('test 7 failed: should allow a lack of inventory_id');
+
+    res = await fetch('http://localhost:8080/api/inventory-transactions/distribute', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${STAFF_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quantity: 1,
+        type: 'LOAN',
+        status: 'ACTIVE',
+        staff_user: staffUser.id,
+        foster_user: regularUser.id,
+        item_id: item.id,
+        notes: 'On Loan',
+      }),
+    });
+    data = await res.json();
+    if (res.status === 201) console.log('test 8 passed: allows active loans');
+    else console.log('test 8 failed: should allow active loans');
+
+    res = await fetch('http://localhost:8080/api/inventory-transactions/distribute', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${STAFF_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quantity: 999999,
+        type: 'DISTRIBUTION',
+        status: 'COMPLETE',
+        staff_user: staffUser.id,
+        foster_user: regularUser.id,
+        item_id: item.id,
+        notes: `That's a lot of food...`,
+      }),
+    });
+    data = await res.json();
+    if (res.status === 400)
+      console.log('test 9 passed: rejects when quantity exceeds all inventory count');
+    else console.log('test 9 failed: should reject when quantity exceeds all inventory count');
+
+    res = await fetch('http://localhost:8080/api/inventory-transactions/distribute', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${STAFF_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quantity: 1,
+        type: 'DISTRIBUTION',
+        status: 'COMPLETE',
+        staff_user: staffUser.id,
+        foster_user: regularUser.id,
+        notes: 'What item are we talking about here?',
+      }),
+    });
+    data = await res.json();
+    if (res.status === 400)
+      console.log('test 10 passed: rejects a distribution of an unknown / nonexistent item');
+    else console.log('test 10 failed: should reject missing item_id');
+
+    res = await fetch('http://localhost:8080/api/inventory-transactions/distribute', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${STAFF_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quantity: 1,
+        type: 'INTAKE',
+        status: 'ACTIVE',
+        staff_user: staffUser.id,
+        foster_user: regularUser.id,
+        item_id: item.id,
+        notes: `We should be good here, but an intake won't work`,
+      }),
+    });
+    data = await res.json();
+    if (res.status === 400)
+      console.log('test 11 passed: rejects an INTAKE on /distribute endpoint');
+    else console.log('test 11 failed: /distribute should not accept INTAKE');
+
+    res = await fetch('http://localhost:8080/api/inventory-transactions/distribute', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${STAFF_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quantity: 1,
+        type: 'DISTRIBUTION',
+        status: 'COMPLETE',
+        staff_user: staffUser.id,
+        item_id: item.id,
+        notes: `Who'd this go to?`,
+      }),
+    });
+    data = await res.json();
+    if (res.status === 400)
+      console.log(
+        'test 12 passed: loans and distributions should reject when not associated with a foster_user',
+      );
+    else console.log('test 12 failed: should reject a loan to no one');
+  } catch (error) {
+    console.log({ error });
+  }
+};
+
+runAddTransactionPostTests();
