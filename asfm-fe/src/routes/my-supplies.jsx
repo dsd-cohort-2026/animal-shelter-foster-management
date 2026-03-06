@@ -31,91 +31,62 @@ function RouteComponent() {
   )
   const [loading] = useState(false)
   const [error] = useState(null)
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
-
-  const sortedSupplies = [...supplies].sort((a, b) => {
-    if (!sortConfig.key) return 0
-    const aVal = a[sortConfig.key]
-    const bVal = b[sortConfig.key]
-
-    if (typeof aVal === 'string') {
-      return sortConfig.direction === 'asc'
-        ? aVal.localeCompare(bVal)
-        : bVal.localeCompare(aVal)
-    }
-    return sortConfig.direction === 'asc'
-      ? aVal - bVal
-      : bVal - aVal
-  })
-
-  const handleSort = (key) => {
-    setSortConfig(prev => ({
-      key,
-      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
-    }))
-  }
-
-  const getSortHeader = (label, key) => {
-    const isActive = sortConfig.key === key
-    const indicator = isActive ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : ''
-    return (
-      <button
-        onClick={() => handleSort(key)}
-        className="flex items-center gap-1 hover:text-gray-700 font-medium"
-      >
-        {label}{indicator}
-      </button>
-    )
-  }
-
   const suppliesColumns = [
     {
       accessorKey: 'itemDescription',
-      header: getSortHeader('Item Description', 'itemDescription'),
+      header: 'Item Description',
+      sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[200px]',
     },
     {
       accessorKey: 'userId',
-      header: getSortHeader('User ID', 'userId'),
+      header: 'User ID',
+      sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[120px]',
     },
     {
       accessorKey: 'animalId',
-      header: getSortHeader('Animal ID', 'animalId'),
+      header: 'Animal ID',
+      sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[120px]',
     },
     {
       accessorKey: 'loanedAt',
-      header: getSortHeader('Loaned At', 'loanedAt'),
+      header: 'Loaned At',
+      sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[130px]',
       cell: ({ row }) => formatDate(row.original.loanedAt),
     },
     {
       accessorKey: 'expectedReturnDate',
-      header: getSortHeader('Expected Return Date', 'expectedReturnDate'),
+      header: 'Expected Return Date',
+      sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[180px]',
       cell: ({ row }) => formatDate(row.original.expectedReturnDate),
     },
     {
       accessorKey: 'loanType',
-      header: getSortHeader('Loan Type', 'loanType'),
+      header: 'Loan Type',
+      sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[120px]',
     },
     {
       accessorKey: 'loanStatus',
-      header: getSortHeader('Loan Status', 'loanStatus'),
+      header: 'Loan Status',
+      sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[120px]',
     },
     {
       accessorKey: 'inventoryTransactionId',
-      header: getSortHeader('Inventory Transaction ID', 'inventoryTransactionId'),
+      header: 'Inventory Transaction ID',
+      sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[180px]',
     },
@@ -171,7 +142,7 @@ function RouteComponent() {
       )}
       <ReusableTable
         columns={suppliesColumns}
-        data={sortedSupplies}
+        data={supplies}
         isLoading={loading}
         headerClassName="bg-secondary text-primary-foreground"
         tablebodyRowClassName="bg-white hover:bg-secondary/20"

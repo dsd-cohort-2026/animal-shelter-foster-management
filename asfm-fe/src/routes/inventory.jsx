@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import Layout from '@/components/Layout';
 import BasicNavBar from '@/components/basicNavBar'
 import { ReusableTable } from '../components/table_components'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import apiClient from '../lib/axios';
 import FilterBar from '@/components/FilterBar'
 import FilterSelect from '@/components/custom/FilterSelect';
@@ -28,7 +28,6 @@ export const Route = createFileRoute('/inventory')({
 
 function RouteComponent() {
   const [filters, setFilters] = useState({ category: '', search: '' })
-  const [inventory, setInventory] = useState([])
   const [allInventory, setAllInventory] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
@@ -38,7 +37,19 @@ function RouteComponent() {
   const [editItem, setEditItem] = useState(null)
   const [deleteItem, setDeleteItem] = useState(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
+
+  const filteredInventory = useMemo(() => {
+    let filtered = allInventory
+    if (filters.category) {
+      filtered = filtered.filter(item => item.category === filters.category)
+    }
+    if (filters.search) {
+      filtered = filtered.filter(item =>
+        item.item_name.toLowerCase().includes(filters.search.toLowerCase())
+      )
+    }
+    return filtered
+  }, [allInventory, filters])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,7 +73,6 @@ function RouteComponent() {
         }))
 
         setAllInventory(enrichedInventory)
-        setInventory(enrichedInventory)
         setCategories([...new Set(enrichedInventory.map(item => item.category))])
       } catch (err) {
         console.error('Error fetching data:', err)
@@ -73,38 +83,6 @@ function RouteComponent() {
     }
     fetchData()
   }, [])
-
-  useEffect(() => {
-    let filtered = allInventory
-
-    if (filters.category) {
-      filtered = filtered.filter(item => item.category === filters.category)
-    }
-
-    if (filters.search) {
-      filtered = filtered.filter(item =>
-        item.item_name.toLowerCase().includes(filters.search.toLowerCase())
-      )
-    }
-
-    // Apply sorting
-    const sorted = [...filtered].sort((a, b) => {
-      if (!sortConfig.key) return 0
-      const aVal = a[sortConfig.key]
-      const bVal = b[sortConfig.key]
-
-      if (typeof aVal === 'string') {
-        return sortConfig.direction === 'asc'
-          ? aVal.localeCompare(bVal)
-          : bVal.localeCompare(aVal)
-      }
-      return sortConfig.direction === 'asc'
-        ? aVal - bVal
-        : bVal - aVal
-    })
-
-    setInventory(sorted)
-  }, [filters, allInventory, sortConfig])
 
   const handleEdit = (inventoryItem) => {
     setEditItem(inventoryItem)
@@ -125,26 +103,6 @@ function RouteComponent() {
     setFilters({ search: '', category: '' })
   }
 
-  const handleSort = (key) => {
-    setSortConfig(prev => ({
-      key,
-      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
-    }))
-  }
-
-  const getSortHeader = (label, key) => {
-    const isActive = sortConfig.key === key
-    const indicator = isActive ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : ''
-    return (
-      <button
-        onClick={() => handleSort(key)}
-        className="flex items-center gap-1 hover:text-gray-700 font-medium"
-      >
-        {label}{indicator}
-      </button>
-    )
-  }
-
   const handleAddNew = () => {
     setIsModalOpen(true)
   }
@@ -156,25 +114,29 @@ function RouteComponent() {
   const inventoryColumns = [
     {
       accessorKey: "item_name",
-      header: getSortHeader("Item Name", "item_name"),
+      header: "Item Name",
+      sortable: true,
       textSize: "sm",
       headClassName: "min-w-[180px]",
     },
     {
       accessorKey: "category",
-      header: getSortHeader("Category", "category"),
+      header: "Category",
+      sortable: true,
       textSize: "sm",
       headClassName: "min-w-[180px]",
     },
     {
       accessorKey: "quantity",
-      header: getSortHeader("Quantity", "quantity"),
+      header: "Quantity",
+      sortable: true,
       textSize: "sm",
       headClassName: "min-w-[100px]",
     },
     {
       accessorKey: "expiration_date",
-      header: getSortHeader("Expiration Date", "expiration_date"),
+      header: "Expiration Date",
+      sortable: true,
       textSize: "sm",
       headClassName: "min-w-[150px]",
       cell: ({ row }) => formatDate(row.original.expiration_date),
@@ -244,12 +206,12 @@ function RouteComponent() {
         />
       </FilterBar>
 
-      {!loading && inventory.length === 0 && (
+      {!loading && filteredInventory.length === 0 && (
         <div className="flex justify-center pt-8 text-gray-500">No inventory items found.</div>
       )}
       <ReusableTable
         columns={inventoryColumns}
-        data={inventory}
+        data={filteredInventory}
         isLoading={loading}
         headerClassName="bg-secondary text-primary-foreground"
         tablebodyRowClassName="bg-white hover:bg-secondary/20"

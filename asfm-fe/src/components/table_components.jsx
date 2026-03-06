@@ -1,3 +1,4 @@
+import { useState, useMemo } from 'react';
 import {
   Table,
   TableBody,
@@ -17,16 +18,52 @@ export function ReusableTable({
   isLoading,
   numberOfRowForSkelton = 10,
 }) {
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
+
+  const handleSort = (key) => {
+    setSortConfig((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
+    }))
+  }
+
+  const sortedData = useMemo(() => {
+    if (!sortConfig.key) return data
+    return [...data].sort((a, b) => {
+      const aVal = a[sortConfig.key]
+      const bVal = b[sortConfig.key]
+      if (typeof aVal === 'string') {
+        return sortConfig.direction === 'asc'
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal)
+      }
+      return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal
+    })
+  }, [data, sortConfig])
+
   return (
     <div className={containerClassName}>
       <Table>
         <ShadcnTableHeader className={`sticky top-0 z-10 ${headerClassName}`}>
           <ShadcnTableRow>
-            {columns.map((column) => (
-              <TableHead key={column.accessorKey} className={column.headClassName}>
-                {column.header}
-              </TableHead>
-            ))}
+            {columns.map((column) => {
+              const isActive = sortConfig.key === column.accessorKey
+              const indicator = isActive ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : ''
+              return (
+                <TableHead key={column.accessorKey || column.id} className={column.headClassName}>
+                  {column.sortable ? (
+                    <button
+                      onClick={() => handleSort(column.accessorKey)}
+                      className="flex items-center gap-1 hover:text-gray-700 font-medium"
+                    >
+                      {column.header}{indicator}
+                    </button>
+                  ) : (
+                    column.header
+                  )}
+                </TableHead>
+              )
+            })}
           </ShadcnTableRow>
         </ShadcnTableHeader>
         <TableBody>
@@ -34,13 +71,13 @@ export function ReusableTable({
             ? Array.from({ length: numberOfRowForSkelton }).map((_, i) => (
                 <ShadcnTableRow key={i}>
                   {columns.map((column) => (
-                    <TableCell key={column.accessorKey} className={column.cellClassName}>
+                    <TableCell key={column.accessorKey || column.id} className={column.cellClassName}>
                       <Skeleton className="h-4" />
                     </TableCell>
                   ))}
                 </ShadcnTableRow>
               ))
-            : data.map((row, rowIndex) => (
+            : sortedData.map((row, rowIndex) => (
                 <ShadcnTableRow key={rowIndex} className={`${tablebodyRowClassName} `}>
                   {columns.map((column) => (
                     <TableCell key={column.accessorKey || column.id} className={column.cellClassName}>

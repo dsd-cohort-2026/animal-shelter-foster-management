@@ -34,9 +34,7 @@ function RouteComponent() {
   const [filters, setFilters] = useState({ search: '', loanStatus: '' })
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [formData, setFormData] = useState({ loanType: '' })
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
-
-  const loans = useMemo(() => {
+  const filteredLoans = useMemo(() => {
     let filtered = allLoans
     if (filters.search) {
       filtered = filtered.filter(l =>
@@ -46,25 +44,8 @@ function RouteComponent() {
     if (filters.loanStatus) {
       filtered = filtered.filter(l => l.loanStatus === filters.loanStatus)
     }
-
-    // Apply sorting
-    const sorted = [...filtered].sort((a, b) => {
-      if (!sortConfig.key) return 0
-      const aVal = a[sortConfig.key]
-      const bVal = b[sortConfig.key]
-
-      if (typeof aVal === 'string') {
-        return sortConfig.direction === 'asc'
-          ? aVal.localeCompare(bVal)
-          : bVal.localeCompare(aVal)
-      }
-      return sortConfig.direction === 'asc'
-        ? aVal - bVal
-        : bVal - aVal
-    })
-
-    return sorted
-  }, [filters, allLoans, sortConfig])
+    return filtered
+  }, [filters, allLoans])
 
   const handleEdit = (loan) => {
     console.log('Edit loan:', loan)
@@ -72,26 +53,6 @@ function RouteComponent() {
 
   const handleClearFilters = () => {
     setFilters({ search: '', loanStatus: '' })
-  }
-
-  const handleSort = (key) => {
-    setSortConfig(prev => ({
-      key,
-      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
-    }))
-  }
-
-  const getSortHeader = (label, key) => {
-    const isActive = sortConfig.key === key
-    const indicator = isActive ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : ''
-    return (
-      <button
-        onClick={() => handleSort(key)}
-        className="flex items-center gap-1 hover:text-gray-700 font-medium"
-      >
-        {label}{indicator}
-      </button>
-    )
   }
 
   const handleAddNew = () => {
@@ -107,51 +68,59 @@ function RouteComponent() {
   const loansColumns = [
     {
       accessorKey: 'itemDescription',
-      header: getSortHeader('Item Description', 'itemDescription'),
+      header: 'Item Description',
+      sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[200px]',
     },
     {
       accessorKey: 'userId',
-      header: getSortHeader('User ID', 'userId'),
+      header: 'User ID',
+      sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[120px]',
     },
     {
       accessorKey: 'animalId',
-      header: getSortHeader('Animal ID', 'animalId'),
+      header: 'Animal ID',
+      sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[120px]',
     },
     {
       accessorKey: 'loanedAt',
-      header: getSortHeader('Loaned At', 'loanedAt'),
+      header: 'Loaned At',
+      sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[130px]',
       cell: ({ row }) => formatDate(row.original.loanedAt),
     },
     {
       accessorKey: 'expectedReturnDate',
-      header: getSortHeader('Expected Return Date', 'expectedReturnDate'),
+      header: 'Expected Return Date',
+      sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[180px]',
       cell: ({ row }) => formatDate(row.original.expectedReturnDate),
     },
     {
       accessorKey: 'loanType',
-      header: getSortHeader('Loan Type', 'loanType'),
+      header: 'Loan Type',
+      sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[120px]',
     },
     {
       accessorKey: 'loanStatus',
-      header: getSortHeader('Loan Status', 'loanStatus'),
+      header: 'Loan Status',
+      sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[120px]',
     },
     {
       accessorKey: 'inventoryTransactionId',
-      header: getSortHeader('Inventory Transaction ID', 'inventoryTransactionId'),
+      header: 'Inventory Transaction ID',
+      sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[180px]',
     },
@@ -228,14 +197,14 @@ function RouteComponent() {
         />
       </FilterBar>
 
-      {!loading && loans.length === 0 && (
+      {!loading && filteredLoans.length === 0 && (
         <div className="flex justify-center pt-8 text-gray-500">
           No active loans found.
         </div>
       )}
       <ReusableTable
         columns={loansColumns}
-        data={loans}
+        data={filteredLoans}
         isLoading={loading}
         headerClassName="bg-secondary text-primary-foreground"
         tablebodyRowClassName="bg-white hover:bg-secondary/20"
