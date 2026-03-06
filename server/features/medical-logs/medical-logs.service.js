@@ -1,7 +1,13 @@
 const medicalLogRepository = require('./medical-logs.repository');
 
-exports.getAllMedicalLogs = async () => {
-  const medicalLogs = await medicalLogRepository.findAll();
+exports.getAllMedicalLogs = async (user) => {
+  const where = {};
+
+  if (user.role === 'USER') {
+    where.foster_user_id = user.id;
+  }
+
+  const medicalLogs = await medicalLogRepository.findAll(where);
   return medicalLogs.map(medicalLog => ({
     id: medicalLog.id,
     foster_user_id: medicalLog.foster_user_id,

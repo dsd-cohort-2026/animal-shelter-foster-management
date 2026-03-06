@@ -1,12 +1,12 @@
 const medicalLogService = require('./medical-logs.service');
 
-exports.getAllMedicalLogs = async (req, res) => {
+exports.getAllMedicalLogs = async (req, res, next) => {
   try {
-    const medicalLogs = await medicalLogService.getAllMedicalLogs();
+    const user = req.user;
+    const medicalLogs = await medicalLogService.getAllMedicalLogs(user);
     res.status(200).json(medicalLogs);
   } catch (error) {
-    console.error("Error fetching medical logs:", error);
-    res.status(500).json({ message: "An error occurred while fetching medical logs" });
+    next(error);
   }
 }
 

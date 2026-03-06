@@ -11,12 +11,13 @@ import {
 } from "@/components/ui/popover"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
 
-export function DatePickerSimple({fieldLabelName}) {
+export function DatePickerSimple({fieldLabelName, className}) {
   const [date, setDate] = React.useState()
 
   return (
-    <Field className="mx-auto w-44">
+    <Field className={cn("mx-auto", className)}>
       <FieldLabel htmlFor="date-picker-simple">{fieldLabelName}</FieldLabel>
       <Popover>
         <PopoverTrigger asChild>

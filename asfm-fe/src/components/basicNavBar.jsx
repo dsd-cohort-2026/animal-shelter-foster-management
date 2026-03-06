@@ -15,6 +15,9 @@ function BasicNavBar() {
   const handleMedicalLog = () => {
     navigate({ to: '/medical-logs' });
   };
+  const handleAnimals = () => {
+    navigate({ to: '/animals' });
+  };
 
   // Debug: Log all routes
   return (
@@ -27,6 +30,9 @@ function BasicNavBar() {
         <Button variant="outline">All Users</Button>
         <Button variant="outline" className="text-s">
           My Animals
+        </Button>
+        <Button variant="outline" onClick={handleAnimals}>
+          Animals
         </Button>
         <Button variant="outline">Inventory</Button>
         <Button variant="outline">Loans</Button>

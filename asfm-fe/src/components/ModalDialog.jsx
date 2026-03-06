@@ -1,5 +1,6 @@
 import { Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
+import { cn } from '@/lib/utils';
 import {
   Dialog,
   DialogTrigger,
@@ -13,6 +14,16 @@ import {
   DialogClose,
 } from './ui/dialog';
 
+/**
+ * ModalDialog - A reusable dialog component with form support and scrollable content area.
+ *
+ * Key features:
+ * - Scrollable content area: Children are wrapped in a flex-1 overflow-y-auto div
+ *   to prevent the entire modal from scrolling, keeping header/footer fixed.
+ * - Customizable width via contentClassName prop (max-w-1/2 is default)
+ * - Form submission support with loading state
+ * - Note: Changed from max-w-125 to max-w-1/2 (50% of parent width) for better responsiveness
+ */
 export const ModalDialog = ({
   trigger,
   title,
@@ -23,6 +34,7 @@ export const ModalDialog = ({
   submitHandler,
   open,
   setOpen,
+  contentClassName,
   ...props
 }) => {
   return (
@@ -30,12 +42,19 @@ export const ModalDialog = ({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogPortal>
         <DialogOverlay>
-          <DialogContent className="max-w-125 max-h-[85vh] min-w-75 sm:min-h-38">
+          <DialogContent
+            className={cn(
+              'max-w-125 max-h-[85vh] min-w-75 sm:min-h-38',
+              contentClassName,
+            )}
+          >
             <DialogHeader>
               <DialogTitle>{title}</DialogTitle>
               <DialogDescription>{description}</DialogDescription>
             </DialogHeader>
-            {props.children}
+            <div className="flex-1 overflow-y-auto">
+              {props.children}
+            </div>
             <DialogFooter className="mt-4">
               <div className="flex justify-between w-full gap-4">
                 <DialogClose>

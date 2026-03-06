@@ -1,7 +1,9 @@
-function Layout({ children, navBar }) {
+import NavBar from './NavBar';
+
+function Layout ({ children }) {
   return (
     <div className="flex flex-col min-h-screen">
-      {navBar}
+      <NavBar />
       <main className="flex-1 p-4">
         {children}
       </main>
