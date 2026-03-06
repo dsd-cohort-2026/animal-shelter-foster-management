@@ -35,6 +35,9 @@ function NavBar() {
             <Button variant="outline" onClick={() => navigate({ to: '/medical-logs' })}>
               Med Log
             </Button>
+            <Button variant="outline" onClick={() => navigate({ to: '/medical-logs/admin' })}>
+              Admin Logs
+            </Button>
           </>
         )}
       </div>
