@@ -25,26 +25,13 @@ exports.getInventoryById = async (req, res) => {
   }
 };
 
-exports.updateInventoryItemQuantity = async (req, res) => {
+exports.updateInventory = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { quantity } = req.body;
-    const userId = '550e8400-e29b-41d4-a716-446655440202';
-
-    const inventoryItem = await inventoryService.getInventoryItemById(id);
-    if (!inventoryItem) {
-      return res.status(404).json({ message: 'Inventory item not found' });
-    }
-
-    const updatedInventory = await inventoryService.updateInventoryItemQuantity(
-      id,
-      quantity,
-      userId,
-    );
+    const updatedInventory = await inventoryService.updateInventory(req);
 
     res.status(200).json(updatedInventory);
   } catch (error) {
-    console.error('Error updating inventory item quantity:', error);
-    res.status(500).json({ message: 'An error occurred while updating inventory item quantity' });
+    console.error('Error updating inventory:', error);
+    res.status(500).json({ message: 'An error occurred while updating your inventory!' });
   }
 };

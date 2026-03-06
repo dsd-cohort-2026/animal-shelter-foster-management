@@ -22,35 +22,45 @@ exports.getInventoryItemById = async (id) => {
   };
 };
 
-exports.updateInventoryItemQuantity = async (inventoryId, newQuantity, userId) => {
-  const currentInventory = await inventoryRepository.findById(inventoryId);
+exports.updateInventory = async (req) => {
+  try {
+    if (req.body.quantity && !req.body.transaction_id) {
+      const err = new Error(
+        `You cannot update a quantity without also updating its corresponding transaction's quantity! Please provide a valid transaction ID!`,
+      );
+      err.statusCode = 400;
+      throw err;
+    }
+    const inventory = { id: req.params.id };
+    if (req.body.quantity || req.body.quantity === 0) inventory.quantity = req.body.quantity;
+    if (req.body.item_id) inventory.item_id = req.body.item_id;
+    if (req.body.expiration_date) inventory.expiration_date = new Date(req.body.expiration_date);
 
-  if (!currentInventory) {
-    throw new Error('Inventory item not found');
+    let inventory_transactions;
+    if (req.body.transaction_id) {
+      const update = {};
+      if (req.body.quantity || req.body.quantity === 0) update.quantity = req.body.quantity;
+      if (req.body.status) update.status = req.body.status;
+      if (req.body.type) update.type = req.body.type;
+      if (req.body.notes) update.notes = req.body.notes;
+      if (req.body.foster_user) update.foster_user = { connect: { id: req.body.foster_user } };
+      update.staff_user = { connect: { id: req.body.staff_user } };
+      if (req.body.item) update.item_id = { connect: { id: req.body.item_id } };
+      inventory_transactions = {
+        update: {
+          where: { id: req.body.transaction_id },
+          data: update,
+        },
+      };
+    }
+
+    const updatedInventory = await inventoryRepository.updateInventory({
+      inventory,
+      inventory_transactions,
+    });
+    return updatedInventory;
+  } catch (err) {
+    console.log(err);
+    throw err;
   }
-
-  const quantityChange = newQuantity - currentInventory.quantity;
-
-  const updatedInventory = await inventoryRepository.update(inventoryId, {
-    quantity: newQuantity,
-  });
-
-  await inventoryTransactionRepository.create({
-    inventory_id: inventoryId,
-    item_id: currentInventory.item_id,
-    qty_out: Math.abs(quantityChange),
-    status: quantityChange > 0 ? 'received' : 'distributed',
-    type: quantityChange > 0 ? 'restock' : 'distribution',
-    created_by_staff_user_id: userId,
-    foster_user_id: null,
-    notes: null,
-    return_date: null,
-  });
-
-  return {
-    id: updatedInventory.id,
-    item_id: updatedInventory.item_id,
-    quantity: updatedInventory.quantity,
-    expiration_date: updatedInventory.expiration_date,
-  };
 };

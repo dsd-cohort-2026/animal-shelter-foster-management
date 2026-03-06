@@ -99,15 +99,36 @@ const runTests = async () => {
     const USER_TOKEN = await getRegularUserToken();
     const staffUser = await getRandomStaffUser();
     const regularUser = await getRandomRegularUser();
+    const inventory = await prisma.inventory.findFirst({
+      where: {
+        inventory_transactions: { some: {} },
+      },
+      include: {
+        inventory_transactions: { take: 1 },
+      },
+    });
+    const transaction = inventory.inventory_transactions[0];
+    const item = await getRandomItem();
     const animal = await getRandomAnimal();
-    const PATH = `inventory`;
-    const METHOD = 'GET';
+    const PATH = `inventory/${inventory.id}`;
+    const METHOD = 'PATCH';
 
     const response = await fetch(`http://localhost:8080/api/${PATH}`, {
       method: METHOD,
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${STAFF_TOKEN}`,
       },
+      body: JSON.stringify({
+        quantity: 47835623,
+        expiration_date: '2026-12-30',
+        item_id: item.id,
+        foster_user: regularUser.id,
+        type: 'INTAKE',
+        status: 'COMPLETE',
+        notes: 'transaction complete, paid in full',
+        transaction_id: transaction.id,
+      }),
     });
     const data = await response.json();
     console.log({ data });
