@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useMemo, useEffect } from 'react';
 import Layout from '@/components/Layout';
-import BasicNavBar from '@/components/basicNavBar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -130,7 +129,7 @@ function AdminLogsPage() {
 
   if (medicalLogsError) {
     return (
-      <Layout navBar={<BasicNavBar />}>
+      <Layout>
         <RoleGuard allowedRoles={['STAFF']}>
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <p className="text-xl text-red-500">{medicalLogsError}</p>
@@ -144,7 +143,7 @@ function AdminLogsPage() {
   }
 
   return (
-    <Layout navBar={<BasicNavBar />}>
+    <Layout>
       <RoleGuard allowedRoles={['STAFF']}>
         <div className="flex flex-col gap-6 h-full">
           {/* Dashboard Header Card */}

@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useMemo, useEffect } from 'react';
 import Layout from '@/components/Layout';
-import BasicNavBar from '@/components/basicNavBar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -44,7 +43,7 @@ function MedicalLogListPage() {
 
   if (medicalLogsError) {
     return (
-      <Layout navBar={<BasicNavBar />}>
+      <Layout>
         <div className="flex flex-col items-center justify-center py-24 gap-4">
           <p className="text-xl text-red-500">{medicalLogsError}</p>
           <Button variant="outline" onClick={() => fetchMedicalLogs()}>
@@ -56,7 +55,7 @@ function MedicalLogListPage() {
   }
 
   return (
-    <Layout navBar={<BasicNavBar />}>
+    <Layout>
       <div className="space-y-6">
         {/* Header */}
         <div className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-8">

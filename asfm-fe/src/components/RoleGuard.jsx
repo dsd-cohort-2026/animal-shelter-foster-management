@@ -1,11 +1,11 @@
-import { useAuthStore } from '@/hooks/useAuthStore';
 import { useNavigate } from '@tanstack/react-router';
+import { useBoundStore } from '@/store';
 import { Button } from '@/components/ui/button';
 import { ShieldAlert } from 'lucide-react';
 
 export default function RoleGuard({ allowedRoles, children }) {
-  const { role } = useAuthStore();
   const navigate = useNavigate();
+  const { role } = useBoundStore((state) => state.user);
 
   if (!allowedRoles.includes(role)) {
     return (

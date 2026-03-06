@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useMemo, useEffect } from 'react';
 import Layout from '@/components/Layout';
-import BasicNavBar from '@/components/basicNavBar';
 import { ReusableTable } from '@/components/table_components';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -96,7 +95,7 @@ function AnimalListPage() {
 
   if (animalsError) {
     return (
-      <Layout navBar={<BasicNavBar />}>
+      <Layout>
         <div className="flex flex-col items-center justify-center py-24 gap-4">
           <p className="text-xl text-red-500">{animalsError}</p>
           <Button variant="outline" onClick={() => fetchAnimals()}>
@@ -108,7 +107,7 @@ function AnimalListPage() {
   }
 
   return (
-    <Layout navBar={<BasicNavBar />}>
+    <Layout>
       <div className="space-y-6">
         {/* Dashboard Header Card */}
         <div className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-8">

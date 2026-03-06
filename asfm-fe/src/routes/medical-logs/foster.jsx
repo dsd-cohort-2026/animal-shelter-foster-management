@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useMemo, useEffect } from 'react';
 import Layout from '@/components/Layout';
-import BasicNavBar from '@/components/basicNavBar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -43,7 +42,7 @@ function FosterLogsPage() {
 
   if (medicalLogsError) {
     return (
-      <Layout navBar={<BasicNavBar />}>
+      <Layout>
         <RoleGuard allowedRoles={['USER']}>
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <p className="text-xl text-red-500">{medicalLogsError}</p>
@@ -57,7 +56,7 @@ function FosterLogsPage() {
   }
 
   return (
-    <Layout navBar={<BasicNavBar />}>
+    <Layout>
       <RoleGuard allowedRoles={['USER']}>
         <div className="space-y-6">
           <div>

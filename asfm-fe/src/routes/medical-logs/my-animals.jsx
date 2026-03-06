@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useMemo, useEffect } from 'react';
 import Layout from '@/components/Layout';
-import BasicNavBar from '@/components/basicNavBar';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { HeartPulse } from 'lucide-react';
@@ -128,7 +127,7 @@ function MyAnimalsMedicalLogsPage() {
 
   if (medicalLogsError) {
     return (
-      <Layout navBar={<BasicNavBar />}>
+      <Layout>
         <RoleGuard allowedRoles={['USER']}>
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <p className="text-xl text-red-500">{medicalLogsError}</p>
@@ -139,7 +138,7 @@ function MyAnimalsMedicalLogsPage() {
   }
 
   return (
-    <Layout navBar={<BasicNavBar />}>
+    <Layout>
       <RoleGuard allowedRoles={['USER']}>
         <div className="space-y-6">
           {/* Dashboard Header Card */}
