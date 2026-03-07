@@ -10,6 +10,7 @@ import { FeatureSelector } from '@/components/FeatureSelector';
 import RoleGuard from '@/components/RoleGuard';
 import { useBoundStore } from '@/store';
 import { LOG_TYPE_OPTIONS, LOG_TYPE_COLORS, formatLogType } from '@/constants/medicalLogConstants';
+import { MedicalLogFilterBar } from '@/components/MedicalLogFilterBar';
 
 export const Route = createFileRoute('/medical-logs/foster')({
   component: FosterLogsPage,

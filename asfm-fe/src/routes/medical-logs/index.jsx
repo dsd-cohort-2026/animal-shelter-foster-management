@@ -10,6 +10,7 @@ import CustomBadge from '@/components/custom/CustomBadge';
 import { useBoundStore } from '@/store';
 import { LOG_TYPE_OPTIONS, LOG_TYPE_COLORS, formatLogType } from '@/constants/medicalLogConstants';
 import { ClipboardList, Plus } from 'lucide-react';
+import { MedicalLogFilterBar } from '@/components/MedicalLogFilterBar';
 
 export const Route = createFileRoute('/medical-logs/')(
   { component: MedicalLogListPage },
