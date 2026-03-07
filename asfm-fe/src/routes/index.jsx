@@ -5,7 +5,7 @@ import checkoutImage from '@/assets/checkout.jpeg';
 import medicationImage from '@/assets/medication.jpeg';
 import historyImage from '@/assets/history.jpeg';
 import { Button } from '@/components/ui/button';
-import { Bandage, BriefcaseMedical, Warehouse } from 'lucide-react';
+import { BriefcaseMedical, Dog, Warehouse } from 'lucide-react';
 
 export const Route = createFileRoute('/')({
   component: RouteComponent,
@@ -28,7 +28,7 @@ function RouteComponent() {
   return (
     <div className="flex flex-col items-center">
       {/* Hero */}
-      <div className="min-h-[75vh] flex items-center">
+      <section className="min-h-[75vh] flex items-center">
         <div className="bg-secondary/50 min-h-content w-full flex flex-col-reverse md:flex-row items-center justify-between rounded-2xl">
           <div className="flex flex-col max-w-[90vw] 2xl:max-w-[75vw] gap-3 md:gap-6 p-3 md:p-5 lg:p-7 md:max-w-[50vw] md:w-auto">
             <h1 className="text-2xl md:text-h1 text-primary">
@@ -47,9 +47,9 @@ function RouteComponent() {
             className="h-auto w-3xl aspect-square max-w-[90vw] md:max-w-[50vw] md:w-auto"
           />
         </div>
-      </div>
+      </section>
       {/* Features */}
-      <div className="min-h-[50vh] flex flex-col items-center gap-3 md:gap-6 my-[10%]">
+      <section className="min-h-[50vh] flex flex-col items-center gap-3 md:gap-6 my-[10%]">
         <h1 className="text-2xl md:text-h1 text-primary">Product Features</h1>
         <p className="text-center">
           Stop losing thousands in supplies and reduce medical liability
@@ -66,14 +66,14 @@ function RouteComponent() {
             <p>Foster parents record medication, symptoms, and behavior</p>
           </div>
           <div className="bg-secondary/30 px-2.5 lg:px-4 py-10 md:min-h-60 h-auto sm:w-1/3 flex flex-col justify-start rounded-xl">
-            <Bandage className="sm:h-8 sm:w-8" />
+            <Dog className="sm:h-8 sm:w-8" />
             <h2 className="text-h2">Animal Profile Database</h2>
             <p>One complete source of truth for every animal</p>
           </div>
         </div>
-      </div>
+      </section>
       {/* How it works */}
-      <div className="min-h-[50vh]">
+      <section className="min-h-[50vh]">
         <div className="flex flex-col items-center">
           <h1 className="text-h1 text-primary">How it works</h1>
           <div className="flex flex-col md:flex-row gap-3">
@@ -121,7 +121,7 @@ function RouteComponent() {
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
