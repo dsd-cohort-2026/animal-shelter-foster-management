@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FilterBar from './FilterBar';
 import SearchBar from './SearchBar';
 import { MultiSelect } from './ui/multi-select';
@@ -14,6 +14,10 @@ export function MedicalLogFilterBar({
   className,
 }) {
   const [tempFilters, setTempFilters] = useState(filters);
+
+  useEffect(() => {
+    setTempFilters(filters);
+  }, [filters]);
 
   const handleFilter = () => {
     onFiltersChange(tempFilters);
