@@ -45,6 +45,7 @@ function RouteComponent() {
           <img
             src={heroImage}
             className="h-auto w-3xl aspect-square max-w-[90vw] md:max-w-[50vw] md:w-auto"
+            alt='woman sitting in chair with tablet adn petting a dog'
           />
         </div>
       </section>
@@ -80,7 +81,7 @@ function RouteComponent() {
             <div className="relative inline-block">
               <img
                 src={checkoutImage}
-                alt=""
+                alt="woman checking out supplies at an animal shelter"
                 className="block w-[90%] md:w-full h-auto m-auto rounded-2xl"
                 loading="lazy"
               />
@@ -94,7 +95,7 @@ function RouteComponent() {
             <div className="relative inline-block">
               <img
                 src={medicationImage}
-                alt=""
+                alt="woman giving medications to dog"
                 className="block w-[90%] md:w-full h-auto m-auto rounded-2xl"
                 loading="lazy"
               />
@@ -108,7 +109,7 @@ function RouteComponent() {
             <div className="relative inline-block">
               <img
                 src={historyImage}
-                alt=""
+                alt="sitting dog"
                 className="block w-[90%] md:w-full h-auto m-auto rounded-2xl"
                 loading="lazy"
               />
