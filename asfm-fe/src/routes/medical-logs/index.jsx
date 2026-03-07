@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import CustomBadge from '@/components/custom/CustomBadge';
+import { MedicalLogFilterBar } from '@/components/MedicalLogFilterBar';
 import { useBoundStore } from '@/store';
 import { LOG_TYPE_OPTIONS, LOG_TYPE_COLORS, formatLogType } from '@/constants/medicalLogConstants';
 import { ClipboardList, Plus } from 'lucide-react';
@@ -23,8 +24,12 @@ function MedicalLogListPage() {
   const fetchMedicalLogs = useBoundStore((state) => state.fetchMedicalLogs);
   const fetchAnimals = useBoundStore((state) => state.fetchAnimals);
 
-  const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [filters, setFilters] = useState({
+    search: '',
+    dateRange: { from: null, to: null },
+    logTypes: [],
+    createdBy: 'all',
+  });
 
   useEffect(() => {
     fetchMedicalLogs();
@@ -34,12 +39,33 @@ function MedicalLogListPage() {
   const filtered = useMemo(() => {
     return medicalLogs
       .filter((log) => {
-        const matchesSearch = log.animal_name.toLowerCase().includes(search.toLowerCase());
-        const matchesCategory = categoryFilter === 'all' || log.category === categoryFilter;
-        return matchesSearch && matchesCategory;
+        // Search filter
+        const matchesSearch = log.animal_name.toLowerCase().includes(filters.search.toLowerCase());
+
+        // Date range filter
+        let matchesDateRange = true;
+        if (filters.dateRange.from) {
+          matchesDateRange = matchesDateRange && new Date(log.logged_at) >= filters.dateRange.from;
+        }
+        if (filters.dateRange.to) {
+          matchesDateRange = matchesDateRange && new Date(log.logged_at) <= filters.dateRange.to;
+        }
+
+        // Log type filter
+        const matchesLogTypes = filters.logTypes.length === 0 || filters.logTypes.includes(log.category);
+
+        // Created by filter
+        let matchesCreatedBy = true;
+        if (filters.createdBy === 'admin') {
+          matchesCreatedBy = !log.foster_user_id;
+        } else if (filters.createdBy === 'foster') {
+          matchesCreatedBy = !!log.foster_user_id;
+        }
+
+        return matchesSearch && matchesDateRange && matchesLogTypes && matchesCreatedBy;
       })
       .sort((a, b) => new Date(b.logged_at) - new Date(a.logged_at));
-  }, [medicalLogs, search, categoryFilter]);
+  }, [medicalLogs, filters]);
 
   if (medicalLogsError) {
     return (
@@ -84,27 +110,17 @@ function MedicalLogListPage() {
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap gap-3">
-          <Input
-            placeholder="Search by animal name..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="max-w-60"
+        <div className="space-y-4">
+          <MedicalLogFilterBar
+            filters={filters}
+            onFiltersChange={setFilters}
+            showCreatedBy={true}
+            onAddNew={() => navigate({ to: '/medical-logs/add' })}
+            addNewButtonLabel="Add Log"
           />
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-44">
-              <SelectValue placeholder="Log Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              {LOG_TYPE_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <p className="text-sm text-muted-foreground mt-2">
+            Showing {filtered.length} of {medicalLogs.length} logs
+          </p>
         </div>
 
         {/* Timeline */}
