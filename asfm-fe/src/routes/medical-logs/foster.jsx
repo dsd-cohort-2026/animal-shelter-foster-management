@@ -67,7 +67,8 @@ function FosterLogsPage() {
       if (!log.foster_user_id) return false;
 
       // Search filter
-      const matchesSearch = log.animal_name.toLowerCase().includes(filters.search.toLowerCase());
+      const animalName = log.animal_name || '';
+      const matchesSearch = animalName.toLowerCase().includes(filters.search.toLowerCase());
 
       // Date range filter
       let matchesDateRange = true;
