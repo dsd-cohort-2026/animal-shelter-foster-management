@@ -1,13 +1,12 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useMemo, useEffect } from 'react';
 import Layout from '@/components/Layout';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { ClipboardPlus, Plus } from 'lucide-react';
+import { ClipboardPlus } from 'lucide-react';
 import { ReusableTable } from '@/components/table_components';
 import CustomBadge from '@/components/custom/CustomBadge';
 import { FeatureSelector } from '@/components/FeatureSelector';
+import { MedicalLogFilterBar } from '@/components/MedicalLogFilterBar';
 import RoleGuard from '@/components/RoleGuard';
 import { useBoundStore } from '@/store';
 import { LOG_TYPE_OPTIONS, LOG_TYPE_COLORS, formatLogType } from '@/constants/medicalLogConstants';
@@ -49,22 +48,41 @@ function FosterLogsPage() {
   const medicalLogsError = useBoundStore((state) => state.medicalLogsError);
   const fetchMedicalLogs = useBoundStore((state) => state.fetchMedicalLogs);
 
-  const [search, setSearch] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [filters, setFilters] = useState({
+    search: '',
+    dateRange: { from: null, to: null },
+    logTypes: [],
+    createdBy: 'foster',
+  });
 
   useEffect(() => {
     fetchMedicalLogs();
   }, [fetchMedicalLogs]);
 
-  // Filter to only foster-permitted logs, then apply search/category
+  // Filter to only foster-permitted logs, then apply search/category/date filters
   const filtered = useMemo(() => {
     return medicalLogs.filter((log) => {
+      // First filter: only foster logs
       if (!log.foster_user_id) return false;
-      const matchesSearch = log.animal_name.toLowerCase().includes(search.toLowerCase());
-      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(log.category);
-      return matchesSearch && matchesCategory;
+
+      // Search filter
+      const matchesSearch = log.animal_name.toLowerCase().includes(filters.search.toLowerCase());
+
+      // Date range filter
+      let matchesDateRange = true;
+      if (filters.dateRange.from) {
+        matchesDateRange = matchesDateRange && new Date(log.logged_at) >= filters.dateRange.from;
+      }
+      if (filters.dateRange.to) {
+        matchesDateRange = matchesDateRange && new Date(log.logged_at) <= filters.dateRange.to;
+      }
+
+      // Log type filter
+      const matchesLogTypes = filters.logTypes.length === 0 || filters.logTypes.includes(log.category);
+
+      return matchesSearch && matchesDateRange && matchesLogTypes;
     });
-  }, [medicalLogs, search, selectedCategories]);
+  }, [medicalLogs, filters]);
 
   // Stats for header - foster-permitted logs only
   const fosterLogs = medicalLogs.filter((log) => log.foster_user_id);
@@ -165,28 +183,19 @@ function FosterLogsPage() {
                   </div>
                 </div>
               </div>
-              <Button onClick={() => navigate({ to: '/medical-logs/add' })} size="lg" className="shrink-0 sm:self-start gap-2">
-                <Plus className="size-5" />
-                Add Medical Log
-              </Button>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <Input
-              placeholder="Search by animal name..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="max-w-60"
-            />
-            <FeatureSelector
-              options={LOG_TYPE_OPTIONS}
-              selectedIds={selectedCategories}
-              onChange={setSelectedCategories}
-              label="Filter by Log Type"
-              className="w-auto"
-            />
-          </div>
+          <MedicalLogFilterBar
+            filters={filters}
+            onFiltersChange={setFilters}
+            showCreatedBy={false}
+            onAddNew={() => navigate({ to: '/medical-logs/add' })}
+            addNewButtonLabel="Add Medical Log"
+          />
+          <p className="text-sm text-muted-foreground mt-2">
+            Showing {filtered.length} of {fosterLogs.length} logs
+          </p>
 
           {!medicalLogsLoading && filtered.length === 0 ? (
             <p className="text-muted-foreground text-center py-12">
