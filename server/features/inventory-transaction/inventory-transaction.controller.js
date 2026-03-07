@@ -1,12 +1,13 @@
 const inventoryTransactionService = require('./inventory-transaction.service');
 
-exports.getAllInventoryTransactions = async (req, res) => {
+exports.getAllInventoryTransactions = async (req, res, next) => {
   try {
-    const inventoryTransaction = await inventoryTransactionService.getAllInventoryTransactions();
-    res.status(200).json(inventoryTransaction);
+    const filters = req.query || {};
+    const user = req.user;
+    const transactions = await inventoryTransactionService.getAllInventoryTransactions(filters, user);
+    res.status(200).json(transactions);
   } catch (error) {
-    console.error('Error fetching inventory transactions:', error);
-    res.status(500).json({ message: 'An error occurred while fetching inventory transactions' });
+    next(error);
   }
 };
 

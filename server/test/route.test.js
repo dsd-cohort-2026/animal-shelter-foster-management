@@ -6,6 +6,10 @@ const getRandomRegularUser = async () => {
   return regularUsers[Math.floor(Math.random() * regularUsers.length)];
 };
 
+const getUserByEmail = async (email) => {
+  return await prisma.user.findUnique({ where: { email } });
+};
+
 const getRandomStaffUser = async () => {
   const staffUsers = await prisma.user.findMany({ where: { role: 'STAFF' } });
   return staffUsers[Math.floor(Math.random() * staffUsers.length)];
@@ -710,4 +714,87 @@ const runAddTransactionPostTests = async () => {
   }
 };
 
+// Test: GET /api/inventory-transactions without token (should return 401)
+const testGetInventoryTransactionsNoToken = async () => {
+  try {
+    console.log('\n=== TEST: GET /api/inventory-transactions without token ===');
+    const response = await fetch('http://localhost:8080/api/inventory-transactions', {
+      method: 'GET',
+    });
+    const data = await response.json();
+    console.log(`Status: ${response.status}`);
+    console.log(`Response: ${JSON.stringify(data, null, 2)}`);
+    if (response.status === 401) {
+      console.log('✓ 401 returned for missing token');
+    } else {
+      console.log('✗ Expected 401 status');
+    }
+  } catch (error) {
+    console.log({ error });
+  }
+};
+
+// Test: GET /api/inventory-transactions as STAFF (should see all transactions)
+const testGetInventoryTransactionsAsStaff = async () => {
+  try {
+    const STAFF_TOKEN = await getStaffUserToken();
+    console.log('\n=== TEST: GET /api/inventory-transactions as STAFF ===');
+    const response = await fetch('http://localhost:8080/api/inventory-transactions', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${STAFF_TOKEN}`,
+      },
+    });
+    const data = await response.json();
+    console.log(`Status: ${response.status}`);
+    console.log(`Number of transactions returned: ${Array.isArray(data) ? data.length : 'N/A'}`);
+    if (response.status === 200 && Array.isArray(data)) {
+      console.log('✓ STAFF can fetch all transactions');
+    } else {
+      console.log('✗ STAFF fetch failed');
+    }
+  } catch (error) {
+    console.log({ error });
+  }
+};
+
+// Test: GET /api/inventory-transactions as USER (should see only their own transactions)
+const testGetInventoryTransactionsAsUser = async () => {
+  try {
+    const USER_TOKEN = await getRegularUserToken();
+    const regularUser = await getUserByEmail('regular@user.com');
+    console.log('\n=== TEST: GET /api/inventory-transactions as USER ===');
+    const response = await fetch('http://localhost:8080/api/inventory-transactions', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${USER_TOKEN}`,
+      },
+    });
+    const data = await response.json();
+    console.log(`Status: ${response.status}`);
+    console.log(`Number of transactions returned: ${Array.isArray(data) ? data.length : 'N/A'}`);
+    if (response.status === 200 && Array.isArray(data)) {
+      const allBelongToUser = data.every((t) => t.foster_user_id === regularUser.id);
+      if (allBelongToUser || data.length === 0) {
+        console.log('✓ USER sees only their own transactions');
+      } else {
+        console.log('✗ USER can see transactions that do not belong to them');
+      }
+    } else {
+      console.log('✗ USER fetch failed');
+    }
+  } catch (error) {
+    console.log({ error });
+  }
+};
+
+const runGetInventoryTransactionTests = async () => {
+  console.log('Starting GET /api/inventory-transactions tests...\n');
+  await testGetInventoryTransactionsNoToken();
+  await testGetInventoryTransactionsAsStaff();
+  await testGetInventoryTransactionsAsUser();
+  console.log('\n=== GET /api/inventory-transactions tests completed ===');
+};
+
 runAddTransactionPostTests();
+runGetInventoryTransactionTests();

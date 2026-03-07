@@ -1,7 +1,12 @@
 const prisma = require('../../connections/prisma-client');
 
-exports.findAll = async () => {
-  return await prisma.inventoryTransaction.findMany();
+exports.findAll = async (where = {}, skip = 0, take = 10) => {
+  return await prisma.inventoryTransaction.findMany({
+    where,
+    skip,
+    take,
+    orderBy: { created_at: 'desc' },
+  });
 };
 
 exports.findById = async (id) => {
