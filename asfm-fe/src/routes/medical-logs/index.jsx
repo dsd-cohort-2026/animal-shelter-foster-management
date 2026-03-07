@@ -1,0 +1,188 @@
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useState, useMemo, useEffect } from 'react';
+import Layout from '@/components/Layout';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import CustomBadge from '@/components/custom/CustomBadge';
+import { useBoundStore } from '@/store';
+import { LOG_TYPE_OPTIONS, LOG_TYPE_COLORS, formatLogType } from '@/constants/medicalLogConstants';
+import { ClipboardList, Plus } from 'lucide-react';
+import { MedicalLogFilterBar } from '@/components/MedicalLogFilterBar';
+
+export const Route = createFileRoute('/medical-logs/')(
+  { component: MedicalLogListPage },
+);
+
+function MedicalLogListPage() {
+  const navigate = useNavigate();
+  const medicalLogs = useBoundStore((state) => state.medicalLogs);
+  const medicalLogsLoading = useBoundStore((state) => state.medicalLogsLoading);
+  const medicalLogsError = useBoundStore((state) => state.medicalLogsError);
+  const fetchMedicalLogs = useBoundStore((state) => state.fetchMedicalLogs);
+  const fetchAnimals = useBoundStore((state) => state.fetchAnimals);
+
+  const [filters, setFilters] = useState({
+    search: '',
+    dateRange: { from: null, to: null },
+    logTypes: [],
+    createdBy: 'all',
+  });
+
+  useEffect(() => {
+    fetchMedicalLogs();
+    fetchAnimals();
+  }, [fetchMedicalLogs, fetchAnimals]);
+
+  const filtered = useMemo(() => {
+    return medicalLogs
+      .filter((log) => {
+        // Search filter
+        const matchesSearch = log.animal_name.toLowerCase().includes(filters.search.toLowerCase());
+
+        // Date range filter
+        let matchesDateRange = true;
+        if (filters.dateRange.from) {
+          matchesDateRange = matchesDateRange && new Date(log.logged_at) >= filters.dateRange.from;
+        }
+        if (filters.dateRange.to) {
+          matchesDateRange = matchesDateRange && new Date(log.logged_at) <= filters.dateRange.to;
+        }
+
+        // Log type filter
+        const matchesLogTypes = filters.logTypes.length === 0 || filters.logTypes.includes(log.category);
+
+        // Created by filter
+        let matchesCreatedBy = true;
+        if (filters.createdBy === 'admin') {
+          matchesCreatedBy = !log.foster_user_id;
+        } else if (filters.createdBy === 'foster') {
+          matchesCreatedBy = !!log.foster_user_id;
+        }
+
+        return matchesSearch && matchesDateRange && matchesLogTypes && matchesCreatedBy;
+      })
+      .sort((a, b) => new Date(b.logged_at) - new Date(a.logged_at));
+  }, [medicalLogs, filters]);
+
+  if (medicalLogsError) {
+    return (
+      <Layout>
+        <div className="flex flex-col items-center justify-center py-24 gap-4">
+          <p className="text-xl text-red-500">{medicalLogsError}</p>
+          <Button variant="outline" onClick={() => fetchMedicalLogs()}>
+            Retry
+          </Button>
+        </div>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-8">
+          <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="flex items-center justify-center size-12 sm:size-14 rounded-xl bg-secondary/20 shrink-0">
+                <ClipboardList className="size-6 sm:size-7 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                  Medical Logs
+                </h1>
+                <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+                  View and manage medical log entries for all animals.
+                </p>
+              </div>
+            </div>
+            <Button
+              onClick={() => navigate({ to: '/medical-logs/add' })}
+              size="lg"
+              className="shrink-0 sm:self-start gap-2"
+            >
+              <Plus className="size-5" />
+              Add Log
+            </Button>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <MedicalLogFilterBar
+            filters={filters}
+            onFiltersChange={setFilters}
+            showCreatedBy={true}
+            onAddNew={() => navigate({ to: '/medical-logs/add' })}
+            addNewButtonLabel="Add Log"
+          />
+          <p className="text-sm text-muted-foreground mt-2">
+            Showing {filtered.length} of {medicalLogs.length} logs
+          </p>
+        </div>
+
+        {/* Timeline */}
+        {medicalLogsLoading ? (
+          <div className="space-y-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i}>
+                <CardContent className="p-5 space-y-3">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-48" />
+                  <Skeleton className="h-3 w-full" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <p className="text-muted-foreground text-center py-12">
+            No medical logs match your search.
+          </p>
+        ) : (
+          <div className="relative space-y-4">
+            {/* Timeline line */}
+            <div className="absolute left-4 top-0 bottom-0 w-px bg-border hidden sm:block" />
+
+            {filtered.map((log) => (
+              <Card key={log.id} className="sm:ml-10 relative">
+                {/* Timeline dot */}
+                <div className="absolute -left-10 top-5 size-3 rounded-full bg-primary border-2 border-background hidden sm:block" />
+                <CardContent className="p-5">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <CustomBadge
+                      text={formatLogType(log.category)}
+                      badgeClassName={LOG_TYPE_COLORS[log.category]}
+                    />
+                    <span className="text-sm font-semibold">{log.animal_name}</span>
+                    <span className="text-xs text-muted-foreground ml-auto">
+                      {new Date(log.logged_at).toLocaleDateString()} {new Date(log.logged_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  {log.general_notes && (
+                    <p className="text-sm text-foreground">{log.general_notes}</p>
+                  )}
+                  {log.behavior_notes && (
+                    <p className="text-sm text-muted-foreground mt-1">{log.behavior_notes}</p>
+                  )}
+                  {log.prescription && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      <span className="font-medium">Rx:</span> {log.prescription}
+                    </p>
+                  )}
+                  {log.dose && (
+                    <p className="text-xs text-muted-foreground">
+                      <span className="font-medium">Dose:</span> {log.dose}
+                      {log.qty_administered != null && ` × ${log.qty_administered}`}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </Layout>
+  );
+}

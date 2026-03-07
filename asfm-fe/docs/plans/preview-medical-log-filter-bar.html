@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medical Log Filter Bar Preview</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    body {
+      background: #f5f5f5;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .preview-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #64748b;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .preview-container {
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    /* Filter Bar Styles */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      min-width: 200px;
+    }
+
+    .search-bar svg {
+      width: 16px;
+      height: 16px;
+      color: #64748b;
+    }
+
+    .search-bar input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 14px;
+      width: 100%;
+      color: #0f172a;
+    }
+
+    .search-bar input::placeholder {
+      color: #94a3b8;
+    }
+
+    .multi-select {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      min-width: 160px;
+      cursor: pointer;
+    }
+
+    .multi-select:hover {
+      border-color: #cbd5e1;
+    }
+
+    .multi-select .label {
+      font-size: 14px;
+      color: #0f172a;
+    }
+
+    .multi-select .arrow {
+      width: 16px;
+      height: 16px;
+      color: #64748b;
+    }
+
+    .advanced-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .advanced-btn:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .advanced-btn.active {
+      background: #3b82f6;
+      border-color: #3b82f6;
+      color: white;
+    }
+
+    .advanced-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background: currentColor;
+      border-radius: 50%;
+    }
+
+    .spacer {
+      flex: 1;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #3b82f6;
+      border: none;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+    }
+
+    .btn-outline {
+      background: white;
+      border: 1px solid #e2e8f0;
+      color: #475569;
+    }
+
+    .btn-outline:hover {
+      background: #f8fafc;
+    }
+
+    .btn-secondary {
+      background: #64748b;
+      border: none;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #475569;
+    }
+
+    /* Popover Styles */
+    .popover {
+      position: absolute;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      min-width: 320px;
+      z-index: 10;
+    }
+
+    .popover-section {
+      margin-bottom: 16px;
+    }
+
+    .popover-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .popover-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #475569;
+      margin-bottom: 8px;
+    }
+
+    .date-range-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #0f172a;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .date-range-btn:hover {
+      border-color: #cbd5e1;
+    }
+
+    .filter-select {
+      padding: 8px 12px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #0f172a;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .filter-select:hover {
+      border-color: #cbd5e1;
+    }
+
+    /* Comparison Layout */
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .comparison-item {
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .comparison-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 12px;
+    }
+
+    .old-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      background: #dcfce7;
+      color: #166534;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: auto;
+    }
+
+    .badge-warning {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-container">
+    <h1 style="font-size: 28px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">
+      Medical Log Filter Bar - Preview
+    </h1>
+    <p style="color: #64748b; margin-bottom: 40px;">
+      Priority-based layout showing only primary filters, with secondary filters behind the "Advanced" button
+    </p>
+
+    <!-- State 1: Default (no filters active) -->
+    <div>
+      <div class="preview-label">State 1: Default (No Active Filters)</div>
+      <div class="filter-bar">
+        <div class="search-bar">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input type="text" placeholder="Search by animal name" />
+        </div>
+
+        <div class="multi-select">
+          <span class="label">Log types</span>
+          <svg class="arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+
+        <button class="advanced-btn">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+          </svg>
+          Advanced
+        </button>
+
+        <div class="spacer"></div>
+
+        <button class="btn btn-primary">Filter Search</button>
+        <button class="btn btn-outline">Clear</button>
+        <button class="btn btn-secondary">Add Medical Log</button>
+      </div>
+    </div>
+
+    <!-- State 2: Some filters active -->
+    <div>
+      <div class="preview-label">State 2: Filters Active (2 log types selected + Advanced active)</div>
+      <div class="filter-bar">
+        <div class="search-bar">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input type="text" placeholder="Search by animal name" value="Buddy" />
+        </div>
+
+        <div class="multi-select" style="background: #eff6ff; border-color: #3b82f6;">
+          <span class="label" style="color: #3b82f6; font-weight: 500;">2 types selected</span>
+          <svg class="arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #3b82f6;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+
+        <button class="advanced-btn active">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+          </svg>
+          Advanced
+          <span class="dot"></span>
+        </button>
+
+        <div class="spacer"></div>
+
+        <button class="btn btn-primary">Filter Search</button>
+        <button class="btn btn-outline">Clear</button>
+        <button class="btn btn-secondary">Add Medical Log</button>
+      </div>
+    </div>
+
+    <!-- State 3: Advanced popover open -->
+    <div style="position: relative;">
+      <div class="preview-label">State 3: Advanced Popover Open (showing Date Range + Created By)</div>
+      
+      <div class="filter-bar" style="position: relative;">
+        <div class="search-bar">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input type="text" placeholder="Search by animal name" />
+        </div>
+
+        <div class="multi-select">
+          <span class="label">2 types selected</span>
+          <svg class="arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+
+        <button class="advanced-btn active" style="position: relative;">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+          </svg>
+          Advanced
+          <span class="dot"></span>
+        </button>
+
+        <div class="spacer"></div>
+
+        <button class="btn btn-primary">Filter Search</button>
+        <button class="btn btn-outline">Clear</button>
+        <button class="btn btn-secondary">Add Medical Log</button>
+
+        <!-- Popover positioned next to Advanced button -->
+        <div class="popover" style="position: absolute; left: 540px; top: 60px;">
+          <div class="popover-section">
+            <div class="popover-title">Date Range</div>
+            <button class="date-range-btn" style="background: #eff6ff; border-color: #3b82f6;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #3b82f6;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <span>Mar 01, 2026 - Mar 31, 2026</span>
+            </button>
+          </div>
+
+          <div class="popover-section">
+            <div class="popover-title">Created By</div>
+            <select class="filter-select">
+              <option>All Users</option>
+              <option selected>Admin/Staff</option>
+              <option>Foster</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison: Old vs New -->
+    <div>
+      <div class="preview-label">Comparison: Old Drawer vs New Filter Bar</div>
+      <div class="comparison">
+        <div class="comparison-item">
+          <div class="comparison-title">❌ Old: MedicalLogFilterDrawer (Sheet)</div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <div style="width: 100%; height: 40px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; display: flex; align-items: center; padding: 0 12px; font-size: 11px; color: #94a3b8;">
+              Button to open drawer →
+            </div>
+          </div>
+          <div style="background: #fee2e2; padding: 12px; border-radius: 6px; font-size: 12px; color: #7f1d1d; line-height: 1.6;">
+            <strong>Issues:</strong><br>
+            • Requires 2 clicks (open + apply)<br>
+            • Full drawer takes screen space<br>
+            • Can't see filters until opened<br>
+            • More modal interaction
+          </div>
+          <span class="badge badge-warning" style="margin-top: 8px;">Cluttered</span>
+        </div>
+
+        <div class="comparison-item">
+          <div class="comparison-title" style="color: #059669;">✅ New: MedicalLogFilterBar (Horizontal)</div>
+          <div style="margin-bottom: 8px;">
+            <div class="filter-bar" style="padding: 10px; font-size: 12px;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <div class="search-bar" style="min-width: 120px; padding: 6px 10px;">
+                  <span style="color: #94a3b8; font-size: 11px;">Search...</span>
+                </div>
+                <div class="multi-select" style="min-width: 120px; padding: 6px 10px;">
+                  <span style="font-size: 11px;">Log types</span>
+                </div>
+                <button class="advanced-btn" style="padding: 6px 10px; font-size: 11px;">
+                  Advanced
+                </button>
+                <div class="spacer"></div>
+                <button class="btn btn-primary" style="padding: 6px 12px; font-size: 11px;">Filter</button>
+              </div>
+            </div>
+          </div>
+          <div style="background: #dcfce7; padding: 12px; border-radius: 6px; font-size: 12px; color: #166534; line-height: 1.6;">
+            <strong>Benefits:</strong><br>
+            • Primary filters always visible<br>
+            • Only 2 components shown (50% less)<br>
+            • Quick access to common filters<br>
+            • Advanced filters 1 click away<br>
+            • Clean, minimal UI
+          </div>
+          <span class="badge" style="margin-top: 8px; background: #059669; color: white;">Clean</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layout specs -->
+    <div>
+      <div class="preview-label">Layout Specifications</div>
+      <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <th style="text-align: left; padding: 12px 8px; font-size: 13px; color: #64748b;">Metric</th>
+            <th style="text-align: left; padding: 12px 8px; font-size: 13px; color: #64748b;">Old Layout</th>
+            <th style="text-align: left; padding: 12px 8px; font-size: 13px; color: #64748b;">New Layout</th>
+            <th style="text-align: left; padding: 12px 8px; font-size: 13px; color: #64748b;">Improvement</th>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 12px 8px; font-size: 13px; color: #0f172a;">Visible components</td>
+            <td style="padding: 12px 8px; font-size: 13px; color: #64748b;">4 (all in drawer)</td>
+            <td style="padding: 12px 8px; font-size: 13px; color: #059669; font-weight: 500;">2 (primary)</td>
+            <td style="padding: 12px 8px; font-size: 13px; color: #059669; font-weight: 600;">↓ 50%</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 12px 8px; font-size: 13px; color: #0f172a;">Horizontal width</td>
+            <td style="padding: 12px 8px; font-size: 13px; color: #64748b;">N/A (drawer)</td>
+            <td style="padding: 12px 8px; font-size: 13px; color: #059669; font-weight: 500;">~600px</td>
+            <td style="padding: 12px 8px; font-size: 13px; color: #059669;">Compact</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 12px 8px; font-size: 13px; color: #0f172a;">Clicks to filter</td>
+            <td style="padding: 12px 8px; font-size: 13px; color: #64748b;">3 (open → set → apply)</td>
+            <td style="padding: 12px 8px; font-size: 13px; color: #059669; font-weight: 500;">2 (set → apply)</td>
+            <td style="padding: 12px 8px; font-size: 13px; color: #059669; font-weight: 600;">↓ 33%</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 12px 8px; font-size: 13px; color: #0f172a;">Visual clutter</td>
+            <td style="padding: 12px 8px; font-size: 13px; color: #dc2626;">High</td>
+            <td style="padding: 12px 8px; font-size: 13px; color: #059669; font-weight: 500;">Low</td>
+            <td style="padding: 12px 8px; font-size: 13px; color: #059669;">Clean</td>
+          </tr>
+          <tr>
+            <td style="padding: 12px 8px; font-size: 13px; color: #0f172a;">All filters accessible?</td>
+            <td style="padding: 12px 8px; font-size: 13px; color: #059669;">✓ Yes</td>
+            <td style="padding: 12px 8px; font-size: 13px; color: #059669;">✓ Yes</td>
+            <td style="padding: 12px 8px; font-size: 13px; color: #059669;">Same</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

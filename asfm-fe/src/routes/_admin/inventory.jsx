@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import Layout from '@/components/Layout';
-import BasicNavBar from '@/components/basicNavBar'
+import NavBar from '@/components/NavBar'
 import { ReusableTable } from '../../components/table_components'
 import { useEffect, useMemo, useState } from 'react'
 import apiClient from '../../lib/axios';
@@ -175,7 +175,7 @@ function RouteComponent() {
   const categoryCount = categories.length
 
   return (
-    <Layout navBar={<BasicNavBar />}>
+    <Layout navBar={<NavBar />}>
       <div className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-8 mb-4">
         <div className="flex items-start gap-4">
           <div className="flex items-center justify-center size-12 sm:size-14 rounded-xl bg-secondary/20 shrink-0">

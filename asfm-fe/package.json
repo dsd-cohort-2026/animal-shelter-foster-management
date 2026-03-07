@@ -14,7 +14,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.95.3",
     "@tailwindcss/vite": "^4.1.18",
-    "@tanstack/react-form": "^1.28.3",
+    "@tanstack/react-form": "^1.28.4",
     "@tanstack/react-router": "^1.160.2",
     "@tanstack/react-router-devtools": "^1.160.2",
     "@tanstack/react-table": "^8.21.3",

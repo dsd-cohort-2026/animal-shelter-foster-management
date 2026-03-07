@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import Layout from '@/components/Layout';
-import BasicNavBar from '@/components/basicNavBar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -62,7 +61,7 @@ function AnimalDetailPage() {
 
   if (animalsLoading) {
     return (
-      <Layout navBar={<BasicNavBar />}>
+      <Layout>
         <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
           <Skeleton className="h-8 w-40" />
           <Card>
@@ -87,7 +86,7 @@ function AnimalDetailPage() {
 
   if (animalsError) {
     return (
-      <Layout navBar={<BasicNavBar />}>
+      <Layout>
         <div className="flex flex-col items-center justify-center py-24 gap-4">
           <p className="text-xl text-red-500">{animalsError}</p>
           <Button variant="outline" onClick={() => fetchAnimals()}>
@@ -100,7 +99,7 @@ function AnimalDetailPage() {
 
   if (!animal) {
     return (
-      <Layout navBar={<BasicNavBar />}>
+      <Layout>
         <div className="flex flex-col items-center justify-center py-24 gap-4">
           <p className="text-xl text-muted-foreground">Animal not found.</p>
           <Button variant="outline" onClick={() => navigate({ to: '/animals' })}>
@@ -124,7 +123,7 @@ function AnimalDetailPage() {
   ];
 
   return (
-    <Layout navBar={<BasicNavBar />}>
+    <Layout>
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
         <Button variant="ghost" className="-ml-2" onClick={() => navigate({ to: '/animals' })}>
           ← Back to Animals
