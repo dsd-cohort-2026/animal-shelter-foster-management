@@ -199,6 +199,8 @@ export interface FileRouteTypes {
     | '/_user/my-supplies'
     | '/animals/$animalId'
     | '/animals/add'
+    | '/my-animals/$id'
+    | '/single-animal/$id'
     | '/animals/'
   fileRoutesById: FileRoutesById
 }
