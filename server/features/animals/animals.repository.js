@@ -111,9 +111,8 @@ exports.updateAnimalById = async (idAndBody) => {
   }
 };
 
-exports.softDelete = async (id) => {
-  return prisma.animal.update({
+exports.hardDelete = async (id) => {
+  return prisma.animal.delete({
     where: { id },
-    data: { deletedAt: new Date() },
   });
 };

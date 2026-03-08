@@ -170,7 +170,7 @@ exports.updateAnimalById = async (req) => {
 
 exports.deleteAnimal = async (id) => {
   try {
-    const deletedAnimal = await animalRepository.softDelete(id);
+    const deletedAnimal = await animalRepository.hardDelete(id);
     return deletedAnimal;
   } catch (err) {
     console.log(err);

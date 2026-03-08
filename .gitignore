@@ -41,3 +41,4 @@ coverage/
 
 # Mock data
 mock-api/db.json
+*.planning
