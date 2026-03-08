@@ -52,7 +52,6 @@ export function ReusableTable({
     ? {
         key: initialSort.key,
         direction: initialSort.direction,
-        columnIndex: columns.findIndex((col) => getColumnKey(col) === initialSort.key),
       }
     : { key: null, direction: 'asc' };
 
@@ -111,9 +110,9 @@ export function ReusableTable({
 
   // Handle sorting
   const sortedData = useMemo(() => {
-    if (!sortConfig.key || sortConfig.columnIndex == null) return data;
+    if (!sortConfig.key) return data;
 
-    const column = visibleColumnDefs[sortConfig.columnIndex];
+    const column = visibleColumnDefs.find((col) => getColumnKey(col) === sortConfig.key);
     if (!column) return data;
 
     return [...data].sort((a, b) => {
@@ -169,18 +168,17 @@ export function ReusableTable({
   };
 
   // Handle sort
-  const handleSort = (accessorKey, columnIndex) => {
+  const handleSort = (accessorKey) => {
     setSortConfig((prev) => {
       if (prev.key === accessorKey) {
-        // Toggle direction if same column
-        return {
-          key: prev.direction === 'asc' ? null : accessorKey,
-          direction: prev.direction === 'asc' ? 'asc' : 'desc',
-          columnIndex: prev.direction === 'asc' ? null : columnIndex,
-        };
+        if (prev.direction === 'asc') {
+          return { key: accessorKey, direction: 'desc' };
+        }
+        // Was desc, clear sort
+        return { key: null, direction: 'asc' };
       }
-      // New column, set to asc
-      return { key: accessorKey, direction: 'asc', columnIndex };
+      // New column, start with asc
+      return { key: accessorKey, direction: 'asc' };
     });
   };
 
@@ -191,7 +189,7 @@ export function ReusableTable({
         <Table>
           <ShadcnTableHeader className={`relative sticky top-0 z-10 ${headerClassName}`}>
             <ShadcnTableRow>
-              {visibleColumnDefs.map((column, index) => {
+              {visibleColumnDefs.map((column, _index) => {
                 const columnKey = getColumnKey(column);
                 const isSortable = column.sortable !== false;
                 const isActive = sortConfig.key === columnKey;
@@ -201,7 +199,7 @@ export function ReusableTable({
                   <TableHead key={columnKey} className={column.headClassName}>
                     {isSortable ? (
                       <button
-                        onClick={() => handleSort(columnKey, index)}
+                        onClick={() => handleSort(columnKey)}
                         className="flex items-center gap-1 hover:text-gray-700 font-medium text-left w-full"
                         type="button"
                       >
