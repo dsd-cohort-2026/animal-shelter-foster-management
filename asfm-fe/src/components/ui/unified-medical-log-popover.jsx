@@ -1,16 +1,21 @@
 import * as React from 'react';
-import { SlidersHorizontal, X, Clock, Calendar, Filter, ChevronDown, ChevronUp, Search } from 'lucide-react';
+import {
+  SlidersHorizontal,
+  X,
+  Clock,
+  Calendar,
+  Filter,
+  ChevronDown,
+  ChevronUp,
+  Search,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { DateRangePicker } from './date-range-picker';
 import FilterSelect from '../custom/FilterSelect';
 import { MultiSelect } from './multi-select';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from './popover';
+import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import { LOG_TYPE_OPTIONS } from '@/constants/medicalLogConstants';
 import { cn } from '@/lib/utils';
 
@@ -77,30 +82,32 @@ export function UnifiedMedicalLogPopover({
         });
       },
     },
-    ...(showCreatedBy ? [
-      {
-        id: 'admin-only',
-        label: 'Admin Logs Only',
-        icon: <Filter className="size-3" />,
-        apply: () => {
-          onFiltersChange({
-            ...filters,
-            createdBy: 'admin',
-          });
-        },
-      },
-      {
-        id: 'foster-only',
-        label: 'Foster Logs Only',
-        icon: <Filter className="size-3" />,
-        apply: () => {
-          onFiltersChange({
-            ...filters,
-            createdBy: 'foster',
-          });
-        },
-      },
-    ] : []),
+    ...(showCreatedBy
+      ? [
+          {
+            id: 'admin-only',
+            label: 'Admin Logs Only',
+            icon: <Filter className="size-3" />,
+            apply: () => {
+              onFiltersChange({
+                ...filters,
+                createdBy: 'admin',
+              });
+            },
+          },
+          {
+            id: 'foster-only',
+            label: 'Foster Logs Only',
+            icon: <Filter className="size-3" />,
+            apply: () => {
+              onFiltersChange({
+                ...filters,
+                createdBy: 'foster',
+              });
+            },
+          },
+        ]
+      : []),
   ];
 
   const handleClearAll = () => {
@@ -135,10 +142,7 @@ export function UnifiedMedicalLogPopover({
           <SlidersHorizontal className="size-4" />
           Filters
           {activeFilterCount > 0 && (
-            <Badge
-              variant="secondary"
-              className="ml-1 h-5 px-1.5 text-xs font-medium"
-            >
+            <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs font-medium">
               {activeFilterCount}
             </Badge>
           )}
@@ -173,10 +177,7 @@ export function UnifiedMedicalLogPopover({
                 />
               )}
               {(filters.dateRange?.from || filters.dateRange?.to) && (
-                <FilterChip
-                  label="Date Range"
-                  onRemove={() => handleRemoveFilter('dateRange')}
-                />
+                <FilterChip label="Date Range" onRemove={() => handleRemoveFilter('dateRange')} />
               )}
               {filters.logTypes?.length > 0 && (
                 <FilterChip
@@ -195,9 +196,7 @@ export function UnifiedMedicalLogPopover({
 
           {/* Quick presets - always visible */}
           <div className="px-4 py-3 space-y-2">
-            <p className="text-xs text-muted-foreground">
-              Quick presets for common queries
-            </p>
+            <p className="text-xs text-muted-foreground">Quick presets for common queries</p>
             <div className="grid grid-cols-2 gap-1.5">
               {presets.map((preset) => (
                 <Button
@@ -234,29 +233,21 @@ export function UnifiedMedicalLogPopover({
               <div className="px-4 pb-4 space-y-4">
                 {/* Date Range */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Date Range
-                  </label>
+                  <label className="text-sm font-medium mb-2 block">Date Range</label>
                   <DateRangePicker
                     value={filters.dateRange}
-                    onChange={(range) =>
-                      onFiltersChange({ ...filters, dateRange: range })
-                    }
+                    onChange={(range) => onFiltersChange({ ...filters, dateRange: range })}
                     className="w-full"
                   />
                 </div>
 
                 {/* Log Types */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Log Types
-                  </label>
+                  <label className="text-sm font-medium mb-2 block">Log Types</label>
                   <MultiSelect
                     options={LOG_TYPE_OPTIONS}
                     value={filters.logTypes}
-                    onChange={(types) =>
-                      onFiltersChange({ ...filters, logTypes: types })
-                    }
+                    onChange={(types) => onFiltersChange({ ...filters, logTypes: types })}
                     placeholder="All types"
                     className="w-full"
                   />
@@ -265,14 +256,10 @@ export function UnifiedMedicalLogPopover({
                 {/* Created By */}
                 {showCreatedBy && (
                   <div>
-                    <label className="text-sm font-medium mb-2 block">
-                      Created By
-                    </label>
+                    <label className="text-sm font-medium mb-2 block">Created By</label>
                     <FilterSelect
                       value={filters.createdBy}
-                      onChange={(value) =>
-                        onFiltersChange({ ...filters, createdBy: value })
-                      }
+                      onChange={(value) => onFiltersChange({ ...filters, createdBy: value })}
                       selectTriggerClassName="w-full"
                       selectItems={['all', 'admin', 'foster']}
                       selectItemsMap={{
@@ -285,11 +272,7 @@ export function UnifiedMedicalLogPopover({
                 )}
 
                 {/* Done button */}
-                <Button
-                  size="sm"
-                  onClick={() => setIsOpen(false)}
-                  className="w-full"
-                >
+                <Button size="sm" onClick={() => setIsOpen(false)} className="w-full">
                   Done
                 </Button>
               </div>

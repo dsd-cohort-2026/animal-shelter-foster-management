@@ -3,18 +3,10 @@ import { Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
-export function DateRangePicker({
-  value = { from: null, to: null },
-  onChange,
-  className,
-}) {
+export function DateRangePicker({ value = { from: null, to: null }, onChange, className }) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const formatDateRange = () => {

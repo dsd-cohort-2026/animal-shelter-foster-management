@@ -2,11 +2,8 @@ import * as React from 'react';
 import { X, Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 export function MultiSelect({
   options = [],
   value = [],
@@ -29,15 +26,14 @@ export function MultiSelect({
       ? `${selectedCount} type${selectedCount !== 1 ? 's' : ''} selected`
       : placeholder;
 
-  const selectedLabels = value.map(v => options.find(o => o.value === v)?.label).filter(Boolean);
+  const selectedLabels = value
+    .map((v) => options.find((o) => o.value === v)?.label)
+    .filter(Boolean);
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className={cn('w-[280px] justify-between', className)}
-        >
+        <Button variant="outline" className={cn('w-[280px] justify-between', className)}>
           <span className="truncate">{displayValue}</span>
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -50,7 +46,7 @@ export function MultiSelect({
               onClick={() => handleToggle(option.value)}
               className={cn(
                 'flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm hover:bg-accent hover:text-accent-foreground transition-colors',
-                'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
+                'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
               )}
             >
               <Checkbox
@@ -59,9 +55,7 @@ export function MultiSelect({
                 className="pointer-events-none"
               />
               <span className="flex-1 text-left">{option.label}</span>
-              {value.includes(option.value) && (
-                <Check className="size-4 text-primary" />
-              )}
+              {value.includes(option.value) && <Check className="size-4 text-primary" />}
             </button>
           ))}
         </div>
