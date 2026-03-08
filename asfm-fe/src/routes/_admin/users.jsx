@@ -4,15 +4,6 @@ import { useEffect, useState } from 'react';
 import apiClient from '../../lib/axios';
 import { Users as UsersIcon } from 'lucide-react';
 
-const formatDate = (dateString) => {
-  if (!dateString) return '—';
-  const date = new Date(dateString);
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const year = date.getFullYear();
-  return `${month}/${day}/${year}`;
-};
-
 export const Route = createFileRoute('/_admin/users')({
   component: RouteComponent,
 });
@@ -61,6 +52,7 @@ function RouteComponent() {
       sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[180px]',
+      cell: ({ row }) => `${row.original.first_name} ${row.original.last_name}`,
     },
     {
       accessorKey: 'email',
@@ -77,12 +69,11 @@ function RouteComponent() {
       headClassName: 'min-w-[100px]',
     },
     {
-      accessorKey: 'created_at',
-      header: 'Created At',
+      accessorKey: 'address',
+      header: 'Address',
       sortable: true,
       textSize: 'sm',
-      headClassName: 'min-w-[120px]',
-      cell: ({ row }) => formatDate(row.original.created_at),
+      headClassName: 'min-w-[150px]',
     },
   ];
 
