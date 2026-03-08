@@ -111,7 +111,7 @@ export function ReusableTable({
 
   // Handle sorting
   const sortedData = useMemo(() => {
-    if (!sortConfig.key || !sortConfig.columnIndex) return data;
+    if (!sortConfig.key || sortConfig.columnIndex == null) return data;
 
     const column = visibleColumnDefs[sortConfig.columnIndex];
     if (!column) return data;
