@@ -1,4 +1,3 @@
-import Layout from '@/components/Layout';
 import SignInForm from '@/components/SignInForm';
 import { useBoundStore } from '@/store';
 import { createFileRoute, redirect } from '@tanstack/react-router';
@@ -20,9 +19,5 @@ export const Route = createFileRoute('/SignIn')({
 });
 
 function RouteComponent() {
-  return (
-    <Layout>
-      <SignInForm />
-    </Layout>
-  );
+  return <SignInForm />;
 }

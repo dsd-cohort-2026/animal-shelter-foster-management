@@ -15,10 +15,10 @@ function NavBar() {
   };
 
   return (
-    <nav className="bg-secondary p-4 flex gap-4">
+    <nav className="bg-secondary w-full flex p-2 gap-2 md:p-4 md:gap-4">
       <img src={logo} alt="Company Logo" className="h-17 w-17 -m-3" loading="lazy" />
       {/* Authorized Section*/}
-      <div className="flex flex-grid items-center gap-4">
+      <div className="flex flex-grid items-center gap-1 md:gap-3">
         <Button variant="outline" onClick={() => navigate({ to: '/' })}>
           Home
         </Button>
@@ -47,13 +47,11 @@ function NavBar() {
       </div>
 
       {/* Authenticated Section*/}
-      <div className="flex items-center gap-4 ml-auto">
+      <div className="flex items-center gap-1 md:gap-3 ml-auto">
         {user ? (
-          <div className="flex items-center gap-4 ml-auto">
+          <div className="flex items-center gap-1 md:gap-3 ml-auto">
             <div>
-              <div className="bg-gray-200 px-4 py-2 rounded-2xl">
-                {userRole}
-              </div>
+              <div className="bg-gray-200 px-4 py-2 rounded-2xl">{userRole}</div>
             </div>
             <Button variant="outline" onClick={handleSignOut}>
               Sign Out

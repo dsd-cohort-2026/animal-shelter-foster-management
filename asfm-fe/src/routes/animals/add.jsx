@@ -1,7 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import Layout from '@/components/Layout';
-import BasicNavBar from '@/components/basicNavBar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ConfirmationDialog from '@/components/confirmationDialog';
@@ -47,7 +45,7 @@ function AddAnimalPage() {
   };
 
   return (
-    <Layout navBar={<BasicNavBar />}>
+    <>
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-4">
         <Button variant="ghost" className="-ml-2" onClick={() => navigate({ to: '/animals' })}>
           ← Back to Animals
@@ -59,11 +57,7 @@ function AddAnimalPage() {
           </CardHeader>
           <CardContent className="pt-6">
             <div className="mx-auto w-full">
-              <AnimalForm
-                formId="add-animal-form"
-                onSubmit={handleSubmit}
-                error={submitError}
-              />
+              <AnimalForm formId="add-animal-form" onSubmit={handleSubmit} error={submitError} />
               <div className="flex justify-end gap-3 mt-6">
                 <Button variant="outline" onClick={() => navigate({ to: '/animals' })}>
                   Cancel
@@ -85,6 +79,6 @@ function AddAnimalPage() {
           onClose={() => navigate({ to: '/animals' })}
         />
       )}
-    </Layout>
+    </>
   );
 }

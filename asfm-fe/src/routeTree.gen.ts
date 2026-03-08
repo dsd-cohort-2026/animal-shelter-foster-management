@@ -14,6 +14,7 @@ import { Route as UserRouteImport } from './routes/_user'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as SignInRouteImport } from './routes/SignIn'
+import { Route as ExamplesRouteImport } from './routes/Examples'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnimalsIndexRouteImport } from './routes/animals/index'
 import { Route as AnimalsAddRouteImport } from './routes/animals/add'
@@ -43,6 +44,11 @@ const AdminRoute = AdminRouteImport.update({
 const SignInRoute = SignInRouteImport.update({
   id: '/SignIn',
   path: '/SignIn',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExamplesRoute = ExamplesRouteImport.update({
+  id: '/Examples',
+  path: '/Examples',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -88,6 +94,7 @@ const AdminInventoryRoute = AdminInventoryRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/Examples': typeof ExamplesRoute
   '/SignIn': typeof SignInRoute
   '/medical-logs': typeof MedicalLogsRoute
   '/inventory': typeof AdminInventoryRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/Examples': typeof ExamplesRoute
   '/SignIn': typeof SignInRoute
   '/medical-logs': typeof MedicalLogsRoute
   '/inventory': typeof AdminInventoryRoute
@@ -113,6 +121,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/Examples': typeof ExamplesRoute
   '/SignIn': typeof SignInRoute
   '/_admin': typeof AdminRouteWithChildren
   '/_protected': typeof ProtectedRouteWithChildren
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/Examples'
     | '/SignIn'
     | '/medical-logs'
     | '/inventory'
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/Examples'
     | '/SignIn'
     | '/medical-logs'
     | '/inventory'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/Examples'
     | '/SignIn'
     | '/_admin'
     | '/_protected'
@@ -170,6 +182,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ExamplesRoute: typeof ExamplesRoute
   SignInRoute: typeof SignInRoute
   AdminRoute: typeof AdminRouteWithChildren
   ProtectedRoute: typeof ProtectedRouteWithChildren
@@ -215,6 +228,13 @@ declare module '@tanstack/react-router' {
       path: '/SignIn'
       fullPath: '/SignIn'
       preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/Examples': {
+      id: '/Examples'
+      path: '/Examples'
+      fullPath: '/Examples'
+      preLoaderRoute: typeof ExamplesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -312,6 +332,7 @@ const UserRouteWithChildren = UserRoute._addFileChildren(UserRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ExamplesRoute: ExamplesRoute,
   SignInRoute: SignInRoute,
   AdminRoute: AdminRouteWithChildren,
   ProtectedRoute: ProtectedRouteWithChildren,

@@ -1,7 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import Layout from '@/components/Layout';
-import BasicNavBar from '@/components/basicNavBar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -62,7 +60,7 @@ function AnimalDetailPage() {
 
   if (animalsLoading) {
     return (
-      <Layout navBar={<BasicNavBar />}>
+      <>
         <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
           <Skeleton className="h-8 w-40" />
           <Card>
@@ -81,33 +79,29 @@ function AnimalDetailPage() {
             </CardContent>
           </Card>
         </div>
-      </Layout>
+      </>
     );
   }
 
   if (animalsError) {
     return (
-      <Layout navBar={<BasicNavBar />}>
-        <div className="flex flex-col items-center justify-center py-24 gap-4">
-          <p className="text-xl text-red-500">{animalsError}</p>
-          <Button variant="outline" onClick={() => fetchAnimals()}>
-            Retry
-          </Button>
-        </div>
-      </Layout>
+      <div className="flex flex-col items-center justify-center py-24 gap-4">
+        <p className="text-xl text-red-500">{animalsError}</p>
+        <Button variant="outline" onClick={() => fetchAnimals()}>
+          Retry
+        </Button>
+      </div>
     );
   }
 
   if (!animal) {
     return (
-      <Layout navBar={<BasicNavBar />}>
-        <div className="flex flex-col items-center justify-center py-24 gap-4">
-          <p className="text-xl text-muted-foreground">Animal not found.</p>
-          <Button variant="outline" onClick={() => navigate({ to: '/animals' })}>
-            ← Back to Animals
-          </Button>
-        </div>
-      </Layout>
+      <div className="flex flex-col items-center justify-center py-24 gap-4">
+        <p className="text-xl text-muted-foreground">Animal not found.</p>
+        <Button variant="outline" onClick={() => navigate({ to: '/animals' })}>
+          ← Back to Animals
+        </Button>
+      </div>
     );
   }
 
@@ -119,12 +113,18 @@ function AnimalDetailPage() {
     { label: 'Weight', value: animal.weight ? `${animal.weight} lbs` : '—' },
     { label: 'Kennel ID', value: animal.kennel_id || '—' },
     { label: 'Spayed/Neutered', value: animal.altered ? 'Yes' : 'No' },
-    { label: 'Created', value: animal.created_at ? new Date(animal.created_at).toLocaleDateString() : '—' },
-    { label: 'Last Modified', value: animal.last_modified ? new Date(animal.last_modified).toLocaleDateString() : '—' },
+    {
+      label: 'Created',
+      value: animal.created_at ? new Date(animal.created_at).toLocaleDateString() : '—',
+    },
+    {
+      label: 'Last Modified',
+      value: animal.last_modified ? new Date(animal.last_modified).toLocaleDateString() : '—',
+    },
   ];
 
   return (
-    <Layout navBar={<BasicNavBar />}>
+    <>
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
         <Button variant="ghost" className="-ml-2" onClick={() => navigate({ to: '/animals' })}>
           ← Back to Animals
@@ -139,7 +139,12 @@ function AnimalDetailPage() {
                 badgeClassName={STATUS_COLORS[animal.foster_status]}
               />
             </div>
-            <Button onClick={() => { setSubmitError(''); setEditOpen(true); }}>
+            <Button
+              onClick={() => {
+                setSubmitError('');
+                setEditOpen(true);
+              }}
+            >
               Edit Animal
             </Button>
           </CardHeader>
@@ -147,7 +152,9 @@ function AnimalDetailPage() {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4">
               {fields.map(({ label, value }) => (
                 <div key={label}>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">{label}</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">
+                    {label}
+                  </p>
                   <p className="text-sm font-medium">{value}</p>
                 </div>
               ))}
@@ -176,12 +183,8 @@ function AnimalDetailPage() {
       </ModalDialog>
 
       {confirmation && (
-        <ConfirmationDialog
-          {...confirmation}
-          button="Done"
-          onClose={() => setConfirmation(null)}
-        />
+        <ConfirmationDialog {...confirmation} button="Done" onClose={() => setConfirmation(null)} />
       )}
-    </Layout>
+    </>
   );
 }
