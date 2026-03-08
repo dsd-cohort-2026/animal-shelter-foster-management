@@ -1,13 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useMemo, useEffect } from 'react';
-import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
-  flexRender,
-  createColumnHelper,
-} from '@tanstack/react-table';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,13 +8,10 @@ import { ClipboardPlus, Plus, Edit, Trash2, Eye, ChevronDown, ChevronRight } fro
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ReusableTable } from '@/components/table_components';
 import CustomBadge from '@/components/custom/CustomBadge';
-import { FeatureSelector } from '@/components/FeatureSelector';
 import RoleGuard from '@/components/RoleGuard';
 import { useBoundStore } from '@/store';
 import { LOG_TYPE_OPTIONS, LOG_TYPE_COLORS, formatLogType } from '@/constants/medicalLogConstants';
-import { MedicalLogFilterBar } from '@/components/MedicalLogFilterBar';
-
-const columnHelper = createColumnHelper();
+import { CompactMedicalLogFilterBar } from '@/components/CompactMedicalLogFilterBar';
 
 function ExpandableText({ text }) {
   const [expanded, setExpanded] = useState(false);
@@ -67,7 +56,7 @@ function AdminLogsPage() {
     logTypes: [],
     createdBy: 'all',
   });
-  const [sortBy, setSortBy] = useState('date-desc');
+  const sortBy = 'date-desc';
 
   useEffect(() => {
     fetchMedicalLogs();
@@ -226,16 +215,11 @@ function AdminLogsPage() {
             </div>
           </div>
 
-          <MedicalLogFilterBar
+          <CompactMedicalLogFilterBar
             filters={filters}
             onFiltersChange={setFilters}
-            showCreatedBy={true}
-            onAddNew={() => navigate({ to: '/medical-logs/add' })}
-            addNewButtonLabel="Add Medical Log"
+            showAddNew={false}
           />
-          <p className="text-sm text-muted-foreground mt-2">
-            Showing {filtered.length} of {medicalLogs.length} logs
-          </p>
 
           {!medicalLogsLoading && filtered.length === 0 ? (
             <p className="text-muted-foreground text-center py-12">

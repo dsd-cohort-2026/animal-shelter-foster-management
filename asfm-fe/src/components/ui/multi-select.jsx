@@ -1,16 +1,12 @@
 import * as React from 'react';
-import { X, Check } from 'lucide-react';
+import { X, Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 export function MultiSelect({
   options = [],
   value = [],
@@ -33,47 +29,72 @@ export function MultiSelect({
       ? `${selectedCount} type${selectedCount !== 1 ? 's' : ''} selected`
       : placeholder;
 
+  const selectedLabels = value.map(v => options.find(o => o.value === v)?.label).filter(Boolean);
+
   return (
-    <Select open={isOpen} onOpenChange={setIsOpen}>
-      <SelectTrigger className={cn('w-[280px]', className)}>
-        <SelectValue placeholder={displayValue} />
-      </SelectTrigger>
-      <SelectContent className="max-h-80">
-        {options.map((option) => (
-          <SelectItem
-            key={option.value}
-            value={option.value}
-            onSelect={(e) => {
-              e.preventDefault();
-              handleToggle(option.value);
-            }}
-            className="flex items-center gap-2"
-          >
-            <Checkbox
-              checked={value.includes(option.value)}
-              onChange={() => handleToggle(option.value)}
-              className="pointer-events-none"
-            />
-            <span className="flex-1">{option.label}</span>
-            {value.includes(option.value) && (
-              <Check className="size-4 text-primary" />
-            )}
-          </SelectItem>
-        ))}
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className={cn('w-[280px] justify-between', className)}
+        >
+          <span className="truncate">{displayValue}</span>
+          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[280px] p-0" align="start">
+        <div className="max-h-80 overflow-auto p-1">
+          {options.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => handleToggle(option.value)}
+              className={cn(
+                'flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm hover:bg-accent hover:text-accent-foreground transition-colors',
+                'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
+              )}
+            >
+              <Checkbox
+                checked={value.includes(option.value)}
+                onChange={() => handleToggle(option.value)}
+                className="pointer-events-none"
+              />
+              <span className="flex-1 text-left">{option.label}</span>
+              {value.includes(option.value) && (
+                <Check className="size-4 text-primary" />
+              )}
+            </button>
+          ))}
+        </div>
         {value.length > 0 && (
-          <div className="p-2 border-t">
+          <div className="p-2 border-t bg-muted/30">
+            <div className="flex gap-1 mb-2 flex-wrap">
+              {selectedLabels.map((label, idx) => (
+                <span
+                  key={idx}
+                  className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
+                >
+                  {label}
+                  <button
+                    onClick={() => handleToggle(value[idx])}
+                    className="ml-1 hover:text-primary-foreground/80"
+                  >
+                    <X className="size-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onChange([])}
-              className="w-full text-xs"
+              className="w-full text-xs h-7"
             >
               <X className="size-3 mr-1" />
               Clear all
             </Button>
           </div>
         )}
-      </SelectContent>
-    </Select>
+      </PopoverContent>
+    </Popover>
   );
 }

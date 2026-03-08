@@ -10,7 +10,7 @@ import CustomBadge from '@/components/custom/CustomBadge';
 import { useBoundStore } from '@/store';
 import { LOG_TYPE_OPTIONS, LOG_TYPE_COLORS, formatLogType } from '@/constants/medicalLogConstants';
 import { ClipboardList, Plus } from 'lucide-react';
-import { MedicalLogFilterBar } from '@/components/MedicalLogFilterBar';
+import { CompactMedicalLogFilterBar } from '@/components/CompactMedicalLogFilterBar';
 
 export const Route = createFileRoute('/medical-logs/')(
   { component: MedicalLogListPage },
@@ -105,22 +105,17 @@ function MedicalLogListPage() {
               className="shrink-0 sm:self-start gap-2"
             >
               <Plus className="size-5" />
-              Add Log
             </Button>
           </div>
         </div>
 
         <div className="space-y-4">
-          <MedicalLogFilterBar
+          <CompactMedicalLogFilterBar
             filters={filters}
             onFiltersChange={setFilters}
             showCreatedBy={true}
-            onAddNew={() => navigate({ to: '/medical-logs/add' })}
-            addNewButtonLabel="Add Log"
+            showAddNew={false}
           />
-          <p className="text-sm text-muted-foreground mt-2">
-            Showing {filtered.length} of {medicalLogs.length} logs
-          </p>
         </div>
 
         {/* Timeline */}
