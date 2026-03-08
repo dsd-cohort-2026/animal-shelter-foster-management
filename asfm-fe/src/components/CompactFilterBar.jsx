@@ -18,9 +18,7 @@ export function CompactFilterBar({
     <div className={className}>
       <div className="flex items-center gap-2 p-2.5 bg-white border border-gray-200 rounded-lg">
         {/* Filters */}
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          {children}
-        </div>
+        <div className="flex items-center gap-2 flex-1 min-w-0">{children}</div>
 
         {/* Action buttons */}
         <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -36,11 +34,7 @@ export function CompactFilterBar({
             </Button>
           )}
           {showAddNew && (
-            <Button
-              onClick={onAddNew}
-              size="sm"
-              className="h-8 px-3 text-xs"
-            >
+            <Button onClick={onAddNew} size="sm" className="h-8 px-3 text-xs">
               {addNewButtonLabel}
             </Button>
           )}

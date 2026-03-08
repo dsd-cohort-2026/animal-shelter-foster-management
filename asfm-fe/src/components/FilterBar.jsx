@@ -5,7 +5,7 @@ export default function FilterBar({
   onFilter,
   onClear,
   onAddNew,
-  addNewButtonLabel = "Add New"
+  addNewButtonLabel = 'Add New',
 }) {
   const handleFilterSearch = () => {
     onFilter();
@@ -18,17 +18,11 @@ export default function FilterBar({
   return (
     <div className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg">
       {children}
-      <Button
-        onClick={handleClear}
-        variant="outline"
-      >
+      <Button onClick={handleClear} variant="outline">
         Clear
       </Button>
 
-      <Button
-        onClick={onAddNew}
-        className="ml-auto"
-      >
+      <Button onClick={onAddNew} className="ml-auto">
         {addNewButtonLabel}
       </Button>
     </div>
