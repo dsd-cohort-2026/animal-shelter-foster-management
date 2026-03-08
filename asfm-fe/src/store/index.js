@@ -6,11 +6,13 @@ import { devtools } from 'zustand/middleware';
 import { animalsSlice } from './slices/animalsSlice';
 import { medicalLogsSlice } from './slices/medicalLogsSlice';
 
-export const useBoundStore = create(devtools(
-  immer((...a) => ({
-    ...userAnimalsSlice(...a),
-    ...createAuthSlice(...a),
-    ...animalsSlice(...a),
-    ...medicalLogsSlice(...a),
-  })),
-));
+export const useBoundStore = create(
+  devtools(
+    immer((...a) => ({
+      ...userAnimalsSlice(...a),
+      ...createAuthSlice(...a),
+      ...animalsSlice(...a),
+      ...medicalLogsSlice(...a),
+    })),
+  ),
+);

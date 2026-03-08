@@ -13,7 +13,7 @@ export const createAuthSlice = (set, get) => ({
       .select('role')
       .eq('id', state.user.id)
       .single();
-    
+
     if (error) {
       console.error(error);
       return error;
