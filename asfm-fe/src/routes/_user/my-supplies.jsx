@@ -1,32 +1,32 @@
-import { createFileRoute } from '@tanstack/react-router'
-import Layout from '@/components/Layout'
-import NavBar from '@/components/NavBar'
-import { ReusableTable } from '../../components/table_components'
-import { useMemo } from 'react'
-import { mockLoanedItems } from '../../features/mockLoanedItems'
-import { Badge } from '@/components/ui/badge'
-import { ShoppingBag } from 'lucide-react'
-import { useBoundStore } from '@/store'
+import { createFileRoute } from '@tanstack/react-router';
+import Layout from '@/components/Layout';
+import NavBar from '@/components/NavBar';
+import { ReusableTable } from '../../components/table_components';
+import { useMemo } from 'react';
+import { mockLoanedItems } from '../../features/mockLoanedItems';
+import { Badge } from '@/components/ui/badge';
+import { ShoppingBag } from 'lucide-react';
+import { useBoundStore } from '@/store';
 
 const formatDate = (dateString) => {
-  const date = new Date(dateString)
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const year = date.getFullYear()
-  return `${month}/${day}/${year}`
-}
+  const date = new Date(dateString);
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${month}/${day}/${year}`;
+};
 
 export const Route = createFileRoute('/_user/my-supplies')({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  const { user } = useBoundStore()
+  const { user } = useBoundStore();
 
   const supplies = useMemo(
     () => mockLoanedItems.filter((item) => item.userId === user?.id || item.userId === 'U-1024'),
-    [user?.id]
-  )
+    [user?.id],
+  );
 
   const suppliesColumns = [
     {
@@ -65,9 +65,10 @@ function RouteComponent() {
       textSize: 'sm',
       headClassName: 'min-w-[180px]',
       cell: ({ row }) => {
-        const isCrate = row.original.itemDescription.toLowerCase().includes('crate')
-        if (!isCrate) return <span className="invisible">{formatDate(row.original.expectedReturnDate)}</span>
-        return formatDate(row.original.expectedReturnDate)
+        const isCrate = row.original.itemDescription.toLowerCase().includes('crate');
+        if (!isCrate)
+          return <span className="invisible">{formatDate(row.original.expectedReturnDate)}</span>;
+        return formatDate(row.original.expectedReturnDate);
       },
     },
     {
@@ -84,10 +85,10 @@ function RouteComponent() {
       textSize: 'sm',
       headClassName: 'min-w-[180px]',
     },
-  ]
+  ];
 
-  const activeCount = supplies.filter(s => s.loanStatus === 'Active').length
-  const returnedCount = supplies.filter(s => s.loanStatus === 'Complete').length
+  const activeCount = supplies.filter((s) => s.loanStatus === 'Active').length;
+  const returnedCount = supplies.filter((s) => s.loanStatus === 'Complete').length;
 
   return (
     <Layout navBar={<NavBar />}>
@@ -104,12 +105,24 @@ function RouteComponent() {
               User ID: {user?.id} — supplies assigned to your foster animals.
             </p>
             <div className="flex items-center gap-3 mt-3 flex-wrap">
-              <Badge variant="secondary" className="font-medium">{supplies.length} total</Badge>
+              <Badge variant="secondary" className="font-medium">
+                {supplies.length} total
+              </Badge>
               {activeCount > 0 && (
-                <Badge variant="outline" className="font-medium border-emerald-500/30 text-emerald-600 bg-emerald-500/5">{activeCount} active</Badge>
+                <Badge
+                  variant="outline"
+                  className="font-medium border-emerald-500/30 text-emerald-600 bg-emerald-500/5"
+                >
+                  {activeCount} active
+                </Badge>
               )}
               {returnedCount > 0 && (
-                <Badge variant="outline" className="font-medium border-blue-500/30 text-blue-600 bg-blue-500/5">{returnedCount} complete</Badge>
+                <Badge
+                  variant="outline"
+                  className="font-medium border-blue-500/30 text-blue-600 bg-blue-500/5"
+                >
+                  {returnedCount} complete
+                </Badge>
               )}
             </div>
           </div>
@@ -130,5 +143,5 @@ function RouteComponent() {
         containerClassName="overflow-auto max-h-150 rounded-lg border border-pale-sky shadow-sm relative w-full"
       />
     </Layout>
-  )
+  );
 }
