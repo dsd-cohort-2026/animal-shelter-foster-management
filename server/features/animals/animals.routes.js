@@ -25,5 +25,6 @@ router.patch(
   animalController.assignAnimal,
 );
 router.patch('/:id', staffAuthCheck, validate(updateAnimalById), animalController.updateAnimalById);
+router.delete('/:id', staffAuthCheck, animalController.deleteAnimal);
 
 module.exports = router;

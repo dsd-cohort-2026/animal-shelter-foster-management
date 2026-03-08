@@ -12,6 +12,7 @@ model Animal {
   weight        Float
   last_modified DateTime      @updatedAt
   picture       String
+  deletedAt     DateTime?
 
   // relationship fields
   modified_by        AnimalModification[]

@@ -83,3 +83,17 @@ exports.unassignAnimal = async (req, res) => {
     res.status(500).json({ message: 'An error occurred while removing the animal assignment!' });
   }
 };
+
+exports.deleteAnimal = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedAnimal = await animalService.deleteAnimal(id);
+    if (!deletedAnimal) {
+      return res.status(404).json({ message: 'Animal not found' });
+    }
+    res.status(200).json({ message: 'Animal deleted successfully' });
+  } catch (error) {
+    console.error(`Error deleting animal with id ${id}:`, error);
+    res.status(500).json({ message: 'An error occurred while deleting the animal' });
+  }
+};

@@ -167,3 +167,13 @@ exports.updateAnimalById = async (req) => {
     throw err;
   }
 };
+
+exports.deleteAnimal = async (id) => {
+  try {
+    const deletedAnimal = await animalRepository.softDelete(id);
+    return deletedAnimal;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
