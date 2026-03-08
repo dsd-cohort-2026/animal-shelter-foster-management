@@ -124,7 +124,7 @@ function ExamplesPage() {
           <Button variant="ghost">Ghost button</Button>
           <Button variant="link">Link button</Button>
         </div>
-
+        <Button onClick={() => navigate({ to: '/single-animal' })}>Go to single animal</Button>
         <FilterSelect
           selectTriggerClassName="w-[300px]"
           selectItems={['approved', 'pending', 'denied']}

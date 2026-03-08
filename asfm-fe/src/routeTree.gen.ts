@@ -17,6 +17,8 @@ import { Route as SignInRouteImport } from './routes/SignIn'
 import { Route as ExamplesRouteImport } from './routes/Examples'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnimalsIndexRouteImport } from './routes/animals/index'
+import { Route as SingleAnimalIdRouteImport } from './routes/single-animal.$id'
+import { Route as MyAnimalsIdRouteImport } from './routes/my-animals.$id'
 import { Route as AnimalsAddRouteImport } from './routes/animals/add'
 import { Route as AnimalsAnimalIdRouteImport } from './routes/animals/$animalId'
 import { Route as UserMySuppliesRouteImport } from './routes/_user/my-supplies'
@@ -61,6 +63,16 @@ const AnimalsIndexRoute = AnimalsIndexRouteImport.update({
   path: '/animals/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SingleAnimalIdRoute = SingleAnimalIdRouteImport.update({
+  id: '/single-animal/$id',
+  path: '/single-animal/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyAnimalsIdRoute = MyAnimalsIdRouteImport.update({
+  id: '/my-animals/$id',
+  path: '/my-animals/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AnimalsAddRoute = AnimalsAddRouteImport.update({
   id: '/animals/add',
   path: '/animals/add',
@@ -103,6 +115,8 @@ export interface FileRoutesByFullPath {
   '/my-supplies': typeof UserMySuppliesRoute
   '/animals/$animalId': typeof AnimalsAnimalIdRoute
   '/animals/add': typeof AnimalsAddRoute
+  '/my-animals/$id': typeof MyAnimalsIdRoute
+  '/single-animal/$id': typeof SingleAnimalIdRoute
   '/animals/': typeof AnimalsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -116,6 +130,8 @@ export interface FileRoutesByTo {
   '/my-supplies': typeof UserMySuppliesRoute
   '/animals/$animalId': typeof AnimalsAnimalIdRoute
   '/animals/add': typeof AnimalsAddRoute
+  '/my-animals/$id': typeof MyAnimalsIdRoute
+  '/single-animal/$id': typeof SingleAnimalIdRoute
   '/animals': typeof AnimalsIndexRoute
 }
 export interface FileRoutesById {
@@ -133,6 +149,8 @@ export interface FileRoutesById {
   '/_user/my-supplies': typeof UserMySuppliesRoute
   '/animals/$animalId': typeof AnimalsAnimalIdRoute
   '/animals/add': typeof AnimalsAddRoute
+  '/my-animals/$id': typeof MyAnimalsIdRoute
+  '/single-animal/$id': typeof SingleAnimalIdRoute
   '/animals/': typeof AnimalsIndexRoute
 }
 export interface FileRouteTypes {
@@ -148,6 +166,8 @@ export interface FileRouteTypes {
     | '/my-supplies'
     | '/animals/$animalId'
     | '/animals/add'
+    | '/my-animals/$id'
+    | '/single-animal/$id'
     | '/animals/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -161,6 +181,8 @@ export interface FileRouteTypes {
     | '/my-supplies'
     | '/animals/$animalId'
     | '/animals/add'
+    | '/my-animals/$id'
+    | '/single-animal/$id'
     | '/animals'
   id:
     | '__root__'
@@ -177,6 +199,8 @@ export interface FileRouteTypes {
     | '/_user/my-supplies'
     | '/animals/$animalId'
     | '/animals/add'
+    | '/my-animals/$id'
+    | '/single-animal/$id'
     | '/animals/'
   fileRoutesById: FileRoutesById
 }
@@ -190,6 +214,8 @@ export interface RootRouteChildren {
   MedicalLogsRoute: typeof MedicalLogsRoute
   AnimalsAnimalIdRoute: typeof AnimalsAnimalIdRoute
   AnimalsAddRoute: typeof AnimalsAddRoute
+  MyAnimalsIdRoute: typeof MyAnimalsIdRoute
+  SingleAnimalIdRoute: typeof SingleAnimalIdRoute
   AnimalsIndexRoute: typeof AnimalsIndexRoute
 }
 
@@ -249,6 +275,20 @@ declare module '@tanstack/react-router' {
       path: '/animals'
       fullPath: '/animals/'
       preLoaderRoute: typeof AnimalsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/single-animal/$id': {
+      id: '/single-animal/$id'
+      path: '/single-animal/$id'
+      fullPath: '/single-animal/$id'
+      preLoaderRoute: typeof SingleAnimalIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-animals/$id': {
+      id: '/my-animals/$id'
+      path: '/my-animals/$id'
+      fullPath: '/my-animals/$id'
+      preLoaderRoute: typeof MyAnimalsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/animals/add': {
@@ -340,6 +380,8 @@ const rootRouteChildren: RootRouteChildren = {
   MedicalLogsRoute: MedicalLogsRoute,
   AnimalsAnimalIdRoute: AnimalsAnimalIdRoute,
   AnimalsAddRoute: AnimalsAddRoute,
+  MyAnimalsIdRoute: MyAnimalsIdRoute,
+  SingleAnimalIdRoute: SingleAnimalIdRoute,
   AnimalsIndexRoute: AnimalsIndexRoute,
 }
 export const routeTree = rootRouteImport
