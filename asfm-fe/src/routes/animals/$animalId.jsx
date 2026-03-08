@@ -11,9 +11,7 @@ import CustomBadge from '@/components/custom/CustomBadge';
 import AnimalForm from '@/components/animals/AnimalForm';
 import { useBoundStore } from '@/store';
 import { STATUS_COLORS, formatStatus, formatSpecies, formatSex } from '@/constants/animalConstants';
-
-// TODO: Replace with actual API call to backend
-const SIMULATED_API_DELAY = 600;
+import apiClient from '@/lib/axios';
 
 export const Route = createFileRoute('/animals/$animalId')({
   component: AnimalDetailPage,
@@ -39,25 +37,24 @@ function AnimalDetailPage() {
 
   const animal = animals.find((a) => a.id === animalId);
 
-  const handleEditSubmit = (formData) => {
+  const handleEditSubmit = async (formData) => {
     setSubmitError('');
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      try {
-        updateAnimal({ ...animal, ...formData });
-        setIsSubmitting(false);
-        setEditOpen(false);
-        setConfirmation({
-          type: 'success',
-          primaryText: 'Animal Updated',
-          secondaryText: `${formData.name} has been updated successfully.`,
-        });
-      } catch {
-        setIsSubmitting(false);
-        setSubmitError('Something went wrong. Please try again.');
-      }
-    }, SIMULATED_API_DELAY);
+    try {
+      await apiClient.put(`/animals/${animal.id}`, formData);
+      updateAnimal({ ...animal, ...formData });
+      setIsSubmitting(false);
+      setEditOpen(false);
+      setConfirmation({
+        type: 'success',
+        primaryText: 'Animal Updated',
+        secondaryText: `${formData.name} has been updated successfully.`,
+      });
+    } catch {
+      setIsSubmitting(false);
+      setSubmitError('Failed to update animal. Please try again.');
+    }
   };
 
   if (animalsLoading) {
