@@ -16,7 +16,7 @@ export default function MyAnimalsListPage() {
   }
 
 
-  const url = 'http://localhost:8080/api'; // <-- change url once we know where server will be hosted
+  const url = 'http://localhost:8080/api'; // <-- change url to an env variable once backend deployment url is finalized 
 
   async function fetchMyAnimals(userId) {
     try {
