@@ -51,36 +51,29 @@ function RouteComponent() {
     return filtered
   }, [allInventory, filters])
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [inventoryRes, itemsRes] = await Promise.all([
-          apiClient.get('/inventory'),
-          apiClient.get('/items'),
-        ])
+  const fetchData = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const inventoryRes = await apiClient.get('/inventory')
 
-        const itemMap = {}
-        const categoryMap = {}
-        itemsRes.data.forEach(item => {
-          itemMap[item.id] = item.name
-          categoryMap[item.id] = item.category
-        })
+      const enrichedInventory = inventoryRes.data.map(inv => ({
+        ...inv,
+        item_name: inv.item?.name ?? 'Unknown',
+        category: inv.item?.category ?? 'Unknown',
+      }))
 
-        const enrichedInventory = inventoryRes.data.map(inv => ({
-          ...inv,
-          item_name: itemMap[inv.item_id] || 'Unknown',
-          category: categoryMap[inv.item_id] || 'Unknown',
-        }))
-
-        setAllInventory(enrichedInventory)
-        setCategories([...new Set(enrichedInventory.map(item => item.category))])
-      } catch (err) {
-        console.error('Error fetching data:', err)
-        setError('Failed to load inventory. Please try again.')
-      } finally {
-        setLoading(false)
-      }
+      setAllInventory(enrichedInventory)
+      setCategories([...new Set(enrichedInventory.map(item => item.category))])
+    } catch (err) {
+      console.error('Error fetching data:', err)
+      setError('Failed to load inventory. Please try again.')
+    } finally {
+      setLoading(false)
     }
+  }
+
+  useEffect(() => {
     fetchData()
   }, [])
 
@@ -169,7 +162,17 @@ function RouteComponent() {
     },
   ]
 
-  if (error) return <div className="flex justify-center pt-8 text-red-500">{error}</div>
+  if (error) return (
+    <div className="flex flex-col items-center pt-8 gap-3">
+      <p className="text-red-500">{error}</p>
+      <button
+        onClick={fetchData}
+        className="px-4 py-2 text-sm rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+      >
+        Retry
+      </button>
+    </div>
+  )
 
   const totalItems = allInventory.length
   const categoryCount = categories.length

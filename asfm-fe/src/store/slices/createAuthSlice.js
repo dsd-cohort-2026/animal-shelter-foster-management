@@ -70,7 +70,7 @@ export const createAuthSlice = (set, get) => ({
 
     if (session) {
       get().setSession(session);
-      get().setUserRole();
+      await get().setUserRole();
     } else {
       get().clearSession();
     }
