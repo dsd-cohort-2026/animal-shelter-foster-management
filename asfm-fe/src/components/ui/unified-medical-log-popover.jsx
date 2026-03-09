@@ -155,7 +155,7 @@ export function UnifiedMedicalLogPopover({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-0" align="start" side="bottom">
+      <PopoverContent className="w-[400px] p-0" align="end" side="bottom">
         <div className="flex flex-col">
           {/* Header */}
           <div className="border-b px-4 py-3">
