@@ -127,10 +127,26 @@ function AdminLogsPage() {
     { accessorKey: 'administeredAtDisplay', header: 'Administered At' },
     { accessorKey: 'fosterUser', header: 'Foster User' },
     { accessorKey: 'loggedAtDisplay', header: 'Logged At' },
-    { accessorKey: 'prescriptionDisplay', header: 'Prescription', cellClassName: 'whitespace-normal max-w-md' },
-    { accessorKey: 'generalNotes', header: 'General Notes', cellClassName: 'whitespace-normal max-w-md' },
-    { accessorKey: 'behaviorNotes', header: 'Behavior Notes', cellClassName: 'whitespace-normal max-w-md' },
-    { accessorKey: 'documentsDisplay', header: 'Documents', cellClassName: 'whitespace-normal max-w-md' },
+    {
+      accessorKey: 'prescriptionDisplay',
+      header: 'Prescription',
+      cellClassName: 'whitespace-normal max-w-md',
+    },
+    {
+      accessorKey: 'generalNotes',
+      header: 'General Notes',
+      cellClassName: 'whitespace-normal max-w-md',
+    },
+    {
+      accessorKey: 'behaviorNotes',
+      header: 'Behavior Notes',
+      cellClassName: 'whitespace-normal max-w-md',
+    },
+    {
+      accessorKey: 'documentsDisplay',
+      header: 'Documents',
+      cellClassName: 'whitespace-normal max-w-md',
+    },
   ];
 
   const tableData = filtered.map((log) => ({

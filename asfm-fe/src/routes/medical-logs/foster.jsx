@@ -109,8 +109,16 @@ function FosterLogsPage() {
     { accessorKey: 'administeredAtDisplay', header: 'Administered At' },
     { accessorKey: 'loggedAtDisplay', header: 'Logged At' },
     { accessorKey: 'prescriptionDisplay', header: 'Prescription' },
-    { accessorKey: 'generalNotes', header: 'General Notes', cellClassName: 'whitespace-normal max-w-md' },
-    { accessorKey: 'behaviorNotes', header: 'Behavior Notes', cellClassName: 'whitespace-normal max-w-md' },
+    {
+      accessorKey: 'generalNotes',
+      header: 'General Notes',
+      cellClassName: 'whitespace-normal max-w-md',
+    },
+    {
+      accessorKey: 'behaviorNotes',
+      header: 'Behavior Notes',
+      cellClassName: 'whitespace-normal max-w-md',
+    },
   ];
 
   const tableData = filtered.map((log) => ({

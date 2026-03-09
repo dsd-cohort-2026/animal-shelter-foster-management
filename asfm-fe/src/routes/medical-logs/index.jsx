@@ -69,12 +69,12 @@ function MedicalLogListPage() {
     return (
       <Layout>
         <RoleGuard allowedRoles={['STAFF']}>
-        <div className="flex flex-col items-center justify-center py-24 gap-4">
-          <p className="text-xl text-red-500">{medicalLogsError}</p>
-          <Button variant="outline" onClick={() => fetchMedicalLogs()}>
-            Retry
-          </Button>
-        </div>
+          <div className="flex flex-col items-center justify-center py-24 gap-4">
+            <p className="text-xl text-red-500">{medicalLogsError}</p>
+            <Button variant="outline" onClick={() => fetchMedicalLogs()}>
+              Retry
+            </Button>
+          </div>
         </RoleGuard>
       </Layout>
     );
@@ -83,107 +83,107 @@ function MedicalLogListPage() {
   return (
     <Layout>
       <RoleGuard allowedRoles={['STAFF']}>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-8">
-          <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-4">
-              <div className="flex items-center justify-center size-12 sm:size-14 rounded-xl bg-secondary/20 shrink-0">
-                <ClipboardList className="size-6 sm:size-7 text-primary" />
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-8">
+            <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-4">
+                <div className="flex items-center justify-center size-12 sm:size-14 rounded-xl bg-secondary/20 shrink-0">
+                  <ClipboardList className="size-6 sm:size-7 text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                    Medical Logs
+                  </h1>
+                  <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+                    View and manage medical log entries for all animals.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-                  Medical Logs
-                </h1>
-                <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-                  View and manage medical log entries for all animals.
-                </p>
-              </div>
+              <Button
+                onClick={() => navigate({ to: '/medical-logs/add' })}
+                size="lg"
+                className="shrink-0 sm:self-start gap-2"
+              >
+                <Plus className="size-5" />
+                Add Medical Log
+              </Button>
             </div>
-            <Button
-              onClick={() => navigate({ to: '/medical-logs/add' })}
-              size="lg"
-              className="shrink-0 sm:self-start gap-2"
-            >
-              <Plus className="size-5" />
-              Add Medical Log
-            </Button>
           </div>
-        </div>
 
-        <div className="space-y-4">
-          <CompactMedicalLogFilterBar
-            filters={filters}
-            onFiltersChange={setFilters}
-            showCreatedBy={true}
-            showAddNew={false}
-          />
-        </div>
-
-        {/* Timeline */}
-        {medicalLogsLoading ? (
           <div className="space-y-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Card key={i}>
-                <CardContent className="p-5 space-y-3">
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-3 w-48" />
-                  <Skeleton className="h-3 w-full" />
-                </CardContent>
-              </Card>
-            ))}
+            <CompactMedicalLogFilterBar
+              filters={filters}
+              onFiltersChange={setFilters}
+              showCreatedBy={true}
+              showAddNew={false}
+            />
           </div>
-        ) : filtered.length === 0 ? (
-          <p className="text-muted-foreground text-center py-12">
-            No medical logs match your search.
-          </p>
-        ) : (
-          <div className="relative space-y-4">
-            {/* Timeline line */}
-            <div className="absolute left-4 top-0 bottom-0 w-px bg-border hidden sm:block" />
 
-            {filtered.map((log) => (
-              <Card key={log.id} className="sm:ml-10 relative">
-                {/* Timeline dot */}
-                <div className="absolute -left-10 top-5 size-3 rounded-full bg-primary border-2 border-background hidden sm:block" />
-                <CardContent className="p-5">
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <CustomBadge
-                      text={formatLogType(log.category)}
-                      badgeClassName={LOG_TYPE_COLORS[log.category]}
-                    />
-                    <span className="text-sm font-semibold">{log.animal_name}</span>
-                    <span className="text-xs text-muted-foreground ml-auto">
-                      {new Date(log.logged_at).toLocaleDateString()}{' '}
-                      {new Date(log.logged_at).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
-                  </div>
-                  {log.general_notes && (
-                    <p className="text-sm text-foreground">{log.general_notes}</p>
-                  )}
-                  {log.behavior_notes && (
-                    <p className="text-sm text-muted-foreground mt-1">{log.behavior_notes}</p>
-                  )}
-                  {log.prescription && (
-                    <p className="text-xs text-muted-foreground mt-2">
-                      <span className="font-medium">Rx:</span> {log.prescription}
-                    </p>
-                  )}
-                  {log.dose && (
-                    <p className="text-xs text-muted-foreground">
-                      <span className="font-medium">Dose:</span> {log.dose}
-                      {log.qty_administered != null && ` × ${log.qty_administered}`}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
+          {/* Timeline */}
+          {medicalLogsLoading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Card key={i}>
+                  <CardContent className="p-5 space-y-3">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-48" />
+                    <Skeleton className="h-3 w-full" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
+            <p className="text-muted-foreground text-center py-12">
+              No medical logs match your search.
+            </p>
+          ) : (
+            <div className="relative space-y-4">
+              {/* Timeline line */}
+              <div className="absolute left-4 top-0 bottom-0 w-px bg-border hidden sm:block" />
+
+              {filtered.map((log) => (
+                <Card key={log.id} className="sm:ml-10 relative">
+                  {/* Timeline dot */}
+                  <div className="absolute -left-10 top-5 size-3 rounded-full bg-primary border-2 border-background hidden sm:block" />
+                  <CardContent className="p-5">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <CustomBadge
+                        text={formatLogType(log.category)}
+                        badgeClassName={LOG_TYPE_COLORS[log.category]}
+                      />
+                      <span className="text-sm font-semibold">{log.animal_name}</span>
+                      <span className="text-xs text-muted-foreground ml-auto">
+                        {new Date(log.logged_at).toLocaleDateString()}{' '}
+                        {new Date(log.logged_at).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                    </div>
+                    {log.general_notes && (
+                      <p className="text-sm text-foreground">{log.general_notes}</p>
+                    )}
+                    {log.behavior_notes && (
+                      <p className="text-sm text-muted-foreground mt-1">{log.behavior_notes}</p>
+                    )}
+                    {log.prescription && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        <span className="font-medium">Rx:</span> {log.prescription}
+                      </p>
+                    )}
+                    {log.dose && (
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-medium">Dose:</span> {log.dose}
+                        {log.qty_administered != null && ` × ${log.qty_administered}`}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
       </RoleGuard>
     </Layout>
   );
