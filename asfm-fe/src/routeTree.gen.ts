@@ -23,6 +23,8 @@ import { Route as UserMySuppliesRouteImport } from './routes/_user/my-supplies';
 import { Route as ProtectedAdminPortalRouteImport } from './routes/_admin/admin-portal';
 import { Route as AdminLoansRouteImport } from './routes/_admin/loans';
 import { Route as AdminInventoryRouteImport } from './routes/_admin/inventory';
+import { Route as MyAnimalsIdRouteImport } from './routes/my-animals.$id';
+import { Route as SingleAnimalIdRouteImport } from './routes/single-animal.$id';
 
 const MedicalLogsRoute = MedicalLogsRouteImport.update({
   id: '/medical-logs',
@@ -91,6 +93,16 @@ const AdminInventoryRoute = AdminInventoryRouteImport.update({
   path: '/inventory',
   getParentRoute: () => AdminRoute,
 } as any);
+const MyAnimalsIdRoute = MyAnimalsIdRouteImport.update({
+  id: '/my-animals/$id',
+  path: '/my-animals/$id',
+  getParentRoute: () => rootRouteImport,
+} as any);
+const SingleAnimalIdRoute = SingleAnimalIdRouteImport.update({
+  id: '/single-animal/$id',
+  path: '/single-animal/$id',
+  getParentRoute: () => rootRouteImport,
+} as any);
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute;
@@ -104,6 +116,8 @@ export interface FileRoutesByFullPath {
   '/animals/$animalId': typeof AnimalsAnimalIdRoute;
   '/animals/add': typeof AnimalsAddRoute;
   '/animals/': typeof AnimalsIndexRoute;
+  '/my-animals/$id': typeof MyAnimalsIdRoute;
+  '/single-animal/$id': typeof SingleAnimalIdRoute;
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute;
@@ -117,6 +131,8 @@ export interface FileRoutesByTo {
   '/animals/$animalId': typeof AnimalsAnimalIdRoute;
   '/animals/add': typeof AnimalsAddRoute;
   '/animals': typeof AnimalsIndexRoute;
+  '/my-animals/$id': typeof MyAnimalsIdRoute;
+  '/single-animal/$id': typeof SingleAnimalIdRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
@@ -134,6 +150,8 @@ export interface FileRoutesById {
   '/animals/$animalId': typeof AnimalsAnimalIdRoute;
   '/animals/add': typeof AnimalsAddRoute;
   '/animals/': typeof AnimalsIndexRoute;
+  '/my-animals/$id': typeof MyAnimalsIdRoute;
+  '/single-animal/$id': typeof SingleAnimalIdRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
@@ -148,7 +166,9 @@ export interface FileRouteTypes {
     | '/my-supplies'
     | '/animals/$animalId'
     | '/animals/add'
-    | '/animals/';
+    | '/animals/'
+    | '/my-animals/$id'
+    | '/single-animal/$id';
   fileRoutesByTo: FileRoutesByTo;
   to:
     | '/'
@@ -161,7 +181,9 @@ export interface FileRouteTypes {
     | '/my-supplies'
     | '/animals/$animalId'
     | '/animals/add'
-    | '/animals';
+    | '/animals'
+    | '/my-animals/$id'
+    | '/single-animal/$id';
   id:
     | '__root__'
     | '/'
@@ -177,7 +199,9 @@ export interface FileRouteTypes {
     | '/_user/my-supplies'
     | '/animals/$animalId'
     | '/animals/add'
-    | '/animals/';
+    | '/animals/'
+    | '/my-animals/$id'
+    | '/single-animal/$id';
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
@@ -191,6 +215,8 @@ export interface RootRouteChildren {
   AnimalsAnimalIdRoute: typeof AnimalsAnimalIdRoute;
   AnimalsAddRoute: typeof AnimalsAddRoute;
   AnimalsIndexRoute: typeof AnimalsIndexRoute;
+  MyAnimalsIdRoute: typeof MyAnimalsIdRoute;
+  SingleAnimalIdRoute: typeof SingleAnimalIdRoute;
 }
 
 declare module '@tanstack/react-router' {
@@ -292,6 +318,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/inventory';
       preLoaderRoute: typeof AdminInventoryRouteImport;
       parentRoute: typeof AdminRoute;
+    };
+    '/my-animals/$id': {
+      id: '/my-animals/$id';
+      path: '/my-animals/$id';
+      fullPath: '/my-animals/$id';
+      preLoaderRoute: typeof MyAnimalsIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    '/single-animal/$id': {
+      id: '/single-animal/$id';
+      path: '/single-animal/$id';
+      fullPath: '/single-animal/$id';
+      preLoaderRoute: typeof SingleAnimalIdRouteImport;
+      parentRoute: typeof rootRouteImport;
     };
   }
 }
