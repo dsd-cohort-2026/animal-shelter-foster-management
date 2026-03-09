@@ -1,5 +1,5 @@
 import MyAnimalsListPage from '@/pages/MyAnimalsListPage';
-import BasicNavBar from '@/components/basicNavBar';
+import BasicNavBar from '@/components/NavBar';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/my-animals/$id')({
