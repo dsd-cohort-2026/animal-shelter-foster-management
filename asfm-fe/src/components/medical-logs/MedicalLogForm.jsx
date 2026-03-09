@@ -1,4 +1,5 @@
 import { useForm } from '@tanstack/react-form';
+import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -21,13 +22,29 @@ const EMPTY_DEFAULTS = {
   administered_at: '',
   prescription: '',
 };
+import { Combobox, ComboboxInput, ComboboxContent, ComboboxItem, ComboboxEmpty, ComboboxList, ComboboxCollection } from '@/components/ui/combobox';
+import { useBoundStore } from '@/store';
 
 const required =
   (label) =>
   ({ value }) =>
     !value || !value.toString().trim() ? `${label} is required.` : undefined;
 
-export default function MedicalLogForm({ formId, onSubmit, initialValues = {}, animals = [] }) {
+export default function MedicalLogForm({ formId, onSubmit, initialValues = {} }) {
+  const medicalLogs = useBoundStore((state) => state.medicalLogs);
+  const fetchMedicalLogs = useBoundStore((state) => state.fetchMedicalLogs);
+
+  // Fetch medical logs on mount
+  useEffect(() => {
+    fetchMedicalLogs();
+  }, [fetchMedicalLogs]);
+
+  // Get unique animal names from medical logs
+  const animalNamesFromLogs = useMemo(() => {
+    const names = [...new Set(medicalLogs.map((log) => log.animal_name).filter(Boolean))];
+    return names.sort();
+  }, [medicalLogs]);
+
   const form = useForm({
     defaultValues: { ...EMPTY_DEFAULTS, ...initialValues },
     onSubmit: async ({ value }) => {
@@ -55,29 +72,33 @@ export default function MedicalLogForm({ formId, onSubmit, initialValues = {}, a
             <label className="text-sm font-medium">
               Animal <span className="text-red-500">*</span>
             </label>
-            {animals.length > 0 ? (
-              <Select value={field.state.value} onValueChange={(val) => field.handleChange(val)}>
-                <SelectTrigger
-                  className={`w-full ${field.state.meta.errors.length ? 'border-red-500' : ''}`}
-                  onBlur={field.handleBlur}
-                >
-                  <SelectValue placeholder="Select an animal" />
-                </SelectTrigger>
-                <SelectContent>
-                  {animals.map((animal) => (
-                    <SelectItem key={animal.id} value={animal.id}>
-                      {animal.name} ({animal.species})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            {animalNamesFromLogs.length > 0 ? (
+              <Combobox
+                items={animalNamesFromLogs}
+                value={field.state.label}
+                onValueChange={field.handleChange}
+              >
+                <ComboboxInput placeholder="Select an animal from logs..." />
+                <ComboboxContent>
+                  <ComboboxEmpty>No animals in medical logs yet.</ComboboxEmpty>
+                  <ComboboxList>
+                    <ComboboxCollection>
+                      {(item) => (
+                        <ComboboxItem key={item} value={item}>
+                          {item}
+                        </ComboboxItem>
+                      )}
+                    </ComboboxCollection>
+                  </ComboboxList>
+                </ComboboxContent>
+              </Combobox>
             ) : (
               <Textarea
                 className={`w-full ${field.state.meta.errors.length ? 'border-red-500' : ''}`}
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="Enter animal name or ID..."
+                placeholder="No animals in logs - type animal name..."
                 rows={1}
               />
             )}
