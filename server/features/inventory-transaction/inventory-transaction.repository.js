@@ -6,6 +6,10 @@ exports.findAll = async (where = {}, skip = 0, take = 10) => {
     skip,
     take,
     orderBy: { created_at: 'desc' },
+    include: {
+      item: true,
+      foster_user: true,
+    },
   });
 };
 

@@ -1,17 +1,4 @@
-import { mockAnimals } from '@/features/mockAnimals';
-
-// Helper to merge animal lists, with secondary values taking precedence on ID collision
-// This allows local additions/edits to persist during mock data loading
-function mergeAnimalsById(primary, secondary) {
-  const map = new Map();
-  for (const animal of primary) map.set(animal.id, animal);
-  for (const animal of secondary) map.set(animal.id, animal); // Secondary overwrites on collision
-  return Array.from(map.values());
-}
-
-// TODO: Replace setTimeout with actual API calls to backend
-// Pattern: fetchAnimals -> loading state -> success/error -> update store
-const SIMULATED_API_DELAY = 400;
+import apiClient from '@/lib/axios';
 
 export const animalsSlice = (set, get) => ({
   animals: [],
@@ -19,7 +6,7 @@ export const animalsSlice = (set, get) => ({
   animalsError: null,
   animalsFetched: false,
 
-  fetchAnimals: () => {
+  fetchAnimals: async () => {
     const { animalsLoading, animalsFetched } = get();
     if (animalsFetched || animalsLoading) return;
 
@@ -28,23 +15,19 @@ export const animalsSlice = (set, get) => ({
       state.animalsError = null;
     });
 
-    // Simulate async fetch — swap with real API call later
-    setTimeout(() => {
-      try {
-        set((state) => {
-          // Merge mock data with current state, with current state taking precedence on ID collision.
-          // This preserves any animals added/edited while the fetch was in-flight.
-          state.animals = mergeAnimalsById(mockAnimals, state.animals);
-          state.animalsLoading = false;
-          state.animalsFetched = true;
-        });
-      } catch {
-        set((state) => {
-          state.animalsError = 'Failed to load animals.';
-          state.animalsLoading = false;
-        });
-      }
-    }, SIMULATED_API_DELAY);
+    try {
+      const response = await apiClient.get('/animals');
+      set((state) => {
+        state.animals = response.data;
+        state.animalsLoading = false;
+        state.animalsFetched = true;
+      });
+    } catch (error) {
+      set((state) => {
+        state.animalsError = 'Failed to load animals.';
+        state.animalsLoading = false;
+      });
+    }
   },
 
   setAnimals: (animals) =>

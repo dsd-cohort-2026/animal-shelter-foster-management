@@ -9,6 +9,7 @@ import { ModalDialog } from '@/components/ModalDialog';
 import { Input } from '@/components/ui/input';
 import { Edit, Trash2, Package } from 'lucide-react';
 import ConfirmationDialog from '@/components/confirmationDialog';
+import { useBoundStore } from '@/store';
 
 const formatDate = (dateString) => {
   if (!dateString) return '—';
@@ -47,26 +48,20 @@ function RouteComponent() {
     }
     return filtered;
   }, [allInventory, filters]);
+  const session = useBoundStore((state) => state.session);
+  const authHeader = { Authorization: `Bearer ${session?.access_token}` };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [inventoryRes, itemsRes] = await Promise.all([
-          apiClient.get('/inventory'),
-          apiClient.get('/items'),
+          apiClient.get('/inventory', { headers: authHeader }),
         ]);
-
-        const itemMap = {};
-        const categoryMap = {};
-        itemsRes.data.forEach((item) => {
-          itemMap[item.id] = item.name;
-          categoryMap[item.id] = item.category;
-        });
 
         const enrichedInventory = inventoryRes.data.map((inv) => ({
           ...inv,
-          item_name: itemMap[inv.item_id] || 'Unknown',
-          category: categoryMap[inv.item_id] || 'Unknown',
+          item_name: inv.item?.name || 'Unknown',
+          category: inv.item?.category || 'Unknown',
         }));
 
         setAllInventory(enrichedInventory);
