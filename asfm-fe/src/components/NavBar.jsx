@@ -24,9 +24,7 @@ function NavBar() {
         </Button>
         {userRole === 'USER' && (
           <>
-            <Button variant="outline">
-              My Animals
-            </Button>
+            <Button variant="outline">My Animals</Button>
             <Button variant="outline" onClick={() => navigate({ to: '/medical-logs/foster' })}>
               My Foster Logs
             </Button>
