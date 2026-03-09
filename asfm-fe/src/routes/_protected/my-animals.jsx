@@ -1,18 +1,14 @@
 import MyAnimalsListPage from '@/pages/MyAnimalsListPage';
-import BasicNavBar from '@/components/NavBar';
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/my-animals/$id')({
+export const Route = createFileRoute('/_protected/my-animals')({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { id } = Route.useParams();
-
   return (
     <>
-      <BasicNavBar />
-      <MyAnimalsListPage id={id} />
+      <MyAnimalsListPage />
     </>
   );
 }

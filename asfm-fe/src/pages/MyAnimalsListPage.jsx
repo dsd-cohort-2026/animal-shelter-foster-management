@@ -1,17 +1,29 @@
 import MyAnimalCard from '@/components/my-animals/MyAnimalCard';
 import { useEffect, useState } from 'react';
 import { Spinner } from '@/components/ui/spinner';
+import { useBoundStore } from '@/store';
 
 export default function MyAnimalsListPage() {
+  const user = useBoundStore((state) => state.user);
   const [myAnimals, setMyAnimals] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const session = useBoundStore((state) => state.session);
+  let token;
 
-  const url = 'http://localhost:3005'; // <-- placeholder
+  if (session) {
+    token = session.access_token;
+  }
+
+  const url = 'http://localhost:8080/api'; // <-- change url to an env variable once backend deployment url is finalized
 
   async function fetchMyAnimals(userId) {
     try {
-      const response = await fetch(`${url}/animals?user_id=${userId}`);
+      const response = await fetch(`${url}/animals`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!response.ok) {
         throw new Error(`Failed to fetch my animals: ${response.status}`);
       } else {
@@ -27,9 +39,10 @@ export default function MyAnimalsListPage() {
   }
 
   useEffect(() => {
-    //Note: Once the backend is connected, the frontend should fetch the logged-in userID from the backend session token instead of reading from the URL.
-    fetchMyAnimals('550e8400-e29b-41d4-a716-446655440202');
-  }, []);
+    if (user && token) {
+      fetchMyAnimals(user.id);
+    }
+  }, [user, token]);
 
   if (isLoading)
     return (
