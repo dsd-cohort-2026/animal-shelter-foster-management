@@ -292,13 +292,15 @@ function FilterChip({ label, onRemove }) {
       className="h-6 px-2 gap-1 text-xs font-medium pr-1 cursor-pointer hover:bg-secondary/70 transition-colors"
     >
       {label}
-      <X
-        className="size-3.5 text-muted-foreground hover:text-foreground"
+      <button
         onClick={(e) => {
           e.stopPropagation();
           onRemove();
         }}
-      />
+        className="ml-1 hover:text-foreground/80"
+      >
+        <X className="size-3.5 text-muted-foreground" />
+      </button>
     </Badge>
   );
 }
