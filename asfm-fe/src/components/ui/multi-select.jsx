@@ -52,7 +52,7 @@ export function MultiSelect({
                 className="pointer-events-none"
               />
               <span className="flex-1 text-left">{option.label}</span>
-              {value.includes(option.value) && <Check className="size-4 text-primary" />}
+              {value.includes(option.value)}
             </button>
           ))}
         </div>
