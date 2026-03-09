@@ -2,21 +2,14 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useMemo, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import CustomBadge from '@/components/custom/CustomBadge';
 import { useBoundStore } from '@/store';
-import { LOG_TYPE_OPTIONS, LOG_TYPE_COLORS, formatLogType } from '@/constants/medicalLogConstants';
+import { LOG_TYPE_COLORS, formatLogType } from '@/constants/medicalLogConstants';
 import { ClipboardList, Plus } from 'lucide-react';
 import { CompactMedicalLogFilterBar } from '@/components/CompactMedicalLogFilterBar';
+import RoleGuard from '@/components/RoleGuard';
 
 export const Route = createFileRoute('/medical-logs/')({ component: MedicalLogListPage });
 
@@ -75,18 +68,21 @@ function MedicalLogListPage() {
   if (medicalLogsError) {
     return (
       <Layout>
+        <RoleGuard allowedRoles={['STAFF']}>
         <div className="flex flex-col items-center justify-center py-24 gap-4">
           <p className="text-xl text-red-500">{medicalLogsError}</p>
           <Button variant="outline" onClick={() => fetchMedicalLogs()}>
             Retry
           </Button>
         </div>
+        </RoleGuard>
       </Layout>
     );
   }
 
   return (
     <Layout>
+      <RoleGuard allowedRoles={['STAFF']}>
       <div className="space-y-6">
         {/* Header */}
         <div className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-8">
@@ -188,6 +184,7 @@ function MedicalLogListPage() {
           </div>
         )}
       </div>
+      </RoleGuard>
     </Layout>
   );
 }
