@@ -1,8 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { ReusableTable } from '../../components/table_components';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { useBoundStore } from '@/store';
 import { Edit, ClipboardList } from 'lucide-react';
-import { mockLoanedItems } from '../../features/mockLoanedItems';
+import apiClient from '@/lib/axios';
 import FilterBar from '@/components/FilterBar';
 import FilterSelect from '@/components/custom/FilterSelect';
 import InputGroupForSearch from '@/components/InputGroupForSearch';
@@ -23,9 +24,11 @@ export const Route = createFileRoute('/_admin/loans')({
 });
 
 function RouteComponent() {
-  const [allLoans] = useState(mockLoanedItems);
-  const [loading] = useState(false);
-  const [error] = useState(null);
+  const session = useBoundStore((state) => state.session);
+  const [allLoans, setAllLoans] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedLoan, setSelectedLoan] = useState(null);
   const [filters, setFilters] = useState({ search: '', loanStatus: '' });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ loanType: '' });
@@ -42,8 +45,31 @@ function RouteComponent() {
     return filtered;
   }, [filters, allLoans]);
 
+  useEffect(() => {
+    const fetchLoans = async () => {
+      try {
+        const res = await apiClient.get('/inventory-transactions?type=LOAN');
+        const loans = res.data.map((transaction) => ({
+          inventoryTransactionId: transaction.id,
+          itemDescription: transaction.item?.name,
+          quantity: transaction.quantity,
+          userId: `${transaction.foster_user?.first_name} ${transaction.foster_user?.last_name}`,
+          loanedAt: transaction.created_at,
+          loanStatus: transaction.status[0] + transaction.status.slice(1).toLowerCase(),
+        }));
+        setAllLoans(loans);
+      } catch (err) {
+        setError('Failed loading loans. Try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLoans();
+  }, []);
+
   const handleEdit = (loan) => {
-    console.log('Edit loan:', loan);
+    setSelectedLoan(loan);
+    setIsModalOpen(true);
   };
 
   const handleClearFilters = () => {
@@ -76,8 +102,8 @@ function RouteComponent() {
       headClassName: 'min-w-[120px]',
     },
     {
-      accessorKey: 'animalId',
-      header: 'Animal ID',
+      accessorKey: 'quantity',
+      header: 'Quantity',
       sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[120px]',
@@ -222,19 +248,52 @@ function RouteComponent() {
         <form id="addLoanForm" className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Item Description</label>
-            <Input placeholder="Enter item description" />
+            <Input
+              placeholder="Enter item description"
+              value={selectedLoan?.itemDescription || ''}
+              onChange={(e) =>
+                setSelectedLoan({ ...selectedLoan, itemDescription: e.target.value })
+              }
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Requesting User ID</label>
-            <Input placeholder="Enter user ID" />
+            <label className="block text-sm font-medium mb-1">User Loaning Item</label>
+            <Input
+              placeholder="Enter user ID"
+              value={selectedLoan?.userId || ''}
+              onChange={(e) => setSelectedLoan({ ...selectedLoan, userId: e.target.value })}
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Requesting Animal ID</label>
-            <Input placeholder="Enter animal ID" />
+            <label className="block text-sm font-medium mb-1">Quantity</label>
+            <Input
+              placeholder="Enter quantity"
+              value={selectedLoan?.quantity || ''}
+              onChange={(e) => setSelectedLoan({ ...selectedLoan, quantity: e.target.value })}
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Set Requested Return</label>
-            <Input type="date" />
+            <label className="block text-sm font-medium mb-1">Set Loan Date</label>
+            <Input
+              type="date"
+              placeholder="Enter loan date"
+              value={selectedLoan?.loanedAt || ''}
+              onChange={(e) => setSelectedLoan({ ...selectedLoan, loanedAt: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Loan Status</label>
+            <select
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+              value={selectedLoan?.loanStatus ?? ''}
+              onChange={(e) => setSelectedLoan({ ...selectedLoan, loanStatus: e.target.value })}
+            >
+              <option value="" disabled>
+                Select status
+              </option>
+              <option value="ACTIVE">Active</option>
+              <option value="COMPLETE">Complete</option>
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Notes</label>
@@ -242,6 +301,8 @@ function RouteComponent() {
               placeholder="Enter additional notes"
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
               rows="4"
+              value={selectedLoan?.notes || ''}
+              onChange={(e) => setSelectedLoan({ ...selectedLoan, notes: e.target.value })}
             />
           </div>
         </form>
