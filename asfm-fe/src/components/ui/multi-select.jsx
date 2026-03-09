@@ -10,6 +10,7 @@ export function MultiSelect({
   onChange,
   placeholder = 'Select options',
   className,
+  showChips = true,
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -55,7 +56,7 @@ export function MultiSelect({
             </button>
           ))}
         </div>
-        {value.length > 0 && (
+        {showChips && value.length > 0 && (
           <div className="p-2 border-t bg-muted/30">
             <div className="flex gap-1 mb-2 flex-wrap">
               {value.map((v) => {

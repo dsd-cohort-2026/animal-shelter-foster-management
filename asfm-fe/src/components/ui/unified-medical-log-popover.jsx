@@ -131,6 +131,13 @@ export function UnifiedMedicalLogPopover({
     }
   };
 
+  const handleRemoveLogType = (logType) => {
+    onFiltersChange({
+      ...filters,
+      logTypes: filters.logTypes.filter((t) => t !== logType),
+    });
+  };
+
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
@@ -179,12 +186,17 @@ export function UnifiedMedicalLogPopover({
               {(filters.dateRange?.from || filters.dateRange?.to) && (
                 <FilterChip label="Date Range" onRemove={() => handleRemoveFilter('dateRange')} />
               )}
-              {filters.logTypes?.length > 0 && (
-                <FilterChip
-                  label={`${filters.logTypes.length} types`}
-                  onRemove={() => handleRemoveFilter('logTypes')}
-                />
-              )}
+              {filters.logTypes?.length > 0 &&
+                filters.logTypes.map((logType) => {
+                  const label = LOG_TYPE_OPTIONS.find((o) => o.value === logType)?.label || logType;
+                  return (
+                    <FilterChip
+                      key={logType}
+                      label={label}
+                      onRemove={() => handleRemoveLogType(logType)}
+                    />
+                  );
+                })}
               {showCreatedBy && filters.createdBy && filters.createdBy !== 'all' && (
                 <FilterChip
                   label={filters.createdBy === 'admin' ? 'Admin only' : 'Foster only'}
@@ -250,6 +262,7 @@ export function UnifiedMedicalLogPopover({
                     onChange={(types) => onFiltersChange({ ...filters, logTypes: types })}
                     placeholder="All types"
                     className="w-full"
+                    showChips={false}
                   />
                 </div>
 
