@@ -15,33 +15,7 @@ export const Route = createFileRoute('/medical-logs/foster')({
   component: FosterLogsPage,
 });
 
-function ExpandableText({ text }) {
-  const [expanded, setExpanded] = useState(false);
 
-  if (!text || text === '—') return <span className="text-muted-foreground">—</span>;
-
-  const isLong = text.length > 50;
-
-  if (!isLong) return <span>{text}</span>;
-
-  return (
-    <button
-      type="button"
-      onClick={() => setExpanded((prev) => !prev)}
-      className="text-left cursor-pointer hover:bg-muted/50 rounded px-1 -mx-1 transition-colors"
-    >
-      {expanded ? (
-        <span>
-          {text} <span className="text-xs text-primary underline">less</span>
-        </span>
-      ) : (
-        <span className="line-clamp-2">
-          {text.slice(0, 150)}… <span className="text-xs text-primary underline">more</span>
-        </span>
-      )}
-    </button>
-  );
-}
 
 function FosterLogsPage() {
   const navigate = useNavigate();
@@ -130,7 +104,7 @@ function FosterLogsPage() {
       />
     ),
     generalNotes: log.general_notes || '—',
-    behaviorNotes: <ExpandableText text={log.behavior_notes} />,
+    behaviorNotes: log.behavior_notes || '—',
     doseDisplay: log.dose || '—',
     qtyDisplay: log.qty_administered != null ? log.qty_administered : '—',
     administeredAtDisplay: log.administered_at
