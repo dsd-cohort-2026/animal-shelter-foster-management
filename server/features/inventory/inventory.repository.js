@@ -2,7 +2,7 @@ const prisma = require('../../connections/prisma-client');
 
 exports.findAll = async () => {
   try {
-    return await prisma.inventory.findMany({});
+    return await prisma.inventory.findMany({ include: { item: true } });
   } catch (err) {
     console.log(err);
     throw err;
