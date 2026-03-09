@@ -187,7 +187,7 @@ export function ReusableTable({
       {/* Table */}
       <div>
         <Table>
-          <ShadcnTableHeader className={`relative sticky top-0 z-10 ${headerClassName}`}>
+          <ShadcnTableHeader className={`relative sticky top-0 z-10 ${headerClassName} ${enableColumnVisibility ? 'pr-12' : ''}`}>
             <ShadcnTableRow>
               {visibleColumnDefs.map((column, _index) => {
                 const columnKey = getColumnKey(column);
