@@ -54,7 +54,7 @@ function AddMedicalLogPage() {
         addMedicalLog({
           ...formData,
           id: createClientId(),
-          animal_name: animal?.name || 'Unknown',
+          animal_name: formData.animal_id  || 'Unknown',
           logged_at: formData.logged_at
             ? new Date(formData.logged_at).toISOString()
             : new Date().toISOString(),
