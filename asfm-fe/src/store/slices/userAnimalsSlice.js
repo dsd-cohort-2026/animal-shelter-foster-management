@@ -44,11 +44,19 @@ export const userAnimalsSlice = (set, get) => ({
         }
     },
 
-    addUserAnimal: (animal) => set(state => {state.userAnimals.push(animal)}),
-    // Safe to push animals due to the global store wrapped in immer which makes a draft copy of current state that is mutate  
+  addUserAnimal: (animal) =>
+    set((state) => {
+      state.userAnimals.push(animal);
+    }),
+  // Safe to push animals due to the global store wrapped in immer which makes a draft copy of current state that is mutate
 
-    removeUserAnimal: (animal) => set(state => {state.userAnimals = state.userAnimals.filter((entity) => entity.id !== animal.id)}),
+  removeUserAnimal: (animal) =>
+    set((state) => {
+      state.userAnimals = state.userAnimals.filter((entity) => entity.id !== animal.id);
+    }),
 
-    setIsFosterMember: (isFoster) => set(state => {state.isFosterMember = isFoster}) 
-
-})
+  setIsFosterMember: (isFoster) =>
+    set((state) => {
+      state.isFosterMember = isFoster;
+    }),
+});

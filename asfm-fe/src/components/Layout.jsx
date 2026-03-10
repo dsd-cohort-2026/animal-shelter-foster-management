@@ -1,12 +1,10 @@
 import NavBar from './NavBar';
 
-function Layout ({ children }) {
+function Layout({ children }) {
   return (
     <div className="flex flex-col min-h-screen">
       <NavBar />
-      <main className="flex-1 p-4">
-        {children}
-      </main>
+      <main className="flex-1 p-4">{children}</main>
       <footer className="border-t border-gray-300 p-4 text-center text-sm text-primary">
         <p>&copy; 2026 ShelterSync.</p>
       </footer>

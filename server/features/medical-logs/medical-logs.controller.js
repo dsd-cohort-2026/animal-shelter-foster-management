@@ -23,3 +23,14 @@ exports.getMedicalLogById = async (req, res) => {
     res.status(500).json({ message: "An error occurred while fetching a single medical log" });
   }
 }
+
+exports.createMedicalLog = async (req, res, next) => {
+  try {
+    const body = req.body;
+    const user = req.user;
+    const medicalLog = await medicalLogService.createMedicalLog(body, user);
+    res.status(201).json(medicalLog);
+  } catch (error) {
+    next(error);
+  }
+};

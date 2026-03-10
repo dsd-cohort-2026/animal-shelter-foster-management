@@ -1,15 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router';
-import SearchBar from '@/components/SearchBar';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/medical-logs')({
-  component: RouteComponent,
+  component: () => <Outlet />,
 });
-
-function RouteComponent() {
-  return (
-    <>
-      <div className="flex justify-center pt-2">Medical History</div>
-      <SearchBar />
-    </>
-  );
-}

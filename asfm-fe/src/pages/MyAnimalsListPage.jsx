@@ -2,6 +2,7 @@ import MyAnimalCard from '@/components/my-animals/MyAnimalCard';
 import { useEffect, useState } from 'react';
 import { Spinner } from '@/components/ui/spinner';
 import { useBoundStore } from '@/store';
+import apiClient from '@/lib/axios';
 
 export default function MyAnimalsListPage() {
   const user = useBoundStore((state) => state.user);
@@ -15,21 +16,10 @@ export default function MyAnimalsListPage() {
     token = session.access_token;
   }
 
-  const url = 'http://localhost:8080/api'; // <-- change url to an env variable once backend deployment url is finalized
-
-  async function fetchMyAnimals(userId) {
+  async function fetchMyAnimals() {
     try {
-      const response = await fetch(`${url}/animals`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`Failed to fetch my animals: ${response.status}`);
-      } else {
-        const data = await response.json();
-        setMyAnimals(data);
-      }
+      const response = await apiClient.get('/animals');
+      setMyAnimals(response.data);
     } catch (err) {
       console.error(err);
       setIsError(true);
@@ -40,7 +30,7 @@ export default function MyAnimalsListPage() {
 
   useEffect(() => {
     if (user && token) {
-      fetchMyAnimals(user.id);
+      fetchMyAnimals();
     }
   }, [user, token]);
 

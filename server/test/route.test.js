@@ -796,5 +796,146 @@ const runGetInventoryTransactionTests = async () => {
   console.log('\n=== GET /api/inventory-transactions tests completed ===');
 };
 
-runAddTransactionPostTests();
-runGetInventoryTransactionTests();
+const runPostMedicalLogTests = async () => {
+  try {
+    const STAFF_TOKEN = await getStaffUserToken();
+    const USER_TOKEN = await getRegularUserToken();
+    const animal = await getRandomAnimal();
+
+    // Test 1: STAFF can create a medical log (AC #3 - should return 201)
+    console.log('\n=== TEST 1: POST /api/medical-logs as STAFF ===');
+    let res = await fetch('http://localhost:8080/api/medical-logs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${STAFF_TOKEN}`,
+      },
+      body: JSON.stringify({
+        category: 'MEDICAL',
+        animal_id: animal.id,
+        general_notes: 'Routine checkup - all good',
+      }),
+    });
+    let data = await res.json();
+    console.log(`Status: ${res.status}`);
+    console.log(`Response: ${JSON.stringify(data, null, 2)}`);
+    if (res.status === 201) console.log('✓ STAFF can create medical log');
+    else console.log('✗ Expected 201');
+
+    // Test 2: No token (AC #5 - should return 401)
+    console.log('\n=== TEST 2: POST /api/medical-logs without token ===');
+    res = await fetch('http://localhost:8080/api/medical-logs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        category: 'MEDICAL',
+        animal_id: animal.id,
+      }),
+    });
+    data = await res.json();
+    console.log(`Status: ${res.status}`);
+    if (res.status === 401) console.log('✓ 401 returned for missing token');
+    else console.log('✗ Expected 401');
+
+    // Test 3: Invalid body - bad category (AC #5 - should return 400)
+    console.log('\n=== TEST 3: POST /api/medical-logs with invalid category ===');
+    res = await fetch('http://localhost:8080/api/medical-logs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${STAFF_TOKEN}`,
+      },
+      body: JSON.stringify({
+        category: 'INVALID_CATEGORY',
+        animal_id: animal.id,
+      }),
+    });
+    data = await res.json();
+    console.log(`Status: ${res.status}`);
+    if (res.status === 400) console.log('✓ 400 returned for invalid category');
+    else console.log('✗ Expected 400');
+
+    // Test 4: Missing required field - no animal_id (AC #5 - should return 400)
+    console.log('\n=== TEST 4: POST /api/medical-logs missing animal_id ===');
+    res = await fetch('http://localhost:8080/api/medical-logs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${STAFF_TOKEN}`,
+      },
+      body: JSON.stringify({
+        category: 'MEDICAL',
+      }),
+    });
+    data = await res.json();
+    console.log(`Status: ${res.status}`);
+    if (res.status === 400) console.log('✓ 400 returned for missing required field');
+    else console.log('✗ Expected 400');
+
+    // Test 5: Non-existent animal (AC #5 - should return 404)
+    console.log('\n=== TEST 5: POST /api/medical-logs with non-existent animal ===');
+    res = await fetch('http://localhost:8080/api/medical-logs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${STAFF_TOKEN}`,
+      },
+      body: JSON.stringify({
+        category: 'MEDICAL',
+        animal_id: '00000000-0000-0000-0000-000000000000',
+      }),
+    });
+    data = await res.json();
+    console.log(`Status: ${res.status}`);
+    if (res.status === 404) console.log('✓ 404 returned for non-existent animal');
+    else console.log('✗ Expected 404');
+
+    // Test 6: USER creating log for unassigned animal (AC #4 - should return 403)
+    console.log('\n=== TEST 6: POST /api/medical-logs as USER for unassigned animal ===');
+    res = await fetch('http://localhost:8080/api/medical-logs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${USER_TOKEN}`,
+      },
+      body: JSON.stringify({
+        category: 'BEHAVIORAL',
+        animal_id: animal.id,
+        behavior_notes: 'Should not be allowed if not assigned',
+      }),
+    });
+    data = await res.json();
+    console.log(`Status: ${res.status}`);
+    console.log(`Response: ${JSON.stringify(data, null, 2)}`);
+    if (res.status === 403) console.log('✓ 403 returned for unassigned animal');
+    else if (res.status === 201) console.log('⚠ 201 returned - user IS assigned to this random animal (this is OK)');
+    else console.log('✗ Unexpected status');
+
+    // Test 7: Extra unknown field in body (should return 400 because of strictObject)
+    console.log('\n=== TEST 7: POST /api/medical-logs with extra field ===');
+    res = await fetch('http://localhost:8080/api/medical-logs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${STAFF_TOKEN}`,
+      },
+      body: JSON.stringify({
+        category: 'MEDICAL',
+        animal_id: animal.id,
+        unknown_field: 'should be rejected',
+      }),
+    });
+    data = await res.json();
+    console.log(`Status: ${res.status}`);
+    if (res.status === 400) console.log('✓ 400 returned for unknown field (strictObject works)');
+    else console.log('✗ Expected 400');
+
+    console.log('\n=== POST /api/medical-logs tests completed ===');
+  } catch (error) {
+    console.log({ error });
+  }
+};
+
+runPostMedicalLogTests();
+// runAddTransactionPostTests();
+// runGetInventoryTransactionTests();

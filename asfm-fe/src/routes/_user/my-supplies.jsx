@@ -63,10 +63,11 @@ function RouteComponent() {
       textSize: 'sm',
       headClassName: 'min-w-[180px]',
       cell: ({ row }) => {
-        const isCrate = row.original.itemDescription.toLowerCase().includes('crate');
+        const isCrate = row.original.itemDescription.toLowerCase().includes('crate');;
         if (!isCrate)
-          return <span className="invisible">{formatDate(row.original.expectedReturnDate)}</span>;
-        return formatDate(row.original.expectedReturnDate);
+         
+          return <span className="invisible">{formatDate(row.original.expectedReturnDate)}</span>;;
+        return formatDate(row.original.expectedReturnDate);;
       },
     },
     {

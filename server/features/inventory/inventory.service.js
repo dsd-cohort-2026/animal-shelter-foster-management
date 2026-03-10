@@ -7,19 +7,11 @@ exports.getAllInventory = async () => {
 };
 
 exports.getInventoryItemById = async (id) => {
-  const inventoryItem = await inventoryRepository
-    .findAll()
-    .then((items) => items.find((item) => item.id === id));
+  const inventoryItem = await inventoryRepository.findById(id);
   if (!inventoryItem) {
     return null;
   }
-
-  return {
-    id: inventoryItem.id,
-    item_id: inventoryItem.item_id,
-    quantity: inventoryItem.quantity,
-    expiration_date: inventoryItem.expiration_date,
-  };
+  return inventoryItem;
 };
 
 exports.updateInventory = async (req) => {

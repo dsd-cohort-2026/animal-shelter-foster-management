@@ -8,12 +8,16 @@ export default function FilterSelect({
   selectTriggerClassName,
   selectContentClassName,
   selectItems,
+  selectItemsMap,
 }) {
-  const selectItemsMapped = selectItems.map((item, index) => (
-    <SelectItem key={index} value={item}>
-      {item}
-    </SelectItem>
-  ));
+  const selectItemsMapped = selectItems.map((item, index) => {
+    const displayText = selectItemsMap?.[item] || item;
+    return (
+      <SelectItem key={index} value={item}>
+        {displayText}
+      </SelectItem>
+    );
+  });
 
   return (
     <Select value={value} onValueChange={onChange} className={cn(selectClassName)}>

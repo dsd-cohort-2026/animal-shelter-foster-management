@@ -4,11 +4,7 @@ import { SearchIcon } from 'lucide-react';
 function InputGroupForSearch({ placeholder_text, add_search_icon = false, value, onChange }) {
   return (
     <InputGroup className="flex-1">
-      <InputGroupInput
-        placeholder={placeholder_text}
-        value={value}
-        onChange={onChange}
-      />
+      <InputGroupInput placeholder={placeholder_text} value={value} onChange={onChange} />
       {add_search_icon && (
         <InputGroupAddon>
           <SearchIcon />

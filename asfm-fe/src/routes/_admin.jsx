@@ -3,16 +3,13 @@ import { useBoundStore } from '@/store';
 
 export const Route = createFileRoute('/_admin')({
   beforeLoad: async ({ context, location }) => {
-    const { initializeAuth, user, userRole, setUserRole } = useBoundStore.getState();
+    const { initializeAuth } = useBoundStore.getState();
 
-    await initializeAuth(); // force beforeLoad to wait for auth before redirecting
+    await initializeAuth();
 
-    // Get fresh state after init
-    const freshState = useBoundStore.getState();
-    const freshUser = freshState.user;
-    let freshRole = freshState.userRole;
+    const { user, userRole } = useBoundStore.getState();
 
-    if (!freshUser) {
+    if (!user) {
       throw redirect({
         to: '/signin',
         search: {
@@ -21,13 +18,8 @@ export const Route = createFileRoute('/_admin')({
       });
     }
 
-    // If role wasn't fetched during init, fetch it now
-    if (!freshRole && freshUser) {
-      await freshState.setUserRole();
-      freshRole = useBoundStore.getState().userRole;
-    }
-
-    if (freshRole !== 'STAFF') {
+    if (userRole !== 'STAFF') {
+      // TODO: show role guard instead
       throw redirect({
         to: '/',
       });

@@ -219,7 +219,7 @@ function RouteComponent() {
       headClassName: 'min-w-[150px]',
       cell: ({ row }) => {
         const isCrate = row.original.category === 'CRATE';
-        if (!isCrate)
+        if (isCrate)
           return <span className="invisible">{formatDate(row.original.expiration_date)}</span>;
         return formatDate(row.original.expiration_date);
       },
@@ -241,7 +241,17 @@ function RouteComponent() {
     },
   ];
 
-  if (error) return <div className="flex justify-center pt-8 text-red-500">{error}</div>;
+  if (error) return (
+    <div className="flex flex-col items-center pt-8 gap-3">
+      <p className="text-red-500">{error}</p>
+      <button
+        onClick={fetchData}
+        className="px-4 py-2 text-sm rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+      >
+        Retry
+      </button>
+    </div>
+  );
 
   return (
     <>

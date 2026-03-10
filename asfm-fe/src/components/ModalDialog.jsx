@@ -52,9 +52,7 @@ export const ModalDialog = ({
               <DialogTitle>{title}</DialogTitle>
               <DialogDescription>{description}</DialogDescription>
             </DialogHeader>
-            <div className="flex-1 overflow-y-auto">
-              {props.children}
-            </div>
+            <div className="flex-1 overflow-y-auto">{props.children}</div>
             <DialogFooter className="mt-4">
               <div className="flex justify-between w-full gap-4">
                 <DialogClose>

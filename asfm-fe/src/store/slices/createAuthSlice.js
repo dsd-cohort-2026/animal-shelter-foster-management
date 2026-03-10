@@ -13,7 +13,7 @@ export const createAuthSlice = (set, get) => ({
       .select('role')
       .eq('id', state.user.id)
       .single();
-    
+
     if (error) {
       console.error(error);
       return error;
@@ -70,7 +70,7 @@ export const createAuthSlice = (set, get) => ({
 
     if (session) {
       get().setSession(session);
-      get().setUserRole();
+      await get().setUserRole();
     } else {
       get().clearSession();
     }
