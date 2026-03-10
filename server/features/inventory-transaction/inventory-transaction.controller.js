@@ -4,7 +4,10 @@ exports.getAllInventoryTransactions = async (req, res, next) => {
   try {
     const filters = req.query || {};
     const user = req.user;
-    const transactions = await inventoryTransactionService.getAllInventoryTransactions(filters, user);
+    const transactions = await inventoryTransactionService.getAllInventoryTransactions(
+      filters,
+      user,
+    );
     res.status(200).json(transactions);
   } catch (error) {
     next(error);

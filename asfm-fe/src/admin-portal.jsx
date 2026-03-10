@@ -52,7 +52,7 @@ function AdminPortal() {
       }
 
       try {
-        const transactionData = await apiClient.get('/inventory-transactions', {
+        const transactionData = await apiClient.get('/inventory-transactions?limit=10000', {
           headers: authHeader,
         });
         setTransactions(transactionData.data);
@@ -101,7 +101,7 @@ function AdminPortal() {
     })
     .map((transaction) => ({
       quantity: transaction.quantity,
-      'loaned to': `${transaction.foster_user.first_name} ${transaction.foster_user.last_name}`,
+      'loaned to': `${transaction.foster_user?.first_name} ${transaction.foster_user?.last_name}`,
       item: transaction.item?.name,
     }));
 
@@ -177,7 +177,9 @@ function AdminPortal() {
             title="Transactions"
             navLink="transactions"
             itemsArray={
-              transactionRows.length ? transactionRows : [{ info: 'No Transactions Found' }]
+              transactionRows.length
+                ? transactionRows.slice(0, 20)
+                : [{ info: 'No Transactions Found' }]
             }
             cardDescriptionClassName="max-h-64 overflow-y-auto"
           />
