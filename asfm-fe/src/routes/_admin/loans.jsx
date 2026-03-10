@@ -48,7 +48,7 @@ function RouteComponent() {
   useEffect(() => {
     const fetchLoans = async () => {
       try {
-        const res = await apiClient.get('/inventory-transactions?type=LOAN');
+        const res = await apiClient.get('/inventory-transactions?type=LOAN&limit=10000');
         const loans = res.data.map((transaction) => ({
           inventoryTransactionId: transaction.id,
           itemDescription: transaction.item?.name,
