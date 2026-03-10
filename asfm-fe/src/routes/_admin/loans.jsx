@@ -24,7 +24,6 @@ export const Route = createFileRoute('/_admin/loans')({
 });
 
 function RouteComponent() {
-  const session = useBoundStore((state) => state.session);
   const [allLoans, setAllLoans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
