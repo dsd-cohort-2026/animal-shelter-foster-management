@@ -15,10 +15,10 @@ import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as SignInRouteImport } from './routes/SignIn'
 import { Route as ExamplesRouteImport } from './routes/Examples'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AnimalsIndexRouteImport } from './routes/animals/index'
+import { Route as AnimalsIndexRouteImport } from './routes/_admin/animals/index';
 import { Route as SingleAnimalIdRouteImport } from './routes/single-animal.$id'
-import { Route as AnimalsAddRouteImport } from './routes/animals/add'
-import { Route as AnimalsAnimalIdRouteImport } from './routes/animals/$animalId'
+import { Route as AnimalsAddRouteImport } from './routes/_admin/animals/add';
+import { Route as AnimalsAnimalIdRouteImport } from './routes/_admin/animals/$animalId';
 import { Route as UserMySuppliesRouteImport } from './routes/_user/my-supplies'
 import { Route as ProtectedMyAnimalsRouteImport } from './routes/_protected/my-animals'
 import { Route as AdminUsersRouteImport } from './routes/_admin/users'
@@ -57,7 +57,7 @@ const IndexRoute = IndexRouteImport.update({
 const AnimalsIndexRoute = AnimalsIndexRouteImport.update({
   id: '/animals/',
   path: '/animals/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AdminRoute,
 } as any)
 const SingleAnimalIdRoute = SingleAnimalIdRouteImport.update({
   id: '/single-animal/$id',
@@ -67,12 +67,12 @@ const SingleAnimalIdRoute = SingleAnimalIdRouteImport.update({
 const AnimalsAddRoute = AnimalsAddRouteImport.update({
   id: '/animals/add',
   path: '/animals/add',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AdminRoute,
 } as any)
 const AnimalsAnimalIdRoute = AnimalsAnimalIdRouteImport.update({
   id: '/animals/$animalId',
   path: '/animals/$animalId',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AdminRoute,
 } as any)
 const UserMySuppliesRoute = UserMySuppliesRouteImport.update({
   id: '/my-supplies',

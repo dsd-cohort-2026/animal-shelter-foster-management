@@ -12,7 +12,7 @@ import { STATUS_COLORS, formatStatus, formatSpecies, formatSex } from '@/constan
 import apiClient from '@/lib/axios';
 import { supabase } from '@/lib/supabaseClient';
 
-export const Route = createFileRoute('/animals/$animalId')({
+export const Route = createFileRoute('/_admin/animals/$animalId')({
   component: AnimalDetailPage,
 });
 

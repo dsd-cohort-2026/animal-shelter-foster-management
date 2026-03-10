@@ -9,7 +9,7 @@ import { Loader2 } from 'lucide-react';
 import apiClient from '@/lib/axios';
 import { supabase } from '@/lib/supabaseClient';
 
-export const Route = createFileRoute('/animals/add')({
+export const Route = createFileRoute('/_admin/animals/add')({
   component: AddAnimalPage,
 });
 

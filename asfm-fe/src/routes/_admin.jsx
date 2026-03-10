@@ -19,6 +19,7 @@ export const Route = createFileRoute('/_admin')({
     }
 
     if (userRole !== 'STAFF') {
+      // TODO: show role guard instead
       throw redirect({
         to: '/',
       });
