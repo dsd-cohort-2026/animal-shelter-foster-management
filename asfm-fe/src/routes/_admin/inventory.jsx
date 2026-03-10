@@ -9,7 +9,6 @@ import { ModalDialog } from '@/components/ModalDialog';
 import { Input } from '@/components/ui/input';
 import { Edit, Trash2, Package } from 'lucide-react';
 import ConfirmationDialog from '@/components/confirmationDialog';
-import { useBoundStore } from '@/store';
 
 const formatDate = (dateString) => {
   if (!dateString) return '—';
@@ -48,31 +47,29 @@ function RouteComponent() {
     }
     return filtered;
   }, [allInventory, filters]);
-  const session = useBoundStore((state) => state.session);
-  const authHeader = { Authorization: `Bearer ${session?.access_token}` };
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const inventoryRes = await apiClient.get('/inventory');
+
+      const enrichedInventory = inventoryRes.data.map((inv) => ({
+        ...inv,
+        item_name: inv.item?.name || 'Unknown',
+        category: inv.item?.category || 'Unknown',
+      }));
+
+      setAllInventory(enrichedInventory);
+      setCategories([...new Set(enrichedInventory.map((item) => item.category))]);
+    } catch (err) {
+      console.error('Error fetching data:', err);
+      setError('Failed to load inventory. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [inventoryRes, itemsRes] = await Promise.all([
-          apiClient.get('/inventory', { headers: authHeader }),
-        ]);
-
-        const enrichedInventory = inventoryRes.data.map((inv) => ({
-          ...inv,
-          item_name: inv.item?.name || 'Unknown',
-          category: inv.item?.category || 'Unknown',
-        }));
-
-        setAllInventory(enrichedInventory);
-        setCategories([...new Set(enrichedInventory.map((item) => item.category))]);
-      } catch (err) {
-        console.error('Error fetching data:', err);
-        setError('Failed to load inventory. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
 
@@ -133,7 +130,7 @@ function RouteComponent() {
       headClassName: 'min-w-[150px]',
       cell: ({ row }) => {
         const isCrate = row.original.category === 'CRATE';
-        if (!isCrate)
+        if (isCrate)
           return <span className="invisible">{formatDate(row.original.expiration_date)}</span>;
         return formatDate(row.original.expiration_date);
       },
@@ -162,7 +159,17 @@ function RouteComponent() {
     },
   ];
 
-  if (error) return <div className="flex justify-center pt-8 text-red-500">{error}</div>;
+  if (error) return (
+    <div className="flex flex-col items-center pt-8 gap-3">
+      <p className="text-red-500">{error}</p>
+      <button
+        onClick={fetchData}
+        className="px-4 py-2 text-sm rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+      >
+        Retry
+      </button>
+    </div>
+  );
 
   return (
     <>

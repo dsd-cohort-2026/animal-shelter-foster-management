@@ -31,6 +31,7 @@ exports.findById = async (id) => {
   try {
     return await prisma.inventory.findUnique({
       where: { id: id },
+      include: { item: true },
     });
   } catch (err) {
     console.log(err);
