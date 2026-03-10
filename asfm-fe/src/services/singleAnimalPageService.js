@@ -1,6 +1,5 @@
+import apiClient from "@/lib/axios";
 import getBirthdayYear from "@/utils/getBirthday";
-
-const url = 'http://localhost:3005'; // <-- placeholder
 
 function sortMedicalLogs(logs) {
     logs.sort((a, b) => new Date(b.logged_at) - new Date(a.logged_at));
@@ -8,15 +7,10 @@ function sortMedicalLogs(logs) {
 
   export async function fetchAnimal(id) {
     try {
-      const response = await fetch(`${url}/animals?id=${id}`);
-      if (!response.ok) {
-        throw new Error(`Fetch request error status: ${response.status}`);
-      }
-      const data = await response.json();
-      if (data.length === 0) {
-        return null;
-      }
-      const animal = data[0];
+      const response = await apiClient.get(`/animals/${id}`)
+      const data = response.data
+      if(Object.keys(data).length === 0) return null;
+      const animal = data;
 
       const updatedAnimal = {
         ...animal,
@@ -30,13 +24,10 @@ function sortMedicalLogs(logs) {
     }
   }
 
-  export async function fetchAnimalMedicalLogs(id) {
+  export async function fetchAnimalMedicalLogs() {
     try {
-      const response = await fetch(`${url}/medical-logs?animal_id=${id}`);
-      if (!response.ok) {
-        throw new Error(`Failed to find the animal's medical logs ${response.status}`);
-      }
-      const data = await response.json();
+      const response = await apiClient.get(`/medical-logs`);
+      const data = response.data
       sortMedicalLogs(data)
       return data;
     } catch (err) {

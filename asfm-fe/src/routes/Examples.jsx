@@ -14,6 +14,7 @@ import { useDashboardSummary } from '../hooks/useDashboardSummary';
 import { useBoundStore } from '../store';
 import { DatePickerSimple } from '../components/dateTimePicker';
 import { createFileRoute } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/Examples')({
   component: ExamplesPage,
@@ -100,6 +101,11 @@ function ExamplesPage() {
 
       <div id="examples" className="flex flex-col items-center h-auto gap-4 mt-17.5">
         <div>
+          <div>
+          <Link to="/single-animal/$id" params={{id: 'ca0016e6-6614-44fb-bd81-3feec36506c5'}}>
+            Go to single animal
+            </Link>
+          </div>
           <div className="text-center">Global State Test</div>
           <div>
             <div className="flex flex-col items-center">
