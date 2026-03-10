@@ -1,4 +1,5 @@
 const medicalLogRepository = require('./medical-logs.repository');
+const prisma = require('../../connections/prisma-client');
 
 exports.getAllMedicalLogs = async (user) => {
   const where = {};
@@ -47,4 +48,24 @@ exports.getMedicalLogById = async (id) => {
     prescription: medicalLog.prescription,
     documents: medicalLog.documents
   };
+};
+
+exports.createMedicalLog = async (body, user) => {
+  const animal = await prisma.animal.findUnique({ where: { id: body.animal_id } });
+  if (!animal) {
+    const err = new Error('Animal not found');
+    err.statusCode = 404;
+    throw err;
+  }
+
+  if (user.role === 'USER') {
+    const assignment = await medicalLogRepository.findActiveAssignment(body.animal_id, user.id);
+    if (!assignment) {
+      const err = new Error('You are not authorized to create a medical log for this animal');
+      err.statusCode = 403;
+      throw err;
+    }
+  }
+
+  return medicalLogRepository.create(body);
 };

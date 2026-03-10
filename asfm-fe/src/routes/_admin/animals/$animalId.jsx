@@ -14,7 +14,7 @@ import { STATUS_COLORS, formatStatus, formatSpecies, formatSex } from '@/constan
 // TODO: Replace with actual API call to backend
 const SIMULATED_API_DELAY = 600;
 
-export const Route = createFileRoute('/animals/$animalId')({
+export const Route = createFileRoute('/_admin/animals/$animalId')({
   component: AnimalDetailPage,
 });
 

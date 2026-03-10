@@ -18,7 +18,7 @@ import {
   formatSex,
 } from '@/constants/animalConstants';
 
-export const Route = createFileRoute('/animals/')({
+export const Route = createFileRoute('/_admin/animals/')({
   component: AnimalListPage,
 });
 

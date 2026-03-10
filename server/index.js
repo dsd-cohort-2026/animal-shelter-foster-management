@@ -6,15 +6,39 @@ require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || 8080;
-const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || "")
+const allowedOriginPatterns = (process.env.CORS_ALLOWED_ORIGINS || "")
   .split(",")
-  .map((origin) => origin.trim())
+  .map((origin) => normalizeOrigin(origin.trim()))
   .filter((origin) => origin.length > 0);
-const isProduction = process.env.NODE_ENV === "production";
+
+function normalizeOrigin(origin) {
+  return origin.replace(/\/+$/, "");
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function matchesOriginPattern(origin, pattern) {
+  if (!pattern.includes("*")) {
+    return origin === pattern;
+  }
+
+  const wildcardRegex = new RegExp(
+    `^${pattern.split("*").map(escapeRegExp).join(".*")}$`,
+  );
+  return wildcardRegex.test(origin);
+}
+
+function isExplicitlyAllowedOrigin(origin) {
+  return allowedOriginPatterns.some((pattern) =>
+    matchesOriginPattern(origin, pattern),
+  );
+}
 
 function isLocalDevOrigin(origin) {
   try {
-    const url = new URL(origin);
+    const url = new URL(normalizeOrigin(origin));
     return (
       (url.hostname === "localhost" || url.hostname === "127.0.0.1") &&
       (url.protocol === "http:" || url.protocol === "https:")
@@ -28,14 +52,19 @@ function isLocalDevOrigin(origin) {
 app.use(
   cors({
     origin: function (origin, callback) {
+      const normalizedOrigin = normalizeOrigin(origin || "");
+
       // Allow requests with no origin (e.g., mobile apps, curl) or if origin is explicitly allowed
-      const isExplicitlyAllowed = allowedOrigins.includes(origin);
-      const isAllowedLocalDevOrigin = !isProduction && isLocalDevOrigin(origin);
+      const isExplicitlyAllowed =
+        normalizedOrigin.length > 0 &&
+        isExplicitlyAllowedOrigin(normalizedOrigin);
+      const isAllowedLocalDevOrigin =
+        normalizedOrigin.length > 0 && isLocalDevOrigin(normalizedOrigin);
 
       if (!origin || isExplicitlyAllowed || isAllowedLocalDevOrigin) {
         return callback(null, true);
       }
-      return callback(new Error("Not allowed by CORS"));
+      return callback(new Error(`Not allowed by CORS: ${origin}`));
     },
     credentials: true,
   }),

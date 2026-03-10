@@ -12,7 +12,7 @@ import { createClientId } from '@/utils/idHelpers';
 // TODO: Replace with actual API call to backend
 const SIMULATED_API_DELAY = 600;
 
-export const Route = createFileRoute('/animals/add')({
+export const Route = createFileRoute('/_admin/animals/add')({
   component: AddAnimalPage,
 });
 
