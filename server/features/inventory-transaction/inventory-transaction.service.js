@@ -1,20 +1,20 @@
 const inventoryTransactionRepository = require('./inventory-transaction.repository');
 
-exports.getAllInventoryTransactions = async () => {
-  const inventoryTransactions = await inventoryTransactionRepository.findAll();
-  return inventoryTransactions.map((inventoryTransaction) => ({
-    id: inventoryTransaction.id,
-    created_at: inventoryTransaction.created_at,
-    foster_user_id: inventoryTransaction.foster_user_id,
-    created_by_staff_user_id: inventoryTransaction.created_by_staff_user_id,
-    item_id: inventoryTransaction.item_id,
-    inventory_id: inventoryTransaction.inventory_id,
-    qty_out: inventoryTransaction.qty_out,
-    status: inventoryTransaction.status,
-    type: inventoryTransaction.type,
-    notes: inventoryTransaction.notes,
-    return_date: inventoryTransaction.return_date,
-  }));
+exports.getAllInventoryTransactions = async (filters = {}, user) => {
+  const page = parseInt(filters.page, 10) || 1;
+  const limit = parseInt(filters.limit, 10) || 10;
+  const skip = (page - 1) * limit;
+
+  const where = {};
+
+  if (filters.type) where.type = filters.type;
+  if (filters.status) where.status = filters.status;
+
+  if (user.role === 'USER') {
+    where.foster_user_id = user.id;
+  }
+
+  return inventoryTransactionRepository.findAll(where, skip, limit);
 };
 
 exports.getInventoryTransactionById = async (id) => {

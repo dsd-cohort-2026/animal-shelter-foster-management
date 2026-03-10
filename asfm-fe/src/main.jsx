@@ -5,7 +5,6 @@ import { routeTree } from './routeTree.gen'; // Auto-generated
 // Create the router instance
 import './index.css';
 import { useBoundStore } from './store';
-import AuthProvider from './components/AuthProvider';
 
 const router = createRouter({
   routeTree,
@@ -13,20 +12,16 @@ const router = createRouter({
 });
 
 // wrapper component to inject auth context
-function ContextWrapper() {
+function App() {
   const user = useBoundStore((state) => state.user);
   const loading = useBoundStore((state) => state.loading);
   const userRole = useBoundStore((state) => state.userRole);
 
-  return (
-    <AuthProvider>
-      <RouterProvider router={router} context={{ user, loading, userRole }} />
-    </AuthProvider>
-  );
+  return <RouterProvider router={router} context={{ user, loading, userRole }} />;
 }
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ContextWrapper />
+    <App />
   </StrictMode>,
 );

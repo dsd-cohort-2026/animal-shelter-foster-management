@@ -1,68 +1,64 @@
-import { createFileRoute } from '@tanstack/react-router'
-import Layout from '@/components/Layout'
-import NavBar from '@/components/NavBar'
-import { ReusableTable } from '../../components/table_components'
-import { useMemo, useState } from 'react'
-import { Edit, ClipboardList, Plus } from 'lucide-react'
-import { mockLoanedItems } from '../../features/mockLoanedItems'
-import FilterBar from '@/components/FilterBar'
-import FilterSelect from '@/components/custom/FilterSelect'
-import InputGroupForSearch from '@/components/InputGroupForSearch'
-import { ModalDialog } from '@/components/ModalDialog'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-
+import { createFileRoute } from '@tanstack/react-router';
+import { ReusableTable } from '../../components/table_components';
+import { useMemo, useState } from 'react';
+import { Edit, ClipboardList } from 'lucide-react';
+import { mockLoanedItems } from '../../features/mockLoanedItems';
+import FilterBar from '@/components/FilterBar';
+import FilterSelect from '@/components/custom/FilterSelect';
+import InputGroupForSearch from '@/components/InputGroupForSearch';
+import { ModalDialog } from '@/components/ModalDialog';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 
 const formatDate = (dateString) => {
-  const date = new Date(dateString)
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const year = date.getFullYear()
-  return `${month}/${day}/${year}`
-}
+  const date = new Date(dateString);
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${month}/${day}/${year}`;
+};
 
 export const Route = createFileRoute('/_admin/loans')({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  const [allLoans] = useState(mockLoanedItems)
-  const [loading] = useState(false)
-  const [error] = useState(null)
-  const [filters, setFilters] = useState({ search: '', loanStatus: '' })
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [formData, setFormData] = useState({ loanType: '' })
+  const [allLoans] = useState(mockLoanedItems);
+  const [loading] = useState(false);
+  const [error] = useState(null);
+  const [filters, setFilters] = useState({ search: '', loanStatus: '' });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({ loanType: '' });
   const filteredLoans = useMemo(() => {
-    let filtered = allLoans
+    let filtered = allLoans;
     if (filters.search) {
-      filtered = filtered.filter(l =>
-        l.inventoryTransactionId.toLowerCase().includes(filters.search.toLowerCase())
-      )
+      filtered = filtered.filter((l) =>
+        l.inventoryTransactionId.toLowerCase().includes(filters.search.toLowerCase()),
+      );
     }
     if (filters.loanStatus) {
-      filtered = filtered.filter(l => l.loanStatus === filters.loanStatus)
+      filtered = filtered.filter((l) => l.loanStatus === filters.loanStatus);
     }
-    return filtered
-  }, [filters, allLoans])
+    return filtered;
+  }, [filters, allLoans]);
 
   const handleEdit = (loan) => {
-    console.log('Edit loan:', loan)
-  }
+    console.log('Edit loan:', loan);
+  };
 
   const handleClearFilters = () => {
-    setFilters({ search: '', loanStatus: '' })
-  }
+    setFilters({ search: '', loanStatus: '' });
+  };
 
   const handleAddNew = () => {
-    setFormData({ loanType: '' })
-    setIsModalOpen(true)
-  }
+    setFormData({ loanType: '' });
+    setIsModalOpen(true);
+  };
 
   const handleModalSubmit = () => {
-    console.log('Add new loaned item:', formData)
-    setIsModalOpen(false)
-  }
+    console.log('Add new loaned item:', formData);
+    setIsModalOpen(false);
+  };
 
   const loansColumns = [
     {
@@ -101,9 +97,10 @@ function RouteComponent() {
       textSize: 'sm',
       headClassName: 'min-w-[180px]',
       cell: ({ row }) => {
-        const isCrate = row.original.itemDescription.toLowerCase().includes('crate')
-        if (!isCrate) return <span className="invisible">{formatDate(row.original.expectedReturnDate)}</span>
-        return formatDate(row.original.expectedReturnDate)
+        const isCrate = row.original.itemDescription.toLowerCase().includes('crate');
+        if (!isCrate)
+          return <span className="invisible">{formatDate(row.original.expectedReturnDate)}</span>;
+        return formatDate(row.original.expectedReturnDate);
       },
     },
     {
@@ -133,17 +130,16 @@ function RouteComponent() {
         </button>
       ),
     },
-  ]
+  ];
 
-  if (error)
-    return <div className="flex justify-center pt-8 text-red-500">{error}</div>
+  if (error) return <div className="flex justify-center pt-8 text-red-500">{error}</div>;
 
-  const totalLoans = allLoans.length
-  const activeCount = allLoans.filter(l => l.loanStatus === 'Active').length
-  const returnedCount = allLoans.filter(l => l.loanStatus === 'Complete').length
+  const totalLoans = allLoans.length;
+  const activeCount = allLoans.filter((l) => l.loanStatus === 'Active').length;
+  const returnedCount = allLoans.filter((l) => l.loanStatus === 'Complete').length;
 
   return (
-    <Layout navBar={<NavBar />}>
+    <>
       <div className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-8 mb-4">
         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-4">
@@ -158,12 +154,24 @@ function RouteComponent() {
                 Track and manage all shelter supply loans.
               </p>
               <div className="flex items-center gap-3 mt-3 flex-wrap">
-                <Badge variant="secondary" className="font-medium">{totalLoans} total</Badge>
+                <Badge variant="secondary" className="font-medium">
+                  {totalLoans} total
+                </Badge>
                 {activeCount > 0 && (
-                  <Badge variant="outline" className="font-medium border-emerald-500/30 text-emerald-600 bg-emerald-500/5">{activeCount} active</Badge>
+                  <Badge
+                    variant="outline"
+                    className="font-medium border-emerald-500/30 text-emerald-600 bg-emerald-500/5"
+                  >
+                    {activeCount} active
+                  </Badge>
                 )}
                 {returnedCount > 0 && (
-                  <Badge variant="outline" className="font-medium border-blue-500/30 text-blue-600 bg-blue-500/5">{returnedCount} complete</Badge>
+                  <Badge
+                    variant="outline"
+                    className="font-medium border-blue-500/30 text-blue-600 bg-blue-500/5"
+                  >
+                    {returnedCount} complete
+                  </Badge>
                 )}
               </div>
             </div>
@@ -190,9 +198,7 @@ function RouteComponent() {
       </FilterBar>
 
       {!loading && filteredLoans.length === 0 && (
-        <div className="flex justify-center pt-8 text-gray-500">
-          No active loans found.
-        </div>
+        <div className="flex justify-center pt-8 text-gray-500">No active loans found.</div>
       )}
       <ReusableTable
         columns={loansColumns}
@@ -240,6 +246,6 @@ function RouteComponent() {
           </div>
         </form>
       </ModalDialog>
-    </Layout>
-  )
+    </>
+  );
 }
