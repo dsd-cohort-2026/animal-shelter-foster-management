@@ -44,7 +44,7 @@ export const ModalDialog = ({
         <DialogOverlay>
           <DialogContent
             className={cn(
-              'max-w-125 max-h-[85vh] min-w-125 sm:min-h-38',
+              'flex flex-col max-w-125 max-h-[85vh] min-w-125 sm:min-h-38',
               contentClassName,
             )}
           >

@@ -10,7 +10,6 @@ const updateInventorySchema = z.object({
     type: z.enum(['INTAKE', 'DISTRIBUTION', 'LOAN']).optional(),
     status: z.enum(['COMPLETE', 'ACTIVE']).optional(),
     notes: z.string().optional(),
-    transaction_id: z.uuid().optional(),
   }),
   params: z.strictObject({ id: z.uuid() }),
   query: z.object({}).optional(),

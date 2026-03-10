@@ -1,22 +1,21 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { ReusableTable } from '../../components/table_components';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import apiClient from '../../lib/axios';
 import FilterBar from '@/components/FilterBar';
 import FilterSelect from '@/components/custom/FilterSelect';
 import InputGroupForSearch from '@/components/InputGroupForSearch';
 import { ModalDialog } from '@/components/ModalDialog';
 import { Input } from '@/components/ui/input';
-import { Edit, Trash2, Package } from 'lucide-react';
-import ConfirmationDialog from '@/components/confirmationDialog';
+import { Edit, Package } from 'lucide-react';
 import { useBoundStore } from '@/store';
 
 const formatDate = (dateString) => {
   if (!dateString) return '—';
   const date = new Date(dateString);
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const year = date.getFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  const year = date.getUTCFullYear();
   return `${month}/${day}/${year}`;
 };
 
@@ -24,17 +23,49 @@ export const Route = createFileRoute('/_admin/inventory')({
   component: RouteComponent,
 });
 
+const EMPTY_NEW_ITEM = {
+  item_name: '',
+  category: '',
+  species: '',
+  unit: '',
+  quantity: '',
+  brand: '',
+  description: '',
+  notes: '',
+  expiration_date: '',
+  // FOOD
+  life_stage: '',
+  // CRATE
+  crate_size: '',
+  crate_status: '',
+  // MEDICINE
+  medication_dose: '',
+  medication_route: '',
+  medication_side_effects: '',
+};
+
 function RouteComponent() {
+  const user = useBoundStore((state) => state.user);
+  const session = useBoundStore((state) => state.session);
+  const authHeader = { Authorization: `Bearer ${session?.access_token}` };
+
   const [filters, setFilters] = useState({ category: '', search: '' });
   const [allInventory, setAllInventory] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Add modal
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newItem, setNewItem] = useState(EMPTY_NEW_ITEM);
+  const [isAddSubmitting, setIsAddSubmitting] = useState(false);
+  const [addError, setAddError] = useState(null);
+
+  // Edit modal
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
-  const [deleteItem, setDeleteItem] = useState(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
+  const [editError, setEditError] = useState(null);
 
   const filteredInventory = useMemo(() => {
     let filtered = allInventory;
@@ -48,59 +79,114 @@ function RouteComponent() {
     }
     return filtered;
   }, [allInventory, filters]);
-  const session = useBoundStore((state) => state.session);
-  const authHeader = { Authorization: `Bearer ${session?.access_token}` };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [inventoryRes, itemsRes] = await Promise.all([
-          apiClient.get('/inventory', { headers: authHeader }),
-        ]);
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const inventoryRes = await apiClient.get('/inventory');
 
-        const enrichedInventory = inventoryRes.data.map((inv) => ({
-          ...inv,
-          item_name: inv.item?.name || 'Unknown',
-          category: inv.item?.category || 'Unknown',
-        }));
+      const enrichedInventory = inventoryRes.data.map((inv) => ({
+        ...inv,
+        item_name: inv.item?.name || 'Unknown',
+        category: inv.item?.category || 'Unknown',
+      }));
 
-        setAllInventory(enrichedInventory);
-        setCategories([...new Set(enrichedInventory.map((item) => item.category))]);
-      } catch (err) {
-        console.error('Error fetching data:', err);
-        setError('Failed to load inventory. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+      setAllInventory(enrichedInventory);
+      setCategories([...new Set(enrichedInventory.map((item) => item.category))]);
+    } catch (err) {
+      console.error('Error fetching data:', err);
+      setError('Failed to load inventory. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const handleEdit = (inventoryItem) => {
-    setEditItem(inventoryItem);
-    setIsEditModalOpen(true);
-  };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-  const handleEditSubmit = () => {
-    console.log('Edit inventory item:', editItem);
-    setIsEditModalOpen(false);
-  };
-
-  const handleDelete = (inventoryItem) => {
-    setDeleteItem(inventoryItem);
-    setShowDeleteConfirm(true);
-  };
-
-  const handleClearFilters = () => {
-    setFilters({ search: '', category: '' });
-  };
-
+  // --- Add New Item ---
   const handleAddNew = () => {
     setIsModalOpen(true);
   };
 
-  const handleModalSubmit = () => {
-    console.log('Add new inventory item');
+  const handleModalSubmit = async () => {
+    setIsAddSubmitting(true);
+    setAddError(null);
+    try {
+      await apiClient.post(
+        '/inventory-transactions/intake',
+        {
+          item_name: newItem.item_name,
+          item_category: newItem.category,
+          item_species: newItem.species,
+          item_unit: newItem.unit,
+          item_is_active: true,
+          item_brand: newItem.brand || '',
+          item_description: newItem.description || '',
+          quantity: Number(newItem.quantity),
+          status: 'COMPLETE',
+          notes: newItem.notes || '-',
+          staff_user: user.id,
+          ...(newItem.expiration_date && { inventory_expiration_date: new Date(newItem.expiration_date).toISOString() }),
+          ...(newItem.category === 'FOOD' && { item_food_life_stage: newItem.life_stage }),
+          ...(newItem.category === 'CRATE' && {
+            item_crate_size: newItem.crate_size,
+            item_crate_status: newItem.crate_status,
+          }),
+          ...(newItem.category === 'MEDICINE' && {
+            item_medication_dose: newItem.medication_dose,
+            item_medication_administration_route: newItem.medication_route,
+            item_medication_side_effects: newItem.medication_side_effects || '',
+          }),
+        },
+        { headers: authHeader },
+      );
+      setIsModalOpen(false);
+      setNewItem(EMPTY_NEW_ITEM);
+      await fetchData();
+    } catch (err) {
+      const message = err.response?.data?.message || 'Failed to add item. Please try again.';
+      setAddError(message);
+    } finally {
+      setIsAddSubmitting(false);
+    }
+  };
+
+  // --- Edit ---
+  const handleEdit = (inventoryItem) => {
+    setEditItem({ ...inventoryItem, notes: '', expiration_date: inventoryItem.expiration_date ? inventoryItem.expiration_date.split('T')[0] : '' });
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditSubmit = async () => {
+    setIsEditSubmitting(true);
+    setEditError(null);
+    try {
+      await apiClient.patch(
+        `/inventory/${editItem.id}`,
+        {
+          quantity: Number(editItem.quantity),
+          item_id: editItem.item_id,
+          staff_user: user.id,
+          notes: editItem.notes || '-',
+          ...(editItem.expiration_date && { expiration_date: new Date(editItem.expiration_date).toISOString() }),
+        },
+        { headers: authHeader },
+      );
+      setIsEditModalOpen(false);
+      await fetchData();
+    } catch (err) {
+      const message = err.response?.data?.message || 'Failed to update inventory. Please try again.';
+      setEditError(message);
+    } finally {
+      setIsEditSubmitting(false);
+    }
+  };
+
+  const handleClearFilters = () => {
+    setFilters({ search: '', category: '' });
   };
 
   const inventoryColumns = [
@@ -149,13 +235,6 @@ function RouteComponent() {
             title="Edit"
           >
             <Edit size={18} className="text-blue-600" />
-          </button>
-          <button
-            onClick={() => handleDelete(row.original)}
-            className="p-1 hover:bg-red-100 rounded"
-            title="Delete"
-          >
-            <Trash2 size={18} className="text-red-600" />
           </button>
         </div>
       ),
@@ -212,99 +291,227 @@ function RouteComponent() {
         containerClassName="overflow-auto max-h-150 rounded-lg border border-pale-sky shadow-sm relative w-full"
       />
 
+      {/* Add New Item Modal */}
       <ModalDialog
         open={isModalOpen}
-        setOpen={setIsModalOpen}
+        setOpen={(open) => {
+          setIsModalOpen(open);
+          if (!open) {
+            setNewItem(EMPTY_NEW_ITEM);
+            setAddError(null);
+          }
+        }}
         title="Add New Inventory Item"
         description="Fill in the details for the new inventory item"
         formId="addItemForm"
         submitHandler={handleModalSubmit}
+        isSubmitting={isAddSubmitting}
         trigger={<div />}
       >
         <form id="addItemForm" className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Item Name</label>
-            <Input placeholder="Enter item name" />
+            <Input
+              placeholder="Enter item name"
+              required
+              value={newItem.item_name}
+              onChange={(e) => setNewItem({ ...newItem, item_name: e.target.value })}
+            />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Category</label>
             <FilterSelect
-              value=""
-              onChange={() => {}}
+              value={newItem.category}
+              onChange={(val) => setNewItem({ ...newItem, category: val, expiration_date: '' })}
               selectItems={['FOOD', 'MEDICINE', 'CRATE']}
             />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Species</label>
-            <Input placeholder="Enter species" />
+            <FilterSelect
+              value={newItem.species}
+              onChange={(val) => setNewItem({ ...newItem, species: val })}
+              selectItems={['CAT', 'DOG']}
+            />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Unit</label>
-            <Input placeholder="Enter unit" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Quantity</label>
-            <Input type="number" placeholder="Enter quantity" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Brand</label>
-            <Input placeholder="Enter brand" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Description</label>
-            <textarea
-              placeholder="Enter description"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-              rows="4"
-            />
-          </div>
-        </form>
-      </ModalDialog>
-      {showDeleteConfirm && (
-        <ConfirmationDialog
-          type="error"
-          primaryText="Delete Item"
-          secondaryText={`Are you sure you want to delete "${deleteItem?.item_name}"?`}
-          button="Delete"
-          onClose={() => setShowDeleteConfirm(false)}
-        />
-      )}
-
-      <ModalDialog
-        open={isEditModalOpen}
-        setOpen={setIsEditModalOpen}
-        title="Edit Inventory Item"
-        description="Update the details for this inventory item."
-        formId="editItemForm"
-        submitHandler={handleEditSubmit}
-        trigger={<div />}
-      >
-        <form id="editItemForm" className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Item Name</label>
             <Input
-              value={editItem?.item_name ?? ''}
-              onChange={(e) => setEditItem({ ...editItem, item_name: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Category</label>
-            <FilterSelect
-              value={editItem?.category ?? ''}
-              onChange={(val) => setEditItem({ ...editItem, category: val })}
-              selectItems={['FOOD', 'MEDICINE', 'CRATE']}
+              placeholder="e.g. lbs, oz, units"
+              required
+              value={newItem.unit}
+              onChange={(e) => setNewItem({ ...newItem, unit: e.target.value })}
             />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Quantity</label>
             <Input
               type="number"
+              min="0"
+              placeholder="Enter quantity"
+              required
+              value={newItem.quantity}
+              onChange={(e) => setNewItem({ ...newItem, quantity: e.target.value })}
+            />
+          </div>
+          {(newItem.category === 'FOOD' || newItem.category === 'MEDICINE') && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Expiration Date</label>
+              <Input
+                type="date"
+                value={newItem.expiration_date}
+                onChange={(e) => setNewItem({ ...newItem, expiration_date: e.target.value })}
+              />
+            </div>
+          )}
+          {newItem.category === 'FOOD' && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Life Stage</label>
+              <FilterSelect
+                value={newItem.life_stage}
+                onChange={(val) => setNewItem({ ...newItem, life_stage: val })}
+                selectItems={['ADOLESCENT', 'ADULT', 'SENIOR']}
+              />
+            </div>
+          )}
+          {newItem.category === 'CRATE' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-1">Crate Size</label>
+                <FilterSelect
+                  value={newItem.crate_size}
+                  onChange={(val) => setNewItem({ ...newItem, crate_size: val })}
+                  selectItems={['SMALL', 'MEDIUM', 'LARGE']}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Crate Status</label>
+                <FilterSelect
+                  value={newItem.crate_status}
+                  onChange={(val) => setNewItem({ ...newItem, crate_status: val })}
+                  selectItems={['AVAILABLE', 'LOANED', 'DAMAGED']}
+                />
+              </div>
+            </>
+          )}
+          {newItem.category === 'MEDICINE' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-1">Recommended Dose</label>
+                <Input
+                  placeholder="e.g. 1 tablet per 10 lbs"
+                  required
+                  value={newItem.medication_dose}
+                  onChange={(e) => setNewItem({ ...newItem, medication_dose: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Administration Route</label>
+                <Input
+                  placeholder="e.g. oral, topical"
+                  required
+                  value={newItem.medication_route}
+                  onChange={(e) => setNewItem({ ...newItem, medication_route: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Side Effects</label>
+                <Input
+                  placeholder="Known side effects (optional)"
+                  value={newItem.medication_side_effects}
+                  onChange={(e) => setNewItem({ ...newItem, medication_side_effects: e.target.value })}
+                />
+              </div>
+            </>
+          )}
+          <div>
+            <label className="block text-sm font-medium mb-1">Brand</label>
+            <Input
+              placeholder="Enter brand (optional)"
+              value={newItem.brand}
+              onChange={(e) => setNewItem({ ...newItem, brand: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Description</label>
+            <textarea
+              placeholder="Enter description (optional)"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+              rows="3"
+              value={newItem.description}
+              onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Notes</label>
+            <Input
+              placeholder="Reason for intake (optional)"
+              value={newItem.notes}
+              onChange={(e) => setNewItem({ ...newItem, notes: e.target.value })}
+            />
+          </div>
+          {addError && <p className="text-sm text-red-600">{addError}</p>}
+        </form>
+      </ModalDialog>
+
+      {/* Edit Item Modal */}
+      <ModalDialog
+        open={isEditModalOpen}
+        setOpen={(open) => {
+          setIsEditModalOpen(open);
+          if (!open) setEditError(null);
+        }}
+        title="Edit Inventory Item"
+        description="Update the details for this inventory item."
+        formId="editItemForm"
+        submitHandler={handleEditSubmit}
+        isSubmitting={isEditSubmitting}
+        trigger={<div />}
+      >
+        <form id="editItemForm" className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Item Name</label>
+            <p className="text-sm text-muted-foreground px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
+              {editItem?.item_name}
+            </p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Category</label>
+            <p className="text-sm text-muted-foreground px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
+              {editItem?.category}
+            </p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Quantity</label>
+            <Input
+              type="number"
+              min="0"
               value={editItem?.quantity ?? ''}
               onChange={(e) => setEditItem({ ...editItem, quantity: e.target.value })}
             />
           </div>
+          {editItem?.category !== 'CRATE' && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Expiration Date</label>
+              <Input
+                type="date"
+                value={editItem?.expiration_date ?? ''}
+                onChange={(e) => setEditItem({ ...editItem, expiration_date: e.target.value })}
+              />
+            </div>
+          )}
+          <div>
+            <label className="block text-sm font-medium mb-1">Notes</label>
+            <Input
+              placeholder="Reason for adjustment (optional)"
+              value={editItem?.notes ?? ''}
+              onChange={(e) => setEditItem({ ...editItem, notes: e.target.value })}
+            />
+          </div>
+          {editError && <p className="text-sm text-red-600">{editError}</p>}
         </form>
       </ModalDialog>
+
     </>
   );
 }

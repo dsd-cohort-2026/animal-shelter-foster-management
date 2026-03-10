@@ -33,6 +33,8 @@ export function ReusableTable({
     return [...data].sort((a, b) => {
       const aVal = a[sortConfig.key]
       const bVal = b[sortConfig.key]
+      if (aVal === null || aVal === undefined) return 1
+      if (bVal === null || bVal === undefined) return -1
       if (typeof aVal === 'string') {
         return sortConfig.direction === 'asc'
           ? aVal.localeCompare(bVal)
