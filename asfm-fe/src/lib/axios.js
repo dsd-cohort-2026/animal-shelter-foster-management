@@ -2,8 +2,7 @@ import axios from 'axios';
 import { useBoundStore } from '../store';
 
 const apiClient = axios.create({
-  // This points to real server API
-  baseURL: 'http://localhost:8080/api',
+  baseURL: '/api',
 
   timeout: 15000,
   headers: {
