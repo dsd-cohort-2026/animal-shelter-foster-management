@@ -4,14 +4,14 @@ export const DASHBOARD_CARD_CONFIG = [
   {
     id: "all-users",
     title: "All Users",
-    fetchKey: "totalUsers",
+    dataKey: "totalUsers",
     subtitle: "Registered accounts",
     icon : User
   },
   {
     id: "all-animals",
     title: "All Animals",
-    fetchKey: "totalAnimals",
+    dataKey: "totalAnimals",
     subtitle: "Active animal records",
     icon : PawPrint
   },
