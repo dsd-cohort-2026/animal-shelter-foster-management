@@ -176,7 +176,7 @@ function MedicalLogListPage() {
                 </div>
               </div>
               <Button
-                onClick={() => navigate({ to: '/medical-logs/add' })}
+                onClick={() => navigate({ to: '/medical-logs-add' })}
                 size="lg"
                 className="shrink-0 sm:self-center gap-2"
               >
