@@ -9,11 +9,7 @@ import { LOG_TYPE_COLORS, formatLogType } from '@/constants/medicalLogConstants'
 import { CompactMedicalLogFilterBar } from '@/components/CompactMedicalLogFilterBar';
 import apiClient from '@/lib/axios';
 import { useBoundStore } from '@/store';
-
-const formatDateTime = (dateString) => {
-  if (!dateString) return '—';
-  return new Date(dateString).toLocaleString();
-};
+import { formatDateTime } from '@/utils/medicalLogUtils';
 
 export const Route = createFileRoute('/_user/medical-logs-foster')({
   component: FosterLogsPage,
@@ -97,7 +93,7 @@ function FosterLogsPage() {
       console.log('Fetched medical logs:', logsResponse);
 
       // Step 3: Filter logs to only those for current user's assigned animals
-      const relevantLogs = logsResponse.data.filter(log =>
+      const logsForAssignedAnimals = logsResponse.data.filter(log =>
         currentAssignedIds.has(log.animal_id)
       );
 
@@ -107,7 +103,7 @@ function FosterLogsPage() {
       // Step 5: Enrich logs with animal names
       // Note: We don't fetch users list (STAFF-only API)
       // Foster user name is not displayed since these are the current user's own logs
-      const enrichedLogs = relevantLogs.map(log => {
+      const enrichedLogs = logsForAssignedAnimals.map(log => {
         const animalName = animalMap.get(log.animal_id);
         return {
           ...log,
