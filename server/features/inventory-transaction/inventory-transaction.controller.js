@@ -88,3 +88,12 @@ exports.createDistributeTransaction = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.updateStatus = async (req, res, next) => {
+  try {
+    const updatedTransaction = await inventoryTransactionService.updateStatus(req);
+    return res.json(updatedTransaction);
+  } catch (err) {
+    next(err);
+  }
+};
