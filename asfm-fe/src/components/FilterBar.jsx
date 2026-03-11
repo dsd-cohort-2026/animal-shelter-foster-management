@@ -1,6 +1,12 @@
 import { Button } from './ui/button';
 
-export default function FilterBar({ children, onClear, onAddNew, addNewButtonLabel = 'Add New' }) {
+export default function FilterBar({
+  children,
+  onClear,
+  onAddNew,
+  addNewButtonLabel = 'Add New',
+  enableAddButton = true,
+}) {
   const handleClear = () => {
     if (onClear) onClear();
   };
@@ -12,9 +18,11 @@ export default function FilterBar({ children, onClear, onAddNew, addNewButtonLab
         Clear
       </Button>
 
-      <Button onClick={onAddNew} className="ml-auto">
-        {addNewButtonLabel}
-      </Button>
+      {enableAddButton && (
+        <Button onClick={onAddNew} className="ml-auto">
+          {addNewButtonLabel}
+        </Button>
+      )}
     </div>
   );
 }
