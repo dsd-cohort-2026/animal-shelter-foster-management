@@ -28,13 +28,7 @@ function AdminLogsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Create animal lookup for efficient enrichment
-  const animalLookup = useMemo(() => {
-    return animals.reduce((acc, animal) => {
-      acc[animal.id] = animal.name;
-      return acc;
-    }, {});
-  }, [animals]);
+
 
   const filteredLogs = useMemo(() => {
     return allLogs
@@ -215,7 +209,7 @@ function AdminLogsPage() {
     logTypeBadge: (
       <CustomBadge
         text={formatLogType(log.category)}
-        badgeClassName={LOG_TYPE_COLORS[log.category]}
+        badgeClassName={LOG_TYPE_COLORS[log.category] || 'bg-gray-100 text-gray-800'}
       />
     ),
     general_notes: log.general_notes || '—',

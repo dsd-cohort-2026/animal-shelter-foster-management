@@ -14,6 +14,10 @@ export const formatDateTime = (dateString) => {
  * @returns {Object} Statistics { total, medical, behavioral, veterinary }
  */
 export const calculateLogStats = (logs) => {
+  // Guard against non-array input to prevent runtime crashes
+  if (!Array.isArray(logs)) {
+    return { total: 0, medical: 0, behavioral: 0, veterinary: 0 };
+  }
   return {
     total: logs.length,
     medical: logs.filter((l) => l.category === 'MEDICAL').length,
