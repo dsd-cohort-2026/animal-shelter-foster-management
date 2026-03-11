@@ -95,7 +95,7 @@ function MedicalLogListPage() {
       if (animalIds.length > 0) {
         // Try fetching all animals first
         try {
-          const allAnimalsResponse = await apiClient.get('/animals');
+          const allAnimalsResponse = await apiClient.get('/animals', { params: { limit: 10000 } });
           fetchedAnimals = allAnimalsResponse.data;
           console.log('Fetched', fetchedAnimals.length, 'animals');
         } catch (e) {

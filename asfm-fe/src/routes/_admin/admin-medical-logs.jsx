@@ -78,7 +78,7 @@ function AdminLogsPage() {
     setError(null);
     try {
       // Fetch medical logs first
-      const logsResponse = await apiClient.get('/medical-logs');
+      const logsResponse = await apiClient.get('/medical-logs' , {  page: 1, limit: 100 } );
       const rawLogs = logsResponse?.data || [];
 
       // Validate response is an array

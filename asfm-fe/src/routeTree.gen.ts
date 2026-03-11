@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TestMedicalLogsRouteImport } from './routes/test-medical-logs'
 import { Route as MedicalLogsRouteImport } from './routes/medical-logs'
 import { Route as UserRouteImport } from './routes/_user'
 import { Route as AdminRouteImport } from './routes/_admin'
@@ -32,11 +31,6 @@ import { Route as AdminAnimalsIndexRouteImport } from './routes/_admin/animals/i
 import { Route as AdminAnimalsAddRouteImport } from './routes/_admin/animals/add'
 import { Route as AdminAnimalsAnimalIdRouteImport } from './routes/_admin/animals/$animalId'
 
-const TestMedicalLogsRoute = TestMedicalLogsRouteImport.update({
-  id: '/test-medical-logs',
-  path: '/test-medical-logs',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const MedicalLogsRoute = MedicalLogsRouteImport.update({
   id: '/medical-logs',
   path: '/medical-logs',
@@ -146,7 +140,6 @@ export interface FileRoutesByFullPath {
   '/Examples': typeof ExamplesRoute
   '/SignIn': typeof SignInRoute
   '/medical-logs': typeof MedicalLogsRoute
-  '/test-medical-logs': typeof TestMedicalLogsRoute
   '/admin-medical-logs': typeof AdminAdminMedicalLogsRoute
   '/admin-portal': typeof AdminAdminPortalRoute
   '/inventory': typeof AdminInventoryRoute
@@ -168,7 +161,6 @@ export interface FileRoutesByTo {
   '/Examples': typeof ExamplesRoute
   '/SignIn': typeof SignInRoute
   '/medical-logs': typeof MedicalLogsRoute
-  '/test-medical-logs': typeof TestMedicalLogsRoute
   '/admin-medical-logs': typeof AdminAdminMedicalLogsRoute
   '/admin-portal': typeof AdminAdminPortalRoute
   '/inventory': typeof AdminInventoryRoute
@@ -193,7 +185,6 @@ export interface FileRoutesById {
   '/_admin': typeof AdminRouteWithChildren
   '/_user': typeof UserRouteWithChildren
   '/medical-logs': typeof MedicalLogsRoute
-  '/test-medical-logs': typeof TestMedicalLogsRoute
   '/_admin/admin-medical-logs': typeof AdminAdminMedicalLogsRoute
   '/_admin/admin-portal': typeof AdminAdminPortalRoute
   '/_admin/inventory': typeof AdminInventoryRoute
@@ -217,7 +208,6 @@ export interface FileRouteTypes {
     | '/Examples'
     | '/SignIn'
     | '/medical-logs'
-    | '/test-medical-logs'
     | '/admin-medical-logs'
     | '/admin-portal'
     | '/inventory'
@@ -239,7 +229,6 @@ export interface FileRouteTypes {
     | '/Examples'
     | '/SignIn'
     | '/medical-logs'
-    | '/test-medical-logs'
     | '/admin-medical-logs'
     | '/admin-portal'
     | '/inventory'
@@ -263,7 +252,6 @@ export interface FileRouteTypes {
     | '/_admin'
     | '/_user'
     | '/medical-logs'
-    | '/test-medical-logs'
     | '/_admin/admin-medical-logs'
     | '/_admin/admin-portal'
     | '/_admin/inventory'
@@ -288,20 +276,12 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   UserRoute: typeof UserRouteWithChildren
   MedicalLogsRoute: typeof MedicalLogsRoute
-  TestMedicalLogsRoute: typeof TestMedicalLogsRoute
   ProtectedMyAnimalsRoute: typeof ProtectedMyAnimalsRoute
   SingleAnimalIdRoute: typeof SingleAnimalIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/test-medical-logs': {
-      id: '/test-medical-logs'
-      path: '/test-medical-logs'
-      fullPath: '/test-medical-logs'
-      preLoaderRoute: typeof TestMedicalLogsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/medical-logs': {
       id: '/medical-logs'
       path: '/medical-logs'
@@ -501,7 +481,6 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   UserRoute: UserRouteWithChildren,
   MedicalLogsRoute: MedicalLogsRoute,
-  TestMedicalLogsRoute: TestMedicalLogsRoute,
   ProtectedMyAnimalsRoute: ProtectedMyAnimalsRoute,
   SingleAnimalIdRoute: SingleAnimalIdRoute,
 }
