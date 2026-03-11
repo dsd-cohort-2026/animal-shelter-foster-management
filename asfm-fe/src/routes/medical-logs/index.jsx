@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useMemo, useEffect } from 'react';
-import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
