@@ -6,14 +6,15 @@ import ConfirmationDialog from '@/components/confirmationDialog';
 import MedicalLogForm from '@/components/medical-logs/MedicalLogForm';
 import { Loader2 } from 'lucide-react';
 import apiClient from '@/lib/axios';
+import { useBoundStore } from '@/store';
 
-export const Route = createFileRoute('/_admin/medical-logs-add')({
-  id: '/admin-medical-logs-add',
+export const Route = createFileRoute('/_user/add-medical-log')({
   component: AddMedicalLogPage,
 });
 
 function AddMedicalLogPage() {
   const navigate = useNavigate();
+  const user = useBoundStore((state) => state.user);
 
   const [animals, setAnimals] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,9 +24,25 @@ function AddMedicalLogPage() {
 
   const fetchAnimals = async () => {
     setLoadingAnimals(true);
+    setSubmitError('');
     try {
       const response = await apiClient.get('/animals');
-      setAnimals(response.data);
+      console.log('Fetched animals:', response.data.length);
+      console.log('User ID:', user?.id);
+      
+      // Filter to show only fostered animals
+      // Note: The backend will validate the active assignment when creating the log
+      const fosteredAnimals = response.data.filter(animal => 
+        animal.foster_status === 'FOSTERED'
+      );
+      
+      setAnimals(fosteredAnimals);
+      
+      console.log('Filtered to fostered animals:', fosteredAnimals.length);
+      
+      if (fosteredAnimals.length === 0) {
+        console.log('No fostered animals found');
+      }
     } catch (err) {
       console.error('Error fetching animals:', err);
       setSubmitError('Failed to load animals. Please try again.');
@@ -35,13 +52,12 @@ function AddMedicalLogPage() {
   };
 
   useEffect(() => {
-    fetchAnimals();
-  }, []);
-
-  const filteredAnimals = (animals || [])
+    if (user?.id) {
+      fetchAnimals();
+    }
+  }, [user?.id]);
 
   const handleSubmit = async (formData) => {
-    console.log("formData:", formData);
     setSubmitError('');
     setIsSubmitting(true);
 
@@ -60,6 +76,8 @@ function AddMedicalLogPage() {
           administered_at: new Date(formData.administered_at).toISOString() 
         }),
         ...(formData.prescription && { prescription: formData.prescription }),
+        // For foster users, include their ID to link to their foster account
+        ...(user?.id && { foster_user_id: user.id }),
       };
 
       const response = await apiClient.post('/medical-logs', payload);
@@ -73,7 +91,13 @@ function AddMedicalLogPage() {
     } catch (err) {
       setIsSubmitting(false);
       console.error('Error adding medical log:', err);
-      setSubmitError('Something went wrong. Please try again.');
+      if (err.response?.status === 403) {
+        setSubmitError('You are not authorized to create a medical log for this animal. Please ensure the animal is assigned to you.');
+      } else if (err.response?.status === 404) {
+        setSubmitError('Animal not found. Please try again.');
+      } else {
+        setSubmitError('Something went wrong. Please try again.');
+      }
     }
   };
 
@@ -82,7 +106,7 @@ function AddMedicalLogPage() {
       <Button
         variant="ghost"
         className="-ml-2"
-        onClick={() => navigate({ to: '/admin-medical-logs' })}
+        onClick={() => navigate({ to: '/medical-logs-foster' })}
       >
         ← Back to Medical Logs
       </Button>
@@ -96,18 +120,27 @@ function AddMedicalLogPage() {
             <div className="flex justify-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
+          ) : animals.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground mb-4">
+                You don't have any active foster assignments.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Medical logs can only be created for animals currently assigned to you.
+              </p>
+            </div>
           ) : (
             <div className="mx-auto w-full">
               <MedicalLogForm
                 formId="add-medical-log-form"
                 onSubmit={handleSubmit}
-                animals={filteredAnimals}
+                animals={animals}
               />
               {submitError && <p className="text-sm text-red-500 mt-2">{submitError}</p>}
               <div className="flex justify-end gap-3 mt-6">
                 <Button
                   variant="outline"
-                  onClick={() => navigate({ to: '/admin-medical-logs' })}
+                  onClick={() => navigate({ to: '/medical-logs-foster' })}
                 >
                   Cancel
                 </Button>
@@ -125,7 +158,7 @@ function AddMedicalLogPage() {
         <ConfirmationDialog
           {...confirmation}
           button="Done"
-          onClose={() => navigate({ to: '/admin-medical-logs' })}
+          onClose={() => navigate({ to: '/medical-logs-foster' })}
         />
       )}
     </div>

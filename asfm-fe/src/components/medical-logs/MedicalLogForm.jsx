@@ -1,5 +1,5 @@
 import { useForm } from '@tanstack/react-form';
-import { useState, useMemo, useEffect } from 'react';
+import { useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -14,7 +14,7 @@ import { LOG_TYPE_OPTIONS } from '@/constants/medicalLogConstants';
 const EMPTY_DEFAULTS = {
   animal_id: '',
   category: '',
-  logged_at: '',
+  logged_at: new Date().toISOString().slice(0, 16),
   general_notes: '',
   behavior_notes: '',
   qty_administered: '',
@@ -41,12 +41,6 @@ const required =
 
 export default function MedicalLogForm({ formId, onSubmit, initialValues = {}, animals = [] }) {
   const medicalLogs = useBoundStore((state) => state.medicalLogs) || [];
-  const fetchMedicalLogs = useBoundStore((state) => state.fetchMedicalLogs);
-
-  // Fetch medical logs on mount
-  useEffect(() => {
-    fetchMedicalLogs();
-  }, [fetchMedicalLogs]);
 
   // Get unique animal names from medical logs (fallback if no animals prop)
   const animalNamesFromLogs = useMemo(() => {
@@ -54,11 +48,11 @@ export default function MedicalLogForm({ formId, onSubmit, initialValues = {}, a
     return names.sort();
   }, [medicalLogs]);
 
-  // Create animal ID to name map for display
-  const animalIdToNameMap = useMemo(() => {
+  // Create animal name to ID map for form submission
+  const animalNameToIdMap = useMemo(() => {
     const map = new Map();
     animals.forEach(animal => {
-      map.set(animal.id, animal.name);
+      map.set(animal.name, animal.id);
     });
     return map;
   }, [animals]);
@@ -77,8 +71,12 @@ export default function MedicalLogForm({ formId, onSubmit, initialValues = {}, a
   const form = useForm({
     defaultValues: { ...EMPTY_DEFAULTS, ...initialValues },
     onSubmit: async ({ value }) => {
+      // Convert animal name to animal ID for submission
+      const animalId = animalNameToIdMap.get(value.animal_id);
+      
       onSubmit({
         ...value,
+        animal_id: animalId || value.animal_id, // Use ID if found, otherwise keep original value
         qty_administered: value.qty_administered ? parseFloat(value.qty_administered) : null,
       });
     },
@@ -108,15 +106,12 @@ export default function MedicalLogForm({ formId, onSubmit, initialValues = {}, a
                 onValueChange={field.handleChange}
               >
                 <ComboboxInput placeholder="Select an animal..." />
-                <ComboboxValue>
-                  {animalIdToNameMap.get(field.state.value) || field.state.value}
-                </ComboboxValue>
                 <ComboboxContent>
                   <ComboboxEmpty>No animals available.</ComboboxEmpty>
                   <ComboboxList>
                     <ComboboxCollection>
                       {(item) => (
-                        <ComboboxItem key={item.id || item} value={item.id || item}>
+                        <ComboboxItem key={item.id || item} value={item.name || item}>
                           {item.name || item}
                         </ComboboxItem>
                       )}
@@ -194,23 +189,18 @@ export default function MedicalLogForm({ formId, onSubmit, initialValues = {}, a
       </div>
 
       {/* General notes */}
-      <form.Field name="general_notes" validators={{ onChange: required('General Notes') }}>
+      <form.Field name="general_notes">
         {(field) => (
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">
-              General Notes <span className="text-red-500">*</span>
-            </label>
+            <label className="text-sm font-medium">General Notes</label>
             <Textarea
-              className={`w-full ${field.state.meta.errors.length ? 'border-red-500' : ''}`}
+              className="w-full"
               value={field.state.value}
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
               placeholder="Describe the medical log entry..."
               rows={3}
             />
-            {field.state.meta.errors.length > 0 && (
-              <p className="text-xs text-red-500">{field.state.meta.errors.join(', ')}</p>
-            )}
           </div>
         )}
       </form.Field>

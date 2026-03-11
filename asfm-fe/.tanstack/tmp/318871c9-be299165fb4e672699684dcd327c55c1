@@ -1,0 +1,244 @@
+import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import apiClient from '@/lib/axios';
+
+export const Route = createFileRoute('/test-medical-logs')({
+  component: TestMedicalLogsPage,
+});
+
+function TestMedicalLogsPage() {
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [showRaw, setShowRaw] = useState(false);
+
+  const fetchMedicalLogs = async () => {
+    setLoading(true);
+    setError(null);
+    setLogs([]);
+
+    try {
+      const response = await apiClient.get('/medical-logs');
+      console.log('API Response:', response);
+      console.log('Response Data:', response.data);
+
+      setLogs(response.data);
+    } catch (err) {
+      console.error('API Error:', err);
+      setError(err.message || 'Failed to fetch medical logs');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatLogType = (category) => {
+    const types = {
+      MEDICAL: 'Medical',
+      BEHAVIORAL: 'Behavioral',
+      VETERINARY: 'Veterinary',
+    };
+    return types[category] || category;
+  };
+
+  const getLogTypeColor = (category) => {
+    const colors = {
+      MEDICAL: 'bg-green-500/10 text-green-700 border-green-500/20',
+      BEHAVIORAL: 'bg-blue-500/10 text-blue-700 border-blue-500/20',
+      VETERINARY: 'bg-purple-500/10 text-purple-700 border-purple-500/20',
+    };
+    return colors[category] || 'bg-gray-500/10 text-gray-700';
+  };
+
+  const hasAnimalName = (log) => {
+    return log.animal_name !== undefined && log.animal_name !== null;
+  };
+
+  const allLogsHaveAnimalNames = logs.length > 0 && logs.every(hasAnimalName);
+
+  return (
+    <div className="container mx-auto p-6 space-y-6 max-w-6xl">
+      <Card>
+        <CardHeader>
+          <CardTitle>Medical Logs API Test</CardTitle>
+          <CardDescription>
+            Test the medical logs backend API integration
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Test Controls */}
+          <div className="flex gap-4 items-center">
+            <Button
+              onClick={fetchMedicalLogs}
+              disabled={loading}
+              size="lg"
+            >
+              {loading ? 'Loading...' : 'Fetch Medical Logs'}
+            </Button>
+
+            {logs.length > 0 && (
+              <Button
+                onClick={() => setShowRaw(!showRaw)}
+                variant="outline"
+              >
+                {showRaw ? 'Show Formatted' : 'Show Raw JSON'}
+              </Button>
+            )}
+          </div>
+
+          {/* Status Alerts */}
+          {error && (
+            <Alert variant="destructive">
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {logs.length > 0 && !allLogsHaveAnimalNames && (
+            <Alert variant="destructive">
+              <AlertTitle>Missing Animal Names</AlertTitle>
+              <AlertDescription>
+                Some logs are missing the animal_name field. Make sure the frontend
+                is enriching data with animal names from the animals store.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {logs.length > 0 && allLogsHaveAnimalNames && (
+            <Alert>
+              <AlertTitle>✓ Success</AlertTitle>
+              <AlertDescription>
+                All logs have animal names! API integration is working correctly.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Stats */}
+          {logs.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="p-4 bg-muted rounded-lg">
+                <div className="text-2xl font-bold">{logs.length}</div>
+                <div className="text-sm text-muted-foreground">Total Logs</div>
+              </div>
+              <div className="p-4 bg-muted rounded-lg">
+                <div className="text-2xl font-bold">
+                  {logs.filter((l) => l.category === 'MEDICAL').length}
+                </div>
+                <div className="text-sm text-muted-foreground">Medical</div>
+              </div>
+              <div className="p-4 bg-muted rounded-lg">
+                <div className="text-2xl font-bold">
+                  {logs.filter((l) => l.category === 'BEHAVIORAL').length}
+                </div>
+                <div className="text-sm text-muted-foreground">Behavioral</div>
+              </div>
+              <div className="p-4 bg-muted rounded-lg">
+                <div className="text-2xl font-bold">
+                  {logs.filter((l) => l.category === 'VETERINARY').length}
+                </div>
+                <div className="text-sm text-muted-foreground">Veterinary</div>
+              </div>
+            </div>
+          )}
+
+          {/* Raw JSON View */}
+          {showRaw && logs.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold mb-2">Raw JSON Response</h3>
+              <pre className="bg-slate-900 text-slate-50 p-4 rounded-lg overflow-x-auto text-sm">
+                {JSON.stringify(logs, null, 2)}
+              </pre>
+            </div>
+          )}
+
+          {/* Formatted Logs View */}
+          {!showRaw && logs.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">
+                Medical Logs ({logs.length})
+              </h3>
+              {logs.map((log) => (
+                <Card key={log.id}>
+                  <CardContent className="p-5 space-y-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge className={getLogTypeColor(log.category)}>
+                        {formatLogType(log.category)}
+                      </Badge>
+                      <span className="font-semibold">
+                        {hasAnimalName(log) ? (
+                          <>
+                            {log.animal_name}
+                            <span className="text-muted-foreground text-sm ml-2">
+                              (ID: {log.animal_id})
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-red-500">
+                            No animal_name! (ID: {log.animal_id})
+                          </span>
+                        )}
+                      </span>
+                      <span className="text-xs text-muted-foreground ml-auto">
+                        {new Date(log.logged_at).toLocaleString()}
+                      </span>
+                    </div>
+
+                    {log.general_notes && (
+                      <p className="text-sm">{log.general_notes}</p>
+                    )}
+                    {log.behavior_notes && (
+                      <p className="text-sm text-muted-foreground">
+                        {log.behavior_notes}
+                      </p>
+                    )}
+                    {log.prescription && (
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-medium">Rx:</span> {log.prescription}
+                      </p>
+                    )}
+                    {log.dose && (
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-medium">Dose:</span> {log.dose}
+                        {log.qty_administered != null && ` × ${log.qty_administered}`}
+                      </p>
+                    )}
+
+                    {/* Debug Info */}
+                    <details className="mt-2">
+                      <summary className="text-xs text-muted-foreground cursor-pointer">
+                        Show fields
+                      </summary>
+                      <pre className="mt-2 text-xs bg-slate-100 p-2 rounded">
+                        {JSON.stringify(
+                          {
+                            id: log.id,
+                            foster_user_id: log.foster_user_id,
+                            animal_id: log.animal_id,
+                            animal_name: log.animal_name,
+                            category: log.category,
+                          },
+                          null,
+                          2
+                        )}
+                      </pre>
+                    </details>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && !error && logs.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground">
+              No logs loaded. Click "Fetch Medical Logs" to test the API.
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

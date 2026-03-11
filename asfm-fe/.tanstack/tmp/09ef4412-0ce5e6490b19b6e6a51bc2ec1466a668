@@ -16,36 +16,25 @@ const formatDateTime = (dateString) => {
   return new Date(dateString).toLocaleString();
 };
 
-export const Route = createFileRoute('/_admin/medical-logs-foster')({
-  component: FosterLogsPage,
+export const Route = createFileRoute('/_admin/medical-logs/')({
+  component: AdminLogsPage,
 });
 
-function FosterLogsPage() {
+function AdminLogsPage() {
   const navigate = useNavigate();
   const [filters, setFilters] = useState({
     search: '',
     category: '',
     dateRange: { from: null, to: null },
+    createdBy: 'all',
   });
   const [allLogs, setAllLogs] = useState([]);
-  const [animals, setAnimals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Create animal lookup for efficient enrichment
-  const animalLookup = useMemo(() => {
-    return animals.reduce((acc, animal) => {
-      acc[animal.id] = animal.name;
-      return acc;
-    }, {});
-  }, [animals]);
 
   const filteredLogs = useMemo(() => {
     return allLogs
       .filter((log) => {
-        // First filter: only foster logs
-        if (!log.foster_user_id) return false;
-
         // Search filter
         const searchLower = filters.search.toLowerCase();
         const matchesSearch =
@@ -64,7 +53,15 @@ function FosterLogsPage() {
           matchesDateRange = matchesDateRange && new Date(log.logged_at) <= filters.dateRange.to;
         }
 
-        return matchesSearch && matchesCategory && matchesDateRange;
+        // Created by filter
+        let matchesCreatedBy = true;
+        if (filters.createdBy === 'admin') {
+          matchesCreatedBy = !log.foster_user_id;
+        } else if (filters.createdBy === 'foster') {
+          matchesCreatedBy = !!log.foster_user_id;
+        }
+
+        return matchesSearch && matchesCategory && matchesDateRange && matchesCreatedBy;
       })
       .sort((a, b) => new Date(b.logged_at) - new Date(a.logged_at));
   }, [allLogs, filters]);
@@ -73,93 +70,8 @@ function FosterLogsPage() {
     setLoading(true);
     setError(null);
     try {
-      // Fetch medical logs first
-      const logsResponse = await apiClient.get('/medical-logs');
-
-      // Extract unique animal IDs from logs
-      const animalIds = [...new Set(logsResponse.data.map(log => log.animal_id).filter(Boolean))];
-
-      // Extract unique foster user IDs from logs
-      const fosterUserIds = [...new Set(logsResponse.data.map(log => log.foster_user_id).filter(Boolean))];
-
-      // Fetch animals - try all animals first, then fallback to individual fetches
-      let animals = [];
-      let animalMap = new Map();
-
-      if (animalIds.length > 0) {
-        // Try fetching all animals (works for STAFF)
-        try {
-          const allAnimalsResponse = await apiClient.get('/animals');
-          animals = allAnimalsResponse.data;
-        } catch (e) {
-          console.error('Failed to fetch all animals:', e);
-        }
-
-        // Create initial map from fetched animals
-        animalMap = new Map(animals.map(a => [a.id, a.name]));
-
-        // For any animals not found, fetch them individually
-        const missingAnimalIds = animalIds.filter(id => !animalMap.has(id));
-
-        if (missingAnimalIds.length > 0) {
-          console.log('Fetching missing animals individually:', missingAnimalIds.length);
-          const individualFetches = missingAnimalIds.map(id =>
-            apiClient.get(`/animals/${id}`).catch(() => null)
-          );
-          const individualResponses = await Promise.all(individualFetches);
-
-          individualResponses.forEach(response => {
-            if (response?.data) {
-              animalMap.set(response.data.id, response.data.name);
-              animals.push(response.data);
-            }
-          });
-        }
-      }
-
-      // Fetch foster users
-      let users = [];
-      let userMap = new Map();
-
-      if (fosterUserIds.length > 0) {
-        try {
-          const usersResponse = await apiClient.get('/users');
-          users = usersResponse.data;
-
-          // Create user name map (first_name + last_name)
-          userMap = new Map(users.map(u => [
-            u.id,
-            `${u.first_name} ${u.last_name}`.trim() || u.email
-          ]));
-        } catch (e) {
-          console.error('Failed to fetch users:', e);
-        }
-      }
-
-      // Enrich logs with animal names and foster user names
-      const enrichedLogs = logsResponse.data.map(log => {
-        const animalName = animalMap.get(log.animal_id);
-        const fosterUserName = userMap.get(log.foster_user_id);
-        return {
-          ...log,
-          animal_name: animalName || '—',
-          foster_user_name: fosterUserName || '—',
-          // Add a flag for orphaned logs
-          is_orphaned: !animalName,
-        };
-      });
-
-      // Log orphaned logs for debugging
-      const orphanedCount = enrichedLogs.filter(log => log.is_orphaned).length;
-      if (orphanedCount > 0) {
-        console.warn(`⚠️ Found ${orphanedCount} orphaned logs (invalid animal_id)`);
-        enrichedLogs.filter(log => log.is_orphaned).forEach(log => {
-          console.warn(`  Log ID: ${log.id}, Invalid animal_id: ${log.animal_id}`);
-        });
-      }
-
-      setAnimals(animals);
-      setAllLogs(enrichedLogs);
+      const response = await apiClient.get('/medical-logs');
+      setAllLogs(response.data);
     } catch (err) {
       console.error('Error fetching medical logs:', err);
       setError('Failed to load medical logs. Please try again.');
@@ -177,32 +89,24 @@ function FosterLogsPage() {
       search: '',
       category: '',
       dateRange: { from: null, to: null },
+      createdBy: 'all',
     });
   };
 
   // Get unique categories for filter
   const categories = useMemo(() => {
     const uniqueCategories = [...new Set(allLogs.map(log => log.category).filter(Boolean))];
-    return uniqueCategories;
+    return uniqueCategories.map(cat => ({
+      value: cat,
+      label: formatLogType(cat),
+    }));
   }, [allLogs]);
 
-  // Create category labels map
-  const categoryLabelsMap = useMemo(() => {
-    const labels = {};
-    allLogs.forEach(log => {
-      if (log.category && !labels[log.category]) {
-        labels[log.category] = formatLogType(log.category);
-      }
-    });
-    return labels;
-  }, [allLogs]);
-
-  // Stats for header - foster-permitted logs only
-  const fosterLogs = allLogs.filter((log) => log.foster_user_id);
-  const totalLogs = fosterLogs.length;
-  const medicalCount = fosterLogs.filter((l) => l.category === 'MEDICAL').length;
-  const behavioralCount = fosterLogs.filter((l) => l.category === 'BEHAVIORAL').length;
-  const veterinaryCount = fosterLogs.filter((l) => l.category === 'VETERINARY').length;
+  // Stats for header
+  const totalLogs = allLogs.length;
+  const medicalCount = allLogs.filter((l) => l.category === 'MEDICAL').length;
+  const behavioralCount = allLogs.filter((l) => l.category === 'BEHAVIORAL').length;
+  const veterinaryCount = allLogs.filter((l) => l.category === 'VETERINARY').length;
 
   const columns = [
     { accessorKey: 'animal_name', header: 'Animal', textSize: 'sm' },
@@ -216,6 +120,7 @@ function FosterLogsPage() {
     { accessorKey: 'dose', header: 'Dose', textSize: 'sm' },
     { accessorKey: 'qty_administered', header: 'Qty', textSize: 'sm' },
     { accessorKey: 'administered_at', header: 'Administered At', textSize: 'sm' },
+    { accessorKey: 'foster_user_id', header: 'Foster User', textSize: 'sm' },
     { accessorKey: 'logged_at', header: 'Logged At', textSize: 'sm' },
     {
       accessorKey: 'prescription',
@@ -239,7 +144,6 @@ function FosterLogsPage() {
 
   const tableData = filteredLogs.map((log) => ({
     ...log,
-    animal_name: log.animal_name || '—',
     logTypeBadge: (
       <CustomBadge
         text={formatLogType(log.category)}
@@ -252,6 +156,7 @@ function FosterLogsPage() {
     qty_administered: log.qty_administered != null ? log.qty_administered : '—',
     administered_at: formatDateTime(log.administered_at),
     prescription: log.prescription || '—',
+    foster_user_id: log.foster_user_id || '—',
     logged_at: formatDateTime(log.logged_at),
   }));
 
@@ -276,14 +181,14 @@ function FosterLogsPage() {
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground text-balance">
-                Foster Medical Logs
+                Admin Medical Logs
               </h1>
               <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-                View medical logs for animals under foster care.
+                Full visibility into all medical log entries across the shelter.
               </p>
               <div className="flex items-center gap-3 mt-3 flex-wrap">
                 <Badge variant="secondary" className="font-medium">
-                  {totalLogs} foster logs
+                  {totalLogs} total logs
                 </Badge>
                 {medicalCount > 0 && (
                   <Badge
@@ -313,7 +218,7 @@ function FosterLogsPage() {
             </div>
           </div>
           <Button
-            onClick={() => navigate({ to: '/admin-medical-logs-add' })}
+            onClick={() => navigate({ to: '/_admin/medical-logs/add' })}
             size="lg"
             className="shrink-0 sm:self-center gap-2"
           >
@@ -326,7 +231,7 @@ function FosterLogsPage() {
       <FilterBar
         onFilter={() => {}}
         onClear={handleClearFilters}
-        onAddNew={() => navigate({ to: '/admin-medical-logs-add' })}
+        onAddNew={() => navigate({ to: '/_admin/medical-logs/add' })}
         addNewButtonLabel="Add Medical Log"
       >
         <InputGroupForSearch
@@ -338,7 +243,15 @@ function FosterLogsPage() {
           value={filters.category}
           onChange={(value) => setFilters({ ...filters, category: value })}
           selectItems={categories}
-          selectItemsMap={categoryLabelsMap}
+        />
+        <FilterSelect
+          value={filters.createdBy}
+          onChange={(value) => setFilters({ ...filters, createdBy: value })}
+          selectItems={[
+            { value: 'all', label: 'All Logs' },
+            { value: 'admin', label: 'Admin Only' },
+            { value: 'foster', label: 'Foster Only' },
+          ]}
         />
       </FilterBar>
 
@@ -361,6 +274,7 @@ function FosterLogsPage() {
             'animal_name',
             'logTypeBadge',
             'administered_at',
+            'foster_user_id',
             'logged_at',
             'general_notes',
             'dose',
