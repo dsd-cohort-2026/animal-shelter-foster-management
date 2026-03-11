@@ -10,6 +10,7 @@ router.use('/medical-logs', require('../features/medical-logs/medical-logs.route
 router.use('/users', require('../features/users/users.routes'));
 router.use('/inventory', require('../features/inventory/inventory.routes'));
 router.use('/inventory-transactions', require('../features/inventory-transaction/inventory-transaction.routes'));
+router.use('/chat', require('../features/chat/chat.routes'));
 
 
 module.exports = router;
