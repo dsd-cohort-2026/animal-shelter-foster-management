@@ -19,6 +19,7 @@ function NavBar() {
   const user = useBoundStore((state) => state.user);
   const signOut = useBoundStore((state) => state.signOut);
   const [showHamburger, setShowHamburger] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleSignOut = () => {
     signOut();
@@ -35,10 +36,14 @@ function NavBar() {
     };
 
     screenWatcher();
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 250);
 
     window.addEventListener('resize', screenWatcher);
 
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('resize', screenWatcher);
     };
   }, []);
@@ -55,16 +60,65 @@ function NavBar() {
         </Button>
         {userRole === 'USER' && (
           <>
-            <Button variant="outline">My Animals</Button>
-            <Button variant="outline" onClick={() => navigate({ to: '/medical-logs/foster' })}>
-              My Foster Logs
-            </Button>
-            <Button variant="outline" onClick={() => navigate({ to: '/my-animals' })}>
-              My Animals
-            </Button>
-            <Button variant="outline" onClick={() => navigate({ to: '/my-supplies' })}>
-              My Supplies
-            </Button>
+            {showHamburger ? (
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Menu className="ml-auto" />
+                </SheetTrigger>
+                <SheetContent side="right" className="flex flex-col gap-3 pt-10">
+                  <SheetTitle className="text-lg font-semibold sr-only" sr-only="true">
+                    User Menu
+                  </SheetTitle>
+                  <SheetDescription className="sr-only" sr-only="true">
+                    Actions for navigating through your user resources
+                  </SheetDescription>
+                  <SheetClose asChild>
+                    <Button
+                      variant="outline"
+                      onClick={() => navigate({ to: '/medical-logs/foster' })}
+                    >
+                      My Foster Logs
+                    </Button>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Button variant="outline" onClick={() => navigate({ to: '/my-animals' })}>
+                      My Animals
+                    </Button>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Button variant="outline" onClick={() => navigate({ to: '/my-supplies' })}>
+                      My Supplies
+                    </Button>
+                  </SheetClose>
+                  {user && (
+                    <>
+                      <div>
+                        <div className="bg-gray-200 px-4 py-2 rounded-2xl text-center">
+                          {userRole && userRole[0] + userRole.slice(1).toLowerCase()}
+                        </div>
+                      </div>
+                      <SheetClose asChild>
+                        <Button variant="outline" onClick={handleSignOut}>
+                          Sign Out
+                        </Button>
+                      </SheetClose>
+                    </>
+                  )}
+                </SheetContent>
+              </Sheet>
+            ) : (
+              <div className="contents hidden lg:contents">
+                <Button variant="outline" onClick={() => navigate({ to: '/medical-logs/foster' })}>
+                  My Foster Logs
+                </Button>
+                <Button variant="outline" onClick={() => navigate({ to: '/my-animals' })}>
+                  My Animals
+                </Button>
+                <Button variant="outline" onClick={() => navigate({ to: '/my-supplies' })}>
+                  My Supplies
+                </Button>
+              </div>
+            )}
           </>
         )}
         {userRole === 'STAFF' && (
@@ -164,52 +218,35 @@ function NavBar() {
         )}
       </div>
 
-      <div className="flex items-center gap-1 md:gap-3 ml-auto">
-        {userRole !== 'STAFF' && userRole !== 'USER' && (
-          <>
-            <Button variant="outline" onClick={() => navigate({ to: '/signin' })}>
-              Sign In
-            </Button>
-            <Button variant="outline">Sign Up</Button>
-          </>
-        )}
 
-        {userRole && !showHamburger && (
+      {/* Authenticated Section*/}
+      <div className="flex items-center gap-1 md:gap-3 ml-auto">
+        {isLoading ? null : (
           <>
-            <div>
-              <div className="bg-gray-200 px-4 py-2 rounded-2xl">
-                {userRole && userRole[0] + userRole.slice(1).toLowerCase()}
-              </div>
-            </div>
-            <Button variant="outline" onClick={handleSignOut}>
-              Sign Out
-            </Button>
+            {userRole !== 'STAFF' && userRole !== 'USER' && (
+              <>
+                <Button variant="outline" onClick={() => navigate({ to: '/signin' })}>
+                  Sign In
+                </Button>
+                <Button variant="outline">Sign Up</Button>
+              </>
+            )}
+
+            {userRole && !showHamburger && (
+              <>
+                <div>
+                  <div className="bg-gray-200 px-4 py-2 rounded-2xl">
+                    {userRole && userRole[0] + userRole.slice(1).toLowerCase()}
+                  </div>
+                </div>
+                <Button variant="outline" onClick={handleSignOut}>
+                  Sign Out
+                </Button>
+              </>
+            )}
           </>
         )}
       </div>
-
-      {/* Authenticated Section*/}
-      {/* <div className="flex items-center gap-1 md:gap-3 ml-auto">
-        {userRole == 'STAFF' ? (
-          <div className="flex items-center gap-1 md:gap-3 ml-auto">
-            <div>
-              <div className="bg-gray-200 px-4 py-2 rounded-2xl">
-                {userRole && userRole[0] + userRole.slice(1).toLowerCase()}
-              </div>
-            </div>
-            <Button variant="outline" onClick={handleSignOut}>
-              Sign Out
-            </Button>
-          </div>
-        ) : (
-          <>
-            <Button variant="outline" onClick={() => navigate({ to: '/signin' })}>
-              Sign In
-            </Button>
-            <Button variant="outline">Sign Up</Button>
-          </>
-        )}
-      </div> */}
     </nav>
   );
 }
