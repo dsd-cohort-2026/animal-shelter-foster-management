@@ -40,12 +40,6 @@ function TestMedicalLogsPage() {
         throw new Error('Unexpected response format: expected array of animals');
       }
 
-      console.log('=== API Response ===');
-      console.log('Logs count:', rawLogs.length);
-      console.log('Animals count:', rawAnimals.length);
-      console.log('Logs Response status:', logsResponse.status);
-      console.log('=====================');
-
       // Set animals
       setAnimals(rawAnimals);
 
@@ -57,11 +51,6 @@ function TestMedicalLogsPage() {
 
       setLogs(enrichedLogs);
     } catch (err) {
-      console.error('=== API Error ===');
-      console.error('Error:', err);
-      console.error('Response:', err.response);
-      console.error('================');
-
       setError(err.response?.data?.message || err.message || 'Failed to fetch medical logs');
     } finally {
       setLoading(false);

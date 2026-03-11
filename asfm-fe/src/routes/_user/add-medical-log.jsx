@@ -34,9 +34,6 @@ function AddMedicalLogPage() {
         throw new Error('Unexpected response format from server: expected array of animals');
       }
 
-      console.log('Fetched animals in add medical logs:', rawAnimals.length);
-      console.log('User ID:', user?.id);
-      
       // Filter to show only fostered animals
       // Note: The backend will validate the active assignment when creating the log
       const fosteredAnimals = rawAnimals.filter(animal => 
@@ -44,12 +41,6 @@ function AddMedicalLogPage() {
       );
       
       setAnimals(fosteredAnimals);
-      
-      console.log('Filtered to fostered animals:', fosteredAnimals.length);
-      
-      if (fosteredAnimals.length === 0) {
-        console.log('No fostered animals found');
-      }
     } catch (err) {
       console.error('Error fetching animals:', err);
       setSubmitError('Failed to load animals. Please try again.');

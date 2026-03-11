@@ -9,6 +9,7 @@ import { LOG_TYPE_COLORS, formatLogType } from '@/constants/medicalLogConstants'
 import { CompactMedicalLogFilterBar } from '@/components/CompactMedicalLogFilterBar';
 import apiClient from '@/lib/axios';
 import { formatDateTime, calculateLogStats, MEDICAL_LOG_BASE_COLUMNS } from '@/utils/medicalLogUtils';
+import { enrichMedicalLogs, buildEnrichmentMaps } from '@/utils/enrichMedicalLogs';
 
 export const Route = createFileRoute('/_admin/admin-medical-logs')({
   id: '/admin-medical-logs',
@@ -85,8 +86,6 @@ function AdminLogsPage() {
         throw new Error('Unexpected response format from server: expected array of logs');
       }
 
-      console.log('Fetched medical logs:', rawLogs.length);
-
       // Extract unique animal IDs from logs
       const animalIds = [...new Set(rawLogs.map(log => log.animal_id).filter(Boolean))];
 
@@ -113,7 +112,6 @@ function AdminLogsPage() {
         const missingAnimalIds = animalIds.filter(id => !animalMap.has(id));
 
         if (missingAnimalIds.length > 0) {
-          console.log('Fetching missing animals individually:', missingAnimalIds.length);
           const individualFetches = missingAnimalIds.map(id =>
             apiClient.get(`/animals/${id}`).catch(() => null)
           );
@@ -147,27 +145,8 @@ function AdminLogsPage() {
         }
       }
 
-      // Enrich logs with animal names and foster user names
-      const enrichedLogs = rawLogs.map(log => {
-        const animalName = animalMap.get(log.animal_id);
-        const fosterUserName = userMap.get(log.foster_user_id);
-        return {
-          ...log,
-          animal_name: animalName || '—',
-          foster_user_name: fosterUserName || '—',
-          // Add a flag for orphaned logs
-          is_orphaned: !animalName,
-        };
-      });
-
-      // Log orphaned logs for debugging
-      const orphanedCount = enrichedLogs.filter(log => log.is_orphaned).length;
-      if (orphanedCount > 0) {
-        console.warn(`⚠️ Found ${orphanedCount} orphaned logs (invalid animal_id)`);
-        enrichedLogs.filter(log => log.is_orphaned).forEach(log => {
-          console.warn(`  Log ID: ${log.id}, Invalid animal_id: ${log.animal_id}`);
-        });
-      }
+      // Enrich logs using centralized utility
+      const enrichedLogs = enrichMedicalLogs(rawLogs, fetchedAnimals, fetchedUsers);
 
       setAnimals(fetchedAnimals);
       setAllLogs(enrichedLogs);
