@@ -98,7 +98,7 @@ function AdminLogsPage() {
       if (animalIds.length > 0) {
         // Try fetching all animals (works for STAFF)
         try {
-          const allAnimalsResponse = await apiClient.get('/animals');
+          const allAnimalsResponse = await apiClient.get('/animals', { params: { limit: 1000 } });
           fetchedAnimals = allAnimalsResponse.data;
         } catch (e) {
           console.error('Failed to fetch all animals:', e);
@@ -132,6 +132,7 @@ function AdminLogsPage() {
       if (fosterUserIds.length > 0) {
         try {
           const usersResponse = await apiClient.get('/users');
+          console.log('Fetched users for enrichment:', usersResponse.data);
           fetchedUsers = usersResponse.data;
 
           // Create user name map (first_name + last_name)

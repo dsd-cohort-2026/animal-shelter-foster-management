@@ -6,6 +6,8 @@ import ConfirmationDialog from '@/components/confirmationDialog';
 import MedicalLogForm from '@/components/medical-logs/MedicalLogForm';
 import { Loader2 } from 'lucide-react';
 import apiClient from '@/lib/axios';
+import { useBoundStore } from '@/store';
+import { formatDateTime } from '@/utils/medicalLogUtils';
 
 export const Route = createFileRoute('/_admin/medical-logs-add')({
   id: '/admin-medical-logs-add',
@@ -14,7 +16,8 @@ export const Route = createFileRoute('/_admin/medical-logs-add')({
 
 function AddMedicalLogPage() {
   const navigate = useNavigate();
-
+  const user = useBoundStore((state) => state.user);
+  console.log('Current user in AddMedicalLogPage:', user);
   const [animals, setAnimals] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -59,16 +62,17 @@ function AddMedicalLogPage() {
       const payload = {
         category: formData.category,
         animal_id: formData.animal_id,
-        ...(formData.general_notes && { general_notes: formData.general_notes }),
-        ...(formData.behavior_notes && { behavior_notes: formData.behavior_notes }),
-        ...(formData.qty_administered != null && { qty_administered: formData.qty_administered }),
-        ...(formData.dose && { dose: formData.dose }),
-        ...(formData.administered_at && { 
-          administered_at: new Date(formData.administered_at).toISOString() 
-        }),
-        ...(formData.prescription && { prescription: formData.prescription }),
+        ...formData.general_notes && { general_notes: formData.general_notes },
+        ...formData.behavior_notes && { behavior_notes: formData.behavior_notes },
+        ...formData.qty_administered && { qty_administered: formData.qty_administered },
+        ...formData.dose && { dose: formData.dose },
+        ...formData.administered_at && { administered_at: new Date(formData.administered_at).toISOString() },
+        ...formData.prescription && { prescription: formData.prescription },
+        ...formData.documents && { documents: formData.documents },
+        foster_user_id:  user.id,
+        ...formData.medication_id && { medication_id: formData.medication_id },
       };
-
+      console.log('Payload for new medical log:', payload);
       const response = await apiClient.post('/medical-logs', payload);
 
       setIsSubmitting(false);
