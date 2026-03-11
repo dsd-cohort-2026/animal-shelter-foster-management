@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import SingleAnimalPage from '@/pages/SingleAnimalPage';
 
-export const Route = createFileRoute('/single-animal/$id')({
+export const Route = createFileRoute('/_user/single-animal/$id')({
   component: RouteComponent,
 });
 
