@@ -14,7 +14,10 @@ exports.findAll = async (where = {}, skip = 0, take = 10) => {
 };
 
 exports.findById = async (id) => {
-  return await prisma.inventoryTransaction.findUnique({ where: { id } });
+  return await prisma.inventoryTransaction.findUnique({
+    where: { id },
+    include: { inventory: true },
+  });
 };
 
 exports.createIntakeTransaction = async (data) => {
@@ -158,4 +161,25 @@ exports.createDistributeTransaction = async ({
     console.log({ transactions });
     return transactions;
   });
+};
+
+exports.updateStatus = async ({ status, staff_user, quantity, id, inventory_id }) => {
+  const updatedStatus = await prisma.$transaction(async (tx) => {
+    const inventoryAction =
+      status === 'COMPLETE' ? { increment: quantity } : { decrement: quantity };
+
+    await tx.inventory.update({
+      where: { id: inventory_id },
+      data: { quantity: inventoryAction },
+    });
+
+    return tx.inventoryTransaction.update({
+      where: { id },
+      data: {
+        status,
+        staff_user: { connect: { id: staff_user } },
+      },
+    });
+  });
+  return updatedStatus;
 };

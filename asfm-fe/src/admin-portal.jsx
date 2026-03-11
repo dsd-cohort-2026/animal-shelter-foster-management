@@ -7,61 +7,34 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Users, PawPrint, ArrowLeftRight, Timer } from 'lucide-react';
 
 function AdminPortal() {
-  const session = useBoundStore((state) => state.session);
   const [users, setUsers] = useState([]);
   const [animals, setAnimals] = useState([]);
   const [inventory, setInventory] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [usersError, setUsersError] = useState(null);
-  const [animalsError, setAnimalsError] = useState(null);
-  const [inventoryError, setInventoryError] = useState(null);
-  const [transactionsError, setTransactionsError] = useState(null);
-
-  const authHeader = { Authorization: `Bearer ${session?.access_token}` };
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchAll = async () => {
       setLoading(true);
-      setUsersError(null);
-      setAnimalsError(null);
-      setInventoryError(null);
-      setTransactionsError(null);
+      setError(null);
       try {
-        const userData = await apiClient.get('/users', { headers: authHeader });
-        setUsers(userData.data);
+        const [userData, animalData, inventoryData, transactionData] = await Promise.allSettled([
+          await apiClient.get('/users'),
+          await apiClient.get('/animals'),
+          await apiClient.get('/inventory'),
+          await apiClient.get('/inventory-transactions?limit=10000'),
+        ]);
+        setUsers(userData.value.data);
+        setAnimals(animalData.value.data);
+        setInventory(inventoryData.value.data);
+        setTransactions(transactionData.value.data);
       } catch (err) {
         console.error(`User fetch error: ${err}`);
-        setUsersError(`There was an error loading the users!`);
+        setError(`There was an error loading the users!`);
+      } finally {
+        setLoading(false);
       }
-
-      try {
-        const animalData = await apiClient.get('/animals', { headers: authHeader });
-        setAnimals(animalData.data);
-      } catch (err) {
-        console.error(`Animal fetch error: ${err}`);
-        setAnimalsError(`There was an error loading the animals!`);
-      }
-
-      try {
-        const inventoryData = await apiClient.get('/inventory', { headers: authHeader });
-        setInventory(inventoryData.data);
-      } catch (err) {
-        console.error(`Inventory fetch error: ${err}`);
-        setInventoryError(`There was an error loading the inventory!`);
-      }
-
-      try {
-        const transactionData = await apiClient.get('/inventory-transactions?limit=10000', {
-          headers: authHeader,
-        });
-        setTransactions(transactionData.data);
-      } catch (err) {
-        console.error(`Inventory Transaction fetch error: ${err}`);
-        setTransactionsError(`There was an error loading the inventory transactions!`);
-      }
-
-      setLoading(false);
     };
     fetchAll();
   }, []);

@@ -28,7 +28,9 @@ function NavBar() {
             <Button variant="outline" onClick={() => navigate({ to: '/medical-logs/foster' })}>
               My Foster Logs
             </Button>
-            <Button variant="outline" onClick={() => navigate({ to: '/my-animals' })}>My Animals</Button>
+            <Button variant="outline" onClick={() => navigate({ to: '/my-animals' })}>
+              My Animals
+            </Button>
             <Button variant="outline" onClick={() => navigate({ to: '/my-supplies' })}>
               My Supplies
             </Button>
@@ -39,10 +41,18 @@ function NavBar() {
             <Button variant="outline" onClick={() => navigate({ to: '/admin-portal' })}>
               Admin Portal
             </Button>
-            <Button variant="outline" onClick={() => navigate({ to: '/users' })}>All Users</Button>
-            <Button variant="outline" onClick={() => navigate({ to: '/animals' })}>Animals</Button>
-            <Button variant="outline" onClick={() => navigate({ to: '/inventory' })}>Inventory</Button>
-            <Button variant="outline" onClick={() => navigate({ to: '/loans' })}>Loans</Button>
+            <Button variant="outline" onClick={() => navigate({ to: '/users' })}>
+              All Users
+            </Button>
+            <Button variant="outline" onClick={() => navigate({ to: '/animals' })}>
+              Animals
+            </Button>
+            <Button variant="outline" onClick={() => navigate({ to: '/inventory' })}>
+              Inventory
+            </Button>
+            <Button variant="outline" onClick={() => navigate({ to: '/loans' })}>
+              Loans
+            </Button>
             <Button variant="outline" onClick={() => navigate({ to: '/medical-logs' })}>
               Med Log
             </Button>
@@ -58,7 +68,9 @@ function NavBar() {
         {user ? (
           <div className="flex items-center gap-1 md:gap-3 ml-auto">
             <div>
-              <div className="bg-gray-200 px-4 py-2 rounded-2xl">{userRole}</div>
+              <div className="bg-gray-200 px-4 py-2 rounded-2xl">
+                {userRole && userRole[0] + userRole.slice(1).toLowerCase()}
+              </div>
             </div>
             <Button variant="outline" onClick={handleSignOut}>
               Sign Out

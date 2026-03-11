@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ConfirmationDialog from '@/components/confirmationDialog';
@@ -46,7 +45,7 @@ function AddAnimalPage() {
   };
 
   return (
-    <Layout>
+    <>
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-4">
         <Button variant="ghost" className="-ml-2" onClick={() => navigate({ to: '/animals' })}>
           ← Back to Animals
@@ -80,6 +79,6 @@ function AddAnimalPage() {
           onClose={() => navigate({ to: '/animals' })}
         />
       )}
-    </Layout>
+    </>
   );
 }

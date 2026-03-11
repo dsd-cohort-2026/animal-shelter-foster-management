@@ -7,6 +7,7 @@ import FilterSelect from '@/components/custom/FilterSelect';
 import InputGroupForSearch from '@/components/InputGroupForSearch';
 import { ModalDialog } from '@/components/ModalDialog';
 import { Input } from '@/components/ui/input';
+import InventoryTransactionTabs from '@/components/InventoryTransactionTabs';
 import { Edit, Package } from 'lucide-react';
 import { useBoundStore } from '@/store';
 
@@ -237,17 +238,18 @@ function RouteComponent() {
     },
   ];
 
-  if (error) return (
-    <div className="flex flex-col items-center pt-8 gap-3">
-      <p className="text-red-500">{error}</p>
-      <button
-        onClick={fetchData}
-        className="px-4 py-2 text-sm rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
-      >
-        Retry
-      </button>
-    </div>
-  );
+  if (error)
+    return (
+      <div className="flex flex-col items-center pt-8 gap-3">
+        <p className="text-red-500">{error}</p>
+        <button
+          onClick={fetchData}
+          className="px-4 py-2 text-sm rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+        >
+          Retry
+        </button>
+      </div>
+    );
 
   return (
     <>
@@ -266,7 +268,7 @@ function RouteComponent() {
           </div>
         </div>
       </div>
-
+      <InventoryTransactionTabs />
       <FilterBar
         onFilter={() => {}}
         onClear={handleClearFilters}

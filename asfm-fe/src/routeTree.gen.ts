@@ -23,6 +23,7 @@ import { Route as MedicalLogsAddRouteImport } from './routes/medical-logs/add'
 import { Route as UserMySuppliesRouteImport } from './routes/_user/my-supplies'
 import { Route as ProtectedMyAnimalsRouteImport } from './routes/_protected/my-animals'
 import { Route as AdminUsersRouteImport } from './routes/_admin/users'
+import { Route as AdminTransactionsRouteImport } from './routes/_admin/transactions'
 import { Route as AdminLoansRouteImport } from './routes/_admin/loans'
 import { Route as AdminInventoryRouteImport } from './routes/_admin/inventory'
 import { Route as AdminAdminPortalRouteImport } from './routes/_admin/admin-portal'
@@ -98,6 +99,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminTransactionsRoute = AdminTransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLoansRoute = AdminLoansRouteImport.update({
   id: '/loans',
   path: '/loans',
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/admin-portal': typeof AdminAdminPortalRoute
   '/inventory': typeof AdminInventoryRoute
   '/loans': typeof AdminLoansRoute
+  '/transactions': typeof AdminTransactionsRoute
   '/users': typeof AdminUsersRoute
   '/my-animals': typeof ProtectedMyAnimalsRoute
   '/my-supplies': typeof UserMySuppliesRoute
@@ -156,6 +163,7 @@ export interface FileRoutesByTo {
   '/admin-portal': typeof AdminAdminPortalRoute
   '/inventory': typeof AdminInventoryRoute
   '/loans': typeof AdminLoansRoute
+  '/transactions': typeof AdminTransactionsRoute
   '/users': typeof AdminUsersRoute
   '/my-animals': typeof ProtectedMyAnimalsRoute
   '/my-supplies': typeof UserMySuppliesRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/_admin/admin-portal': typeof AdminAdminPortalRoute
   '/_admin/inventory': typeof AdminInventoryRoute
   '/_admin/loans': typeof AdminLoansRoute
+  '/_admin/transactions': typeof AdminTransactionsRoute
   '/_admin/users': typeof AdminUsersRoute
   '/_protected/my-animals': typeof ProtectedMyAnimalsRoute
   '/_user/my-supplies': typeof UserMySuppliesRoute
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
     | '/admin-portal'
     | '/inventory'
     | '/loans'
+    | '/transactions'
     | '/users'
     | '/my-animals'
     | '/my-supplies'
@@ -220,6 +230,7 @@ export interface FileRouteTypes {
     | '/admin-portal'
     | '/inventory'
     | '/loans'
+    | '/transactions'
     | '/users'
     | '/my-animals'
     | '/my-supplies'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/_admin/admin-portal'
     | '/_admin/inventory'
     | '/_admin/loans'
+    | '/_admin/transactions'
     | '/_admin/users'
     | '/_protected/my-animals'
     | '/_user/my-supplies'
@@ -366,6 +378,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/transactions': {
+      id: '/_admin/transactions'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof AdminTransactionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_admin/loans': {
       id: '/_admin/loans'
       path: '/loans'
@@ -415,6 +434,7 @@ interface AdminRouteChildren {
   AdminAdminPortalRoute: typeof AdminAdminPortalRoute
   AdminInventoryRoute: typeof AdminInventoryRoute
   AdminLoansRoute: typeof AdminLoansRoute
+  AdminTransactionsRoute: typeof AdminTransactionsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminAnimalsAnimalIdRoute: typeof AdminAnimalsAnimalIdRoute
   AdminAnimalsAddRoute: typeof AdminAnimalsAddRoute
@@ -425,6 +445,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAdminPortalRoute: AdminAdminPortalRoute,
   AdminInventoryRoute: AdminInventoryRoute,
   AdminLoansRoute: AdminLoansRoute,
+  AdminTransactionsRoute: AdminTransactionsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminAnimalsAnimalIdRoute: AdminAnimalsAnimalIdRoute,
   AdminAnimalsAddRoute: AdminAnimalsAddRoute,
