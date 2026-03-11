@@ -1,5 +1,5 @@
 import { useForm } from '@tanstack/react-form';
-import { useState, useMemo, useEffect } from 'react';
+import { useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -14,7 +14,7 @@ import { LOG_TYPE_OPTIONS } from '@/constants/medicalLogConstants';
 const EMPTY_DEFAULTS = {
   animal_id: '',
   category: '',
-  logged_at: '',
+  logged_at: new Date().toISOString().slice(0, 16),
   general_notes: '',
   behavior_notes: '',
   qty_administered: '',
@@ -30,6 +30,7 @@ import {
   ComboboxEmpty,
   ComboboxList,
   ComboboxCollection,
+  ComboboxValue,
 } from '@/components/ui/combobox';
 import { useBoundStore } from '@/store';
 
@@ -38,26 +39,65 @@ const required =
   ({ value }) =>
     !value || !value.toString().trim() ? `${label} is required.` : undefined;
 
-export default function MedicalLogForm({ formId, onSubmit, initialValues = {} }) {
-  const medicalLogs = useBoundStore((state) => state.medicalLogs);
-  const fetchMedicalLogs = useBoundStore((state) => state.fetchMedicalLogs);
+const notInFuture =
+  (label) =>
+  ({ value }) => {
+    if (!value) return undefined;
+    const selectedDate = new Date(value);
+    const now = new Date();
+    if (selectedDate > now) {
+      return `${label} cannot be in the future.`;
+    }
+    return undefined;
+  };
 
-  // Fetch medical logs on mount
-  useEffect(() => {
-    fetchMedicalLogs();
-  }, [fetchMedicalLogs]);
+export default function MedicalLogForm({ formId, onSubmit, initialValues = {}, animals = [] }) {
+  const medicalLogs = useBoundStore((state) => state.medicalLogs) || [];
 
-  // Get unique animal names from medical logs
+  // Get unique animal names from medical logs (fallback if no animals prop)
   const animalNamesFromLogs = useMemo(() => {
     const names = [...new Set(medicalLogs.map((log) => log.animal_name).filter(Boolean))];
     return names.sort();
   }, [medicalLogs]);
 
+  // Create animal name to ID map for form submission
+  const animalNameToIdMap = useMemo(() => {
+    const map = new Map();
+    animals.forEach(animal => {
+      map.set(animal.name, animal.id);
+    });
+    return map;
+  }, [animals]);
+
+  // Prepare animal options for combobox
+  // Prefer animals prop if available, otherwise fallback to names from logs
+  const animalOptions = useMemo(() => {
+    if (animals.length > 0) {
+      // Return array of animal objects with id and name
+      return animals;
+    }
+    // Fallback: convert names to simple strings
+    return animalNamesFromLogs;
+  }, [animals, animalNamesFromLogs]);
+
   const form = useForm({
     defaultValues: { ...EMPTY_DEFAULTS, ...initialValues },
-    onSubmit: async ({ value }) => {
+    onSubmit: async ({ value, formApi }) => {
+      // Validate all fields before submission
+      await formApi.validateAllFields('change');
+      
+      // Check if form has any errors
+      const state = formApi.getState();
+      if (state.isSubmitting || state.errors.length > 0) {
+        return; // Don't submit if there are validation errors
+      }
+      
+      // Convert animal name to animal ID for submission
+      const animalId = animalNameToIdMap.get(value.animal_id);
+      
       onSubmit({
         ...value,
+        animal_id: animalId || value.animal_id, // Use ID if found, otherwise keep original value
         qty_administered: value.qty_administered ? parseFloat(value.qty_administered) : null,
       });
     },
@@ -80,20 +120,20 @@ export default function MedicalLogForm({ formId, onSubmit, initialValues = {} })
             <label className="text-sm font-medium">
               Animal <span className="text-red-500">*</span>
             </label>
-            {animalNamesFromLogs.length > 0 ? (
+            {animalOptions.length > 0 ? (
               <Combobox
-                items={animalNamesFromLogs}
-                value={field.state.label}
+                items={animalOptions}
+                value={field.state.value}
                 onValueChange={field.handleChange}
               >
-                <ComboboxInput placeholder="Select an animal from logs..." />
+                <ComboboxInput placeholder="Select an animal..." />
                 <ComboboxContent>
-                  <ComboboxEmpty>No animals in medical logs yet.</ComboboxEmpty>
+                  <ComboboxEmpty>No animals available.</ComboboxEmpty>
                   <ComboboxList>
                     <ComboboxCollection>
                       {(item) => (
-                        <ComboboxItem key={item} value={item}>
-                          {item}
+                        <ComboboxItem key={item.id || item} value={item.name || item}>
+                          {item.name || item}
                         </ComboboxItem>
                       )}
                     </ComboboxCollection>
@@ -106,7 +146,7 @@ export default function MedicalLogForm({ formId, onSubmit, initialValues = {} })
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="No animals in logs - type animal name..."
+                placeholder="No animals available - type animal name..."
                 rows={1}
               />
             )}
@@ -170,23 +210,18 @@ export default function MedicalLogForm({ formId, onSubmit, initialValues = {} })
       </div>
 
       {/* General notes */}
-      <form.Field name="general_notes" validators={{ onChange: required('General Notes') }}>
+      <form.Field name="general_notes">
         {(field) => (
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">
-              General Notes <span className="text-red-500">*</span>
-            </label>
+            <label className="text-sm font-medium">General Notes</label>
             <Textarea
-              className={`w-full ${field.state.meta.errors.length ? 'border-red-500' : ''}`}
+              className="w-full"
               value={field.state.value}
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
               placeholder="Describe the medical log entry..."
               rows={3}
             />
-            {field.state.meta.errors.length > 0 && (
-              <p className="text-xs text-red-500">{field.state.meta.errors.join(', ')}</p>
-            )}
           </div>
         )}
       </form.Field>
@@ -244,17 +279,21 @@ export default function MedicalLogForm({ formId, onSubmit, initialValues = {} })
         </form.Field>
 
         {/* Administered at */}
-        <form.Field name="administered_at">
+        <form.Field name="administered_at" validators={{ onChange: notInFuture('Administered At') }}>
           {(field) => (
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium">Administered At</label>
               <Input
                 type="datetime-local"
-                className="w-full"
+                className={`w-full ${field.state.meta.errors.length ? 'border-red-500' : ''}`}
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
+                max={new Date().toISOString().slice(0, 16)}
               />
+              {field.state.meta.errors.length > 0 && (
+                <p className="text-xs text-red-500">{field.state.meta.errors.join(', ')}</p>
+              )}
             </div>
           )}
         </form.Field>

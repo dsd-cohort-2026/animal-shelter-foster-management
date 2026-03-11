@@ -214,37 +214,37 @@ export function ReusableTable({
                   </TableHead>
                 );
               })}
+              {enableColumnVisibility && (
+                <TableHead className="w-10">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-primary">
+                        <Settings className="size-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {columns.map((column) => {
+                        const columnKey = getColumnKey(column);
+                        return (
+                          <DropdownMenuCheckboxItem
+                            key={columnKey}
+                            checked={visibleColumns.includes(columnKey)}
+                            onCheckedChange={() => toggleColumn(columnKey)}
+                            disabled={
+                              visibleColumns.length === 1 && visibleColumns.includes(columnKey)
+                            }
+                          >
+                            {column.header}
+                          </DropdownMenuCheckboxItem>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableHead>
+              )}
             </ShadcnTableRow>
-            {enableColumnVisibility && (
-              <div className="absolute top-1/2 -translate-y-1/2 right-2 z-20">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-primary">
-                      <Settings className="size-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    {columns.map((column) => {
-                      const columnKey = getColumnKey(column);
-                      return (
-                        <DropdownMenuCheckboxItem
-                          key={columnKey}
-                          checked={visibleColumns.includes(columnKey)}
-                          onCheckedChange={() => toggleColumn(columnKey)}
-                          disabled={
-                            visibleColumns.length === 1 && visibleColumns.includes(columnKey)
-                          }
-                        >
-                          {column.header}
-                        </DropdownMenuCheckboxItem>
-                      );
-                    })}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            )}
           </ShadcnTableHeader>
           <TableBody>
             {isLoading

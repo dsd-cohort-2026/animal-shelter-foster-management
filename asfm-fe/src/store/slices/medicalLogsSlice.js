@@ -1,7 +1,5 @@
-import { mockMedicalLogs } from '@/features/mockMedicalLogs';
-
-// TODO: Replace setTimeout with actual API calls to backend
-const SIMULATED_API_DELAY = 400;
+import { fetchMedicalLogs as fetchMedicalLogsFromAPI } from '@/services/medicalLogsService';
+import { enrichMedicalLogs } from '@/utils/enrichMedicalLogs';
 
 export const medicalLogsSlice = (set, get) => ({
   medicalLogs: [],
@@ -9,7 +7,7 @@ export const medicalLogsSlice = (set, get) => ({
   medicalLogsError: null,
   medicalLogsFetched: false,
 
-  fetchMedicalLogs: () => {
+  fetchMedicalLogs: async () => {
     const { medicalLogsLoading, medicalLogsFetched } = get();
     if (medicalLogsFetched || medicalLogsLoading) return;
 
@@ -18,24 +16,35 @@ export const medicalLogsSlice = (set, get) => ({
       state.medicalLogsError = null;
     });
 
-    setTimeout(() => {
-      try {
-        set((state) => {
-          state.medicalLogs = mockMedicalLogs;
-          state.medicalLogsLoading = false;
-          state.medicalLogsFetched = true;
-        });
-      } catch {
-        set((state) => {
-          state.medicalLogsError = 'Failed to load medical logs.';
-          state.medicalLogsLoading = false;
-        });
-      }
-    }, SIMULATED_API_DELAY);
+    try {
+      const data = await fetchMedicalLogsFromAPI();
+      const animals = get().animals;
+
+      // Enrich using centralized utility
+      const enrichedData = enrichMedicalLogs(data, animals, []);
+
+      set((state) => {
+        state.medicalLogs = enrichedData;
+        state.medicalLogsLoading = false;
+        state.medicalLogsFetched = true;
+      });
+    } catch (error) {
+      set((state) => {
+        state.medicalLogsError = 'Failed to load medical logs. Please try again.';
+        state.medicalLogsLoading = false;
+      });
+    }
   },
 
   addMedicalLog: (log) =>
     set((state) => {
-      state.medicalLogs.push(log);
+      const animals = get().animals;
+
+      // Inline enrichment for single log (animals array is typically small)
+      const animal = animals.find((a) => a.id === log.animal_id);
+      state.medicalLogs.push({
+        ...log,
+        animal_name: animal?.name || '—',
+      });
     }),
 });

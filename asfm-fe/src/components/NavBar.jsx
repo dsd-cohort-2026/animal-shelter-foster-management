@@ -27,7 +27,7 @@ function NavBar() {
             <Button variant="outline" onClick={() => navigate({ to: '/my-animals' })}>
               My Animals
             </Button>
-            <Button variant="outline" onClick={() => navigate({ to: '/medical-logs/foster' })}>
+            <Button variant="outline" onClick={() => navigate({ to: '/foster-medical-logs' })}>
               My Foster Logs
             </Button>
             <Button variant="outline" onClick={() => navigate({ to: '/my-supplies' })}>
@@ -52,10 +52,10 @@ function NavBar() {
             <Button variant="outline" onClick={() => navigate({ to: '/loans' })}>
               Loans
             </Button>
-            <Button variant="outline" onClick={() => navigate({ to: '/medical-logs' })}>
+            <Button variant="outline" onClick={() => navigate({ to: '/timeline-view' })}>
               Med Log
             </Button>
-            <Button variant="outline" onClick={() => navigate({ to: '/medical-logs/admin' })}>
+            <Button variant="outline" onClick={() => navigate({ to: '/admin-medical-logs' })}>
               Admin Logs
             </Button>
           </>

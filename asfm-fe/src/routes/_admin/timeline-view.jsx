@@ -4,21 +4,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import CustomBadge from '@/components/custom/CustomBadge';
-import { useBoundStore } from '@/store';
 import { LOG_TYPE_COLORS, formatLogType } from '@/constants/medicalLogConstants';
 import { ClipboardList, Plus } from 'lucide-react';
 import { CompactMedicalLogFilterBar } from '@/components/CompactMedicalLogFilterBar';
 import RoleGuard from '@/components/RoleGuard';
+import apiClient from '@/lib/axios';
 
-export const Route = createFileRoute('/medical-logs/')({ component: MedicalLogListPage });
+export const Route = createFileRoute('/_admin/timeline-view')({ component: MedicalLogListPage });
 
 function MedicalLogListPage() {
   const navigate = useNavigate();
-  const medicalLogs = useBoundStore((state) => state.medicalLogs);
-  const medicalLogsLoading = useBoundStore((state) => state.medicalLogsLoading);
-  const medicalLogsError = useBoundStore((state) => state.medicalLogsError);
-  const fetchMedicalLogs = useBoundStore((state) => state.fetchMedicalLogs);
-  const fetchAnimals = useBoundStore((state) => state.fetchAnimals);
 
   const [filters, setFilters] = useState({
     search: '',
@@ -27,16 +22,28 @@ function MedicalLogListPage() {
     createdBy: 'all',
   });
 
-  useEffect(() => {
-    fetchMedicalLogs();
-    fetchAnimals();
-  }, [fetchMedicalLogs, fetchAnimals]);
+  const [medicalLogs, setMedicalLogs] = useState([]);
+  const [animals, setAnimals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Create animal lookup for efficient enrichment
+  const animalLookup = useMemo(() => {
+    return animals.reduce((acc, animal) => {
+      acc[animal.id] = animal.name;
+      return acc;
+    }, {});
+  }, [animals]);
 
   const filtered = useMemo(() => {
     return medicalLogs
+      .map((log) => ({
+        ...log,
+        animal_name: animalLookup[log.animal_id] || 'Unknown Animal',
+      }))
       .filter((log) => {
         // Search filter
-        const matchesSearch = log.animal_name.toLowerCase().includes(filters.search.toLowerCase());
+        const matchesSearch = log.animal_name?.toLowerCase().includes(filters.search.toLowerCase()) ?? false;
 
         // Date range filter
         let matchesDateRange = true;
@@ -62,14 +69,82 @@ function MedicalLogListPage() {
         return matchesSearch && matchesDateRange && matchesLogTypes && matchesCreatedBy;
       })
       .sort((a, b) => new Date(b.logged_at) - new Date(a.logged_at));
-  }, [medicalLogs, filters]);
+  }, [medicalLogs, filters, animalLookup]);
 
-  if (medicalLogsError) {
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await apiClient.get('/medical-logs');
+      const rawLogs = response?.data || [];
+
+      // Validate response is an array
+      if (!Array.isArray(rawLogs)) {
+        throw new Error('Unexpected response format from server: expected array of logs');
+      }
+
+      setMedicalLogs(rawLogs);
+
+      // Extract unique animal IDs from logs
+      const animalIds = [...new Set(rawLogs.map(log => log.animal_id).filter(Boolean))];
+
+      // Fetch animals
+      let fetchedAnimals = [];
+      let animalMap = new Map();
+
+      if (animalIds.length > 0) {
+        // Try fetching all animals first
+        try {
+          const allAnimalsResponse = await apiClient.get('/animals', { params: { limit: 1000 } }); //  Correct way to do it 
+          fetchedAnimals = allAnimalsResponse.data;
+        } catch (e) {
+          console.error('Failed to fetch all animals:', e);
+        }
+
+        // Create initial map from fetched animals
+        animalMap = new Map(fetchedAnimals.map(a => [a.id, a.name]));
+
+        // For any animals not found, fetch them individually
+        const missingAnimalIds = animalIds.filter(id => !animalMap.has(id));
+
+        if (missingAnimalIds.length > 0) {
+          const individualFetches = missingAnimalIds.map(id =>
+            apiClient.get(`/animals/${id}`).catch(err => {
+              console.error('Failed to fetch animal', id, err);
+              return null;
+            })
+          );
+          const individualResponses = await Promise.all(individualFetches);
+
+          individualResponses.forEach(response => {
+            if (response?.data) {
+              animalMap.set(response.data.id, response.data.name);
+              fetchedAnimals.push(response.data);
+            }
+          });
+        }
+      }
+
+      
+      setAnimals(fetchedAnimals);
+    } catch (err) {
+      console.error('Error fetching medical logs:', err);
+      setError('Failed to load medical logs. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (error) {
     return (
         <RoleGuard allowedRoles={['STAFF']}>
           <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <p className="text-xl text-red-500">{medicalLogsError}</p>
-            <Button variant="outline" onClick={() => fetchMedicalLogs()}>
+            <p className="text-xl text-red-500">{error}</p>
+            <Button variant="outline" onClick={fetchData}>
               Retry
             </Button>
           </div>
@@ -97,7 +172,7 @@ function MedicalLogListPage() {
                 </div>
               </div>
               <Button
-                onClick={() => navigate({ to: '/medical-logs/add' })}
+                onClick={() => navigate({ to: '/medical-logs-add' })}
                 size="lg"
                 className="shrink-0 sm:self-center gap-2"
               >
@@ -117,7 +192,7 @@ function MedicalLogListPage() {
           </div>
 
           {/* Timeline */}
-          {medicalLogsLoading ? (
+          {loading ? (
             <div className="space-y-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Card key={i}>
@@ -146,15 +221,16 @@ function MedicalLogListPage() {
                     <div className="flex flex-wrap items-center gap-2 mb-2">
                       <CustomBadge
                         text={formatLogType(log.category)}
-                        badgeClassName={LOG_TYPE_COLORS[log.category]}
+                        badgeClassName={LOG_TYPE_COLORS[log.category] || 'bg-gray-100 text-gray-800'}
                       />
                       <span className="text-sm font-semibold">{log.animal_name}</span>
                       <span className="text-xs text-muted-foreground ml-auto">
-                        {new Date(log.logged_at).toLocaleDateString()}{' '}
-                        {new Date(log.logged_at).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
+                        {log.logged_at
+                          ? `${new Date(log.logged_at).toLocaleDateString()} ${new Date(log.logged_at).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}`
+                          : '—'}
                       </span>
                     </div>
                     {log.general_notes && (
@@ -172,6 +248,15 @@ function MedicalLogListPage() {
                       <p className="text-xs text-muted-foreground">
                         <span className="font-medium">Dose:</span> {log.dose}
                         {log.qty_administered != null && ` × ${log.qty_administered}`}
+                      </p>
+                    )}
+                    {log.administered_at && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        <span className="font-medium">Administered:</span>{' '}
+                        {new Date(log.administered_at).toLocaleDateString()} {new Date(log.administered_at).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
                       </p>
                     )}
                   </CardContent>
