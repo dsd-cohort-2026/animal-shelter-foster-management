@@ -9,13 +9,15 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "alex": "alex .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "route:generate": "tsr generate"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
     "@supabase/supabase-js": "^2.95.3",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-form": "^1.28.4",
+    "@tanstack/react-query-devtools": "^5.91.3",
     "@tanstack/react-router": "^1.160.2",
     "@tanstack/react-router-devtools": "^1.160.2",
     "@tanstack/react-table": "^8.21.3",
@@ -37,6 +39,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@tanstack/router-cli": "^1.166.7",
     "@tanstack/router-plugin": "^1.160.2",
     "@types/node": "^25.2.3",
     "@types/react": "^19.2.5",

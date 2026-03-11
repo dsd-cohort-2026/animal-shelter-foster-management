@@ -16,7 +16,7 @@ export const animalsSlice = (set, get) => ({
     });
 
     try {
-      const response = await apiClient.get('/animals');
+      const response = await apiClient.get('/animals', { params: { limit: 10000 } });
       set((state) => {
         state.animals = response.data;
         state.animalsLoading = false;
