@@ -8,7 +8,7 @@ import CustomBadge from '@/components/custom/CustomBadge';
 import { LOG_TYPE_COLORS, formatLogType } from '@/constants/medicalLogConstants';
 import { CompactMedicalLogFilterBar } from '@/components/CompactMedicalLogFilterBar';
 import apiClient from '@/lib/axios';
-import { formatDateTime, calculateLogStats } from '@/utils/medicalLogUtils';
+import { formatDateTime, calculateLogStats, MEDICAL_LOG_BASE_COLUMNS } from '@/utils/medicalLogUtils';
 
 export const Route = createFileRoute('/_admin/admin-medical-logs')({
   id: '/admin-medical-logs',
@@ -41,9 +41,7 @@ function AdminLogsPage() {
       .filter((log) => {
         // Search filter
         const searchLower = filters.search.toLowerCase();
-        const matchesSearch =
-          log.animal_name?.toLowerCase().includes(searchLower) ||
-          log.general_notes?.toLowerCase().includes(searchLower);
+        const matchesSearch = log.animal_name?.toLowerCase().includes(searchLower);
 
         // Log type filter (now an array)
         const matchesLogTypes =
@@ -187,40 +185,12 @@ function AdminLogsPage() {
   // Stats for header
   const { total: totalLogs, medical: medicalCount, behavioral: behavioralCount, veterinary: veterinaryCount } = calculateLogStats(allLogs);
 
+  // Admin columns = base columns + created_by_type and creator_name after administered_at
   const columns = [
-    { accessorKey: 'animal_name', header: 'Animal', textSize: 'sm' },
-    {
-      accessorKey: 'logTypeBadge',
-      header: 'Log Type',
-      headClassName: 'text-center',
-      cellClassName: 'text-center',
-      textSize: 'sm',
-    },
-    { accessorKey: 'dose', header: 'Dose', textSize: 'sm' },
-    { accessorKey: 'qty_administered', header: 'Qty', textSize: 'sm' },
-    { accessorKey: 'administered_at', header: 'Administered At', textSize: 'sm' },
+    ...MEDICAL_LOG_BASE_COLUMNS.slice(0, 5), // animal_name through administered_at
     { accessorKey: 'created_by_type', header: 'Created By Type', textSize: 'sm' },
     { accessorKey: 'creator_name', header: 'Creator Name', textSize: 'sm' },
-    { accessorKey: 'logged_at', header: 'Logged At', textSize: 'sm' },
-    {
-      accessorKey: 'prescription',
-      header: 'Prescription',
-      cellClassName: 'whitespace-normal max-w-md',
-      textSize: 'sm',
-    },
-    {
-      accessorKey: 'general_notes',
-      header: 'General Notes',
-      cellClassName: 'whitespace-normal max-w-md',
-      textSize: 'sm',
-    },
-    {
-      accessorKey: 'behavior_notes',
-      header: 'Behavior Notes',
-      cellClassName: 'whitespace-normal max-w-md',
-      textSize: 'sm',
-    },
-    
+    ...MEDICAL_LOG_BASE_COLUMNS.slice(5), // logged_at through behavior_notes
   ];
 
   const tableData = filteredLogs.map((log) => ({

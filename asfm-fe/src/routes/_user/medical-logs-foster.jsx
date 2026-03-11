@@ -9,7 +9,7 @@ import { LOG_TYPE_COLORS, formatLogType } from '@/constants/medicalLogConstants'
 import { CompactMedicalLogFilterBar } from '@/components/CompactMedicalLogFilterBar';
 import apiClient from '@/lib/axios';
 import { useBoundStore } from '@/store';
-import { formatDateTime } from '@/utils/medicalLogUtils';
+import { formatDateTime, calculateLogStats, MEDICAL_LOG_BASE_COLUMNS } from '@/utils/medicalLogUtils';
 
 export const Route = createFileRoute('/_user/medical-logs-foster')({
   component: FosterLogsPage,
@@ -136,44 +136,9 @@ function FosterLogsPage() {
   };
 
   // Stats for header - logs for currently assigned animals only
-  const activeFosterLogs = allLogs;
-  const totalLogs = activeFosterLogs.length;
-  const medicalCount = activeFosterLogs.filter((l) => l.category === 'MEDICAL').length;
-  const behavioralCount = activeFosterLogs.filter((l) => l.category === 'BEHAVIORAL').length;
-  const veterinaryCount = activeFosterLogs.filter((l) => l.category === 'VETERINARY').length;
+  const { total: totalLogs, medical: medicalCount, behavioral: behavioralCount, veterinary: veterinaryCount } = calculateLogStats(allLogs);
 
-  const columns = [
-    { accessorKey: 'animal_name', header: 'Animal', textSize: 'sm' },
-    {
-      accessorKey: 'logTypeBadge',
-      header: 'Log Type',
-      headClassName: 'text-center',
-      cellClassName: 'text-center',
-      textSize: 'sm',
-    },
-    { accessorKey: 'dose', header: 'Dose', textSize: 'sm' },
-    { accessorKey: 'qty_administered', header: 'Qty', textSize: 'sm' },
-    { accessorKey: 'administered_at', header: 'Administered At', textSize: 'sm' },
-    { accessorKey: 'logged_at', header: 'Logged At', textSize: 'sm' },
-    {
-      accessorKey: 'prescription',
-      header: 'Prescription',
-      cellClassName: 'whitespace-normal max-w-md',
-      textSize: 'sm',
-    },
-    {
-      accessorKey: 'general_notes',
-      header: 'General Notes',
-      cellClassName: 'whitespace-normal max-w-md',
-      textSize: 'sm',
-    },
-    {
-      accessorKey: 'behavior_notes',
-      header: 'Behavior Notes',
-      cellClassName: 'whitespace-normal max-w-md',
-      textSize: 'sm',
-    },
-  ];
+  const columns = MEDICAL_LOG_BASE_COLUMNS;
 
   const tableData = filteredLogs.map((log) => ({
     ...log,

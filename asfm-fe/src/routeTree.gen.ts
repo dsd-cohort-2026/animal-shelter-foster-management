@@ -18,7 +18,6 @@ import { Route as ExamplesRouteImport } from './routes/Examples'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SingleAnimalIdRouteImport } from './routes/single-animal.$id'
 import { Route as UserMySuppliesRouteImport } from './routes/_user/my-supplies'
-import { Route as UserMyLogsRouteImport } from './routes/_user/my-logs'
 import { Route as UserMedicalLogsFosterRouteImport } from './routes/_user/medical-logs-foster'
 import { Route as UserAddMedicalLogRouteImport } from './routes/_user/add-medical-log'
 import { Route as ProtectedMyAnimalsRouteImport } from './routes/_protected/my-animals'
@@ -74,11 +73,6 @@ const SingleAnimalIdRoute = SingleAnimalIdRouteImport.update({
 const UserMySuppliesRoute = UserMySuppliesRouteImport.update({
   id: '/my-supplies',
   path: '/my-supplies',
-  getParentRoute: () => UserRoute,
-} as any)
-const UserMyLogsRoute = UserMyLogsRouteImport.update({
-  id: '/my-logs',
-  path: '/my-logs',
   getParentRoute: () => UserRoute,
 } as any)
 const UserMedicalLogsFosterRoute = UserMedicalLogsFosterRouteImport.update({
@@ -163,7 +157,6 @@ export interface FileRoutesByFullPath {
   '/my-animals': typeof ProtectedMyAnimalsRoute
   '/add-medical-log': typeof UserAddMedicalLogRoute
   '/medical-logs-foster': typeof UserMedicalLogsFosterRoute
-  '/my-logs': typeof UserMyLogsRoute
   '/my-supplies': typeof UserMySuppliesRoute
   '/single-animal/$id': typeof SingleAnimalIdRoute
   '/animals/$animalId': typeof AdminAnimalsAnimalIdRoute
@@ -186,7 +179,6 @@ export interface FileRoutesByTo {
   '/my-animals': typeof ProtectedMyAnimalsRoute
   '/add-medical-log': typeof UserAddMedicalLogRoute
   '/medical-logs-foster': typeof UserMedicalLogsFosterRoute
-  '/my-logs': typeof UserMyLogsRoute
   '/my-supplies': typeof UserMySuppliesRoute
   '/single-animal/$id': typeof SingleAnimalIdRoute
   '/animals/$animalId': typeof AdminAnimalsAnimalIdRoute
@@ -212,7 +204,6 @@ export interface FileRoutesById {
   '/_protected/my-animals': typeof ProtectedMyAnimalsRoute
   '/_user/add-medical-log': typeof UserAddMedicalLogRoute
   '/_user/medical-logs-foster': typeof UserMedicalLogsFosterRoute
-  '/_user/my-logs': typeof UserMyLogsRoute
   '/_user/my-supplies': typeof UserMySuppliesRoute
   '/single-animal/$id': typeof SingleAnimalIdRoute
   '/_admin/animals/$animalId': typeof AdminAnimalsAnimalIdRoute
@@ -237,7 +228,6 @@ export interface FileRouteTypes {
     | '/my-animals'
     | '/add-medical-log'
     | '/medical-logs-foster'
-    | '/my-logs'
     | '/my-supplies'
     | '/single-animal/$id'
     | '/animals/$animalId'
@@ -260,7 +250,6 @@ export interface FileRouteTypes {
     | '/my-animals'
     | '/add-medical-log'
     | '/medical-logs-foster'
-    | '/my-logs'
     | '/my-supplies'
     | '/single-animal/$id'
     | '/animals/$animalId'
@@ -285,7 +274,6 @@ export interface FileRouteTypes {
     | '/_protected/my-animals'
     | '/_user/add-medical-log'
     | '/_user/medical-logs-foster'
-    | '/_user/my-logs'
     | '/_user/my-supplies'
     | '/single-animal/$id'
     | '/_admin/animals/$animalId'
@@ -368,13 +356,6 @@ declare module '@tanstack/react-router' {
       path: '/my-supplies'
       fullPath: '/my-supplies'
       preLoaderRoute: typeof UserMySuppliesRouteImport
-      parentRoute: typeof UserRoute
-    }
-    '/_user/my-logs': {
-      id: '/_user/my-logs'
-      path: '/my-logs'
-      fullPath: '/my-logs'
-      preLoaderRoute: typeof UserMyLogsRouteImport
       parentRoute: typeof UserRoute
     }
     '/_user/medical-logs-foster': {
@@ -502,14 +483,12 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 interface UserRouteChildren {
   UserAddMedicalLogRoute: typeof UserAddMedicalLogRoute
   UserMedicalLogsFosterRoute: typeof UserMedicalLogsFosterRoute
-  UserMyLogsRoute: typeof UserMyLogsRoute
   UserMySuppliesRoute: typeof UserMySuppliesRoute
 }
 
 const UserRouteChildren: UserRouteChildren = {
   UserAddMedicalLogRoute: UserAddMedicalLogRoute,
   UserMedicalLogsFosterRoute: UserMedicalLogsFosterRoute,
-  UserMyLogsRoute: UserMyLogsRoute,
   UserMySuppliesRoute: UserMySuppliesRoute,
 }
 
