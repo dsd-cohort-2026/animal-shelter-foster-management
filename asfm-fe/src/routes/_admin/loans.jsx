@@ -10,6 +10,13 @@ import InputGroupForSearch from '@/components/InputGroupForSearch';
 import { ModalDialog } from '@/components/ModalDialog';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -24,13 +31,22 @@ export const Route = createFileRoute('/_admin/loans')({
 });
 
 function RouteComponent() {
+  const user = useBoundStore((state) => state.user);
   const [allLoans, setAllLoans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedLoan, setSelectedLoan] = useState(null);
   const [filters, setFilters] = useState({ search: '', loanStatus: '' });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ loanType: '' });
+  const [formData, setFormData] = useState({
+    item_id: '',
+    foster_user: '',
+    quantity: '',
+    notes: '',
+  });
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [allItems, setAllItems] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+
   const filteredLoans = useMemo(() => {
     let filtered = allLoans;
     if (filters.search) {
@@ -45,44 +61,119 @@ function RouteComponent() {
   }, [filters, allLoans]);
 
   useEffect(() => {
-    const fetchLoans = async () => {
+    const fetchAll = async () => {
       try {
-        const res = await apiClient.get('/inventory-transactions?type=LOAN&limit=10000');
-        const loans = res.data.map((transaction) => ({
-          inventoryTransactionId: transaction.id,
-          itemDescription: transaction.item?.name,
-          quantity: transaction.quantity,
-          userId: `${transaction.foster_user?.first_name} ${transaction.foster_user?.last_name}`,
-          loanedAt: transaction.created_at,
-          loanStatus: transaction.status[0] + transaction.status.slice(1).toLowerCase(),
-        }));
-        setAllLoans(loans);
+        const [loanData, itemsData, usersData] = await Promise.allSettled([
+          apiClient.get('/inventory-transactions?type=LOAN&limit=1000'),
+          apiClient.get('/items'),
+          apiClient.get('/users'),
+        ]);
+        setAllLoans(
+          loanData.value.data.map((trans) => ({
+            inventoryTransactionId: trans.id,
+            itemDescription: trans.item?.name,
+            quantity: trans.quantity,
+            transactionNotes: trans.notes || '-',
+            userId: `${trans.foster_user?.first_name} ${trans.foster_user?.last_name}`,
+            loanedAt: trans.created_at,
+            loanStatus: trans.status[0] + trans.status.slice(1).toLowerCase(),
+          })),
+        );
+        setAllItems(itemsData.value.data);
+        setAllUsers(usersData.value.data);
       } catch (err) {
-        setError('Failed loading loans. Try again.');
+        setError('Failed loading data. Try again.');
       } finally {
         setLoading(false);
       }
     };
-    fetchLoans();
+    fetchAll();
   }, []);
-
-  const handleEdit = (loan) => {
-    setSelectedLoan(loan);
-    setIsModalOpen(true);
-  };
 
   const handleClearFilters = () => {
     setFilters({ search: '', loanStatus: '' });
   };
 
   const handleAddNew = () => {
-    setFormData({ loanType: '' });
+    setFormData({ item_id: '', foster_user: '', quantity: '', notes: '' });
+    setFieldErrors({});
     setIsModalOpen(true);
   };
 
-  const handleModalSubmit = () => {
-    console.log('Add new loaned item:', formData);
-    setIsModalOpen(false);
+  const handleModalSubmit = async () => {
+    const errors = validate(formData);
+    if (Object.keys(errors).length) {
+      setFieldErrors(errors);
+      return;
+    }
+    setFieldErrors({});
+    try {
+      await apiClient.post('/inventory-transactions/distribute', {
+        type: 'LOAN',
+        status: 'ACTIVE',
+        item_id: formData.item_id,
+        foster_user: formData.foster_user,
+        staff_user: user.id,
+        quantity: Number(formData.quantity),
+        notes: formData.notes || '',
+      });
+      setIsModalOpen(false);
+      setLoading(true);
+      const res = await apiClient.get('/inventory-transactions?type=LOAN&limit=1000');
+      setAllLoans(
+        res.data.map((trans) => ({
+          inventoryTransactionId: trans.id,
+          itemDescription: trans.item?.name,
+          quantity: trans.quantity,
+          transactionNotes: trans.notes || '-',
+          userId: `${trans.foster_user?.first_name} ${trans.foster_user?.last_name}`,
+          loanedAt: trans.created_at,
+          loanStatus: trans.status[0] + trans.status.slice(1).toLowerCase(),
+        })),
+      );
+    } catch (err) {
+      setFieldErrors({
+        api: err.response?.data?.message || 'Failed to create loan. Please try again.',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (transactionId, newStatus, quantity) => {
+    try {
+      await apiClient.patch(`/inventory-transactions/${transactionId}/status`, {
+        status: newStatus.toUpperCase(),
+        staff_user: user.id,
+        quantity,
+      });
+      const trigger = document.querySelector(`[data-id="${transactionId}"]`);
+      if (trigger) {
+        trigger.style.borderColor = 'var(--secondary)';
+        trigger.style.borderWidth = '2px';
+        setTimeout(() => {
+          trigger.style.borderColor = '';
+          trigger.style.borderWidth = '';
+        }, 5000);
+      }
+      setAllLoans((prev) =>
+        prev.map((loan) => {
+          return loan.inventoryTransactionId === transactionId
+            ? { ...loan, loanStatus: newStatus[0].toUpperCase() + newStatus.slice(1).toLowerCase() }
+            : loan;
+        }),
+      );
+    } catch (err) {
+      console.error(`There was an error while updating the status of this loan: ${err}`);
+    }
+  };
+
+  const validate = (data) => {
+    const errors = {};
+    if (!data.item_id) errors.item_id = 'Item is required for a loan!';
+    if (!data.foster_user) errors.foster_user = 'To whom do you intend to loan this?';
+    if (!data.quantity) errors.quantity = `You can't loan nothing!`;
+    return errors;
   };
 
   const loansColumns = [
@@ -95,7 +186,7 @@ function RouteComponent() {
     },
     {
       accessorKey: 'userId',
-      header: 'User ID',
+      header: 'Foster User',
       sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[120px]',
@@ -105,7 +196,7 @@ function RouteComponent() {
       header: 'Quantity',
       sortable: true,
       textSize: 'sm',
-      headClassName: 'min-w-[120px]',
+      headClassName: 'min-w-[60px]',
     },
     {
       accessorKey: 'loanedAt',
@@ -116,17 +207,16 @@ function RouteComponent() {
       cell: ({ row }) => formatDate(row.original.loanedAt),
     },
     {
-      accessorKey: 'expectedReturnDate',
-      header: 'Expected Return Date',
+      accessorKey: 'transactionNotes',
+      header: 'Transaction Notes',
       sortable: true,
       textSize: 'sm',
-      headClassName: 'min-w-[180px]',
-      cell: ({ row }) => {
-        const isCrate = row.original.itemDescription.toLowerCase().includes('crate');
-        if (!isCrate)
-          return <span className="invisible">{formatDate(row.original.expectedReturnDate)}</span>;
-        return formatDate(row.original.expectedReturnDate);
-      },
+      headClassName: 'min-w-[200px] ',
+      cell: ({ row }) => (
+        <div className="whitespace-normal break-words max-w-[300px]">
+          {row.original.transactionNotes}
+        </div>
+      ),
     },
     {
       accessorKey: 'loanStatus',
@@ -134,6 +224,22 @@ function RouteComponent() {
       sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[120px]',
+      cell: ({ row }) => (
+        <Select
+          value={row.original.loanStatus.toUpperCase()}
+          onValueChange={(val) =>
+            handleStatusChange(row.original.inventoryTransactionId, val, row.original.quantity)
+          }
+        >
+          <SelectTrigger className="w-[120px]" data-id={row.original.inventoryTransactionId}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ACTIVE">Active</SelectItem>
+            <SelectItem value="COMPLETE">Complete</SelectItem>
+          </SelectContent>
+        </Select>
+      ),
     },
     {
       accessorKey: 'inventoryTransactionId',
@@ -142,26 +248,13 @@ function RouteComponent() {
       textSize: 'sm',
       headClassName: 'min-w-[180px]',
     },
-    {
-      id: 'actions',
-      header: 'Actions',
-      cell: ({ row }) => (
-        <button
-          onClick={() => handleEdit(row.original)}
-          className="p-1 hover:bg-blue-100 rounded"
-          title="Edit"
-        >
-          <Edit size={18} className="text-blue-600" />
-        </button>
-      ),
-    },
   ];
 
   if (error) return <div className="flex justify-center pt-8 text-red-500">{error}</div>;
 
   const totalLoans = allLoans.length;
-  const activeCount = allLoans.filter((l) => l.loanStatus === 'Active').length;
-  const returnedCount = allLoans.filter((l) => l.loanStatus === 'Complete').length;
+  const activeCount = allLoans.filter((l) => l.loanStatus.toLowerCase() === 'active').length;
+  const returnedCount = allLoans.filter((l) => l.loanStatus.toLowerCase() === 'complete').length;
 
   return (
     <>
@@ -238,70 +331,95 @@ function RouteComponent() {
       <ModalDialog
         open={isModalOpen}
         setOpen={setIsModalOpen}
-        title="Add/Edit New Loaned Item"
-        description="Fill in the details for the loaned item"
+        title="Add New Loan"
+        description="Submit Loan Details"
         formId="addLoanForm"
         submitHandler={handleModalSubmit}
         trigger={<div />}
       >
-        <form id="addLoanForm" className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Item Description</label>
-            <Input
-              placeholder="Enter item description"
-              value={selectedLoan?.itemDescription || ''}
-              onChange={(e) =>
-                setSelectedLoan({ ...selectedLoan, itemDescription: e.target.value })
-              }
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">User Loaning Item</label>
-            <Input
-              placeholder="Enter user ID"
-              value={selectedLoan?.userId || ''}
-              onChange={(e) => setSelectedLoan({ ...selectedLoan, userId: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Quantity</label>
-            <Input
-              placeholder="Enter quantity"
-              value={selectedLoan?.quantity || ''}
-              onChange={(e) => setSelectedLoan({ ...selectedLoan, quantity: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Set Loan Date</label>
-            <Input
-              type="date"
-              placeholder="Enter loan date"
-              value={selectedLoan?.loanedAt || ''}
-              onChange={(e) => setSelectedLoan({ ...selectedLoan, loanedAt: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Loan Status</label>
-            <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-              value={selectedLoan?.loanStatus ?? ''}
-              onChange={(e) => setSelectedLoan({ ...selectedLoan, loanStatus: e.target.value })}
+        <form id="addLoanForm" className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
+          {fieldErrors.api && <p className="text-sm text-red-500">{fieldErrors.api}</p>}
+
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium">
+              Item: <span className="text-red-500">*</span>
+            </label>
+            <Select
+              value={formData.item_id}
+              onValueChange={(val) => {
+                setFormData({ ...formData, item_id: val });
+                setFieldErrors((prev) => ({ ...prev, item_id: undefined }));
+              }}
             >
-              <option value="" disabled>
-                Select status
-              </option>
-              <option value="ACTIVE">Active</option>
-              <option value="COMPLETE">Complete</option>
-            </select>
+              <SelectTrigger className={`w-full ${fieldErrors.item_id ? 'border-red-500' : ''}`}>
+                <SelectValue placeholder="Select Item"></SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {allItems.map((item) => (
+                  <SelectItem key={item.id} value={item.id}>
+                    {item.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {fieldErrors.item_id && <p className="text-xs text-red-500">{fieldErrors.item_id}</p>}
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Notes</label>
+
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium">
+              Loaned To: <span className="text-red-500">*</span>
+            </label>
+            <Select
+              value={formData.foster_user}
+              onValueChange={(val) => {
+                setFormData({ ...formData, foster_user: val });
+                setFieldErrors((prev) => ({ ...prev, foster_user: undefined }));
+              }}
+            >
+              <SelectTrigger
+                className={`w-full ${fieldErrors.foster_user ? 'border-red-500' : ''}`}
+              >
+                <SelectValue placeholder="Select a foster user" />
+              </SelectTrigger>
+              <SelectContent>
+                {allUsers.map((u) => (
+                  <SelectItem key={u.id} value={u.id}>
+                    {u.first_name} {u.last_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {fieldErrors.foster_user && (
+              <p className="text-xs text-red-500">{fieldErrors.foster_user}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium">
+              Quantity <span className="text-red-500">*</span>
+            </label>
+            <Input
+              type="number"
+              min="1"
+              placeholder="Enter quantity"
+              className={`w-full ${fieldErrors.quantity ? 'border-red-500' : ''}`}
+              value={formData.quantity}
+              onChange={(e) => {
+                setFormData({ ...formData, quantity: e.target.value });
+                setFieldErrors((prev) => ({ ...prev, quantity: undefined }));
+              }}
+            />
+            {fieldErrors.quantity && <p className="text-xs text-red-500">{fieldErrors.quantity}</p>}
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium">Notes</label>
             <textarea
-              placeholder="Enter additional notes"
+              placeholder="Enter additional notes (optional)"
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
               rows="4"
-              value={selectedLoan?.notes || ''}
-              onChange={(e) => setSelectedLoan({ ...selectedLoan, notes: e.target.value })}
+              value={formData.notes}
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
             />
           </div>
         </form>

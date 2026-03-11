@@ -1,8 +1,7 @@
 import { supabase } from '@/lib/supabaseClient';
 import apiClient from '@/lib/axios';
 
-export const userAnimalsSlice = (set, get) => ({
-
+export const userAnimalsSlice = (set) => ({
     //states
     isFosterMember: true,
     userAnimals: [],

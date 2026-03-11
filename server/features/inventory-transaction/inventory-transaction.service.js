@@ -103,3 +103,16 @@ exports.createDistributeTransaction = async (body) => {
     item_id,
   });
 };
+
+exports.updateStatus = async (req) => {
+  const body = req.body;
+  const id = req.params.id;
+  const transaction = await inventoryTransactionRepository.findById(id);
+  const inventory_id = transaction.inventory.id;
+  const updatedTransaction = await inventoryTransactionRepository.updateStatus({
+    ...body,
+    id,
+    inventory_id,
+  });
+  return updatedTransaction;
+};

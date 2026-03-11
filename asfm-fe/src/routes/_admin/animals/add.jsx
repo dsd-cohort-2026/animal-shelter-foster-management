@@ -1,16 +1,13 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ConfirmationDialog from '@/components/confirmationDialog';
 import AnimalForm from '@/components/animals/AnimalForm';
 import { useBoundStore } from '@/store';
 import { Loader2 } from 'lucide-react';
-import { createClientId } from '@/utils/idHelpers';
-
-// TODO: Replace with actual API call to backend
-const SIMULATED_API_DELAY = 600;
+import apiClient from '@/lib/axios';
+import { supabase } from '@/lib/supabaseClient';
 
 export const Route = createFileRoute('/_admin/animals/add')({
   component: AddAnimalPage,
@@ -24,29 +21,36 @@ function AddAnimalPage() {
   const [submitError, setSubmitError] = useState('');
   const [confirmation, setConfirmation] = useState(null);
 
-  const handleSubmit = (formData) => {
+  const handleSubmit = async (formData) => {
     setSubmitError('');
     setIsSubmitting(true);
 
-    // Simulate async create — swap with real API call later
-    setTimeout(() => {
-      try {
-        addAnimal({ ...formData, id: createClientId() });
-        setIsSubmitting(false);
-        setConfirmation({
-          type: 'success',
-          primaryText: 'Animal Added',
-          secondaryText: `${formData.name} has been added successfully.`,
-        });
-      } catch {
-        setIsSubmitting(false);
-        setSubmitError('Something went wrong. Please try again.');
-      }
-    }, SIMULATED_API_DELAY);
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+
+      const response = await apiClient.post('/animals/create', {
+        ...formData,
+        last_modified: new Date().toISOString(),
+        modified_by: userId,
+      });
+      addAnimal(response.data);
+      setIsSubmitting(false);
+      setConfirmation({
+        type: 'success',
+        primaryText: 'Animal Added',
+        secondaryText: `${formData.name} has been added successfully.`,
+      });
+    } catch {
+      setIsSubmitting(false);
+      setSubmitError('Failed to add animal. Please try again.');
+    }
   };
 
   return (
-    <Layout>
+    <>
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-4">
         <Button variant="ghost" className="-ml-2" onClick={() => navigate({ to: '/animals' })}>
           ← Back to Animals
@@ -80,6 +84,6 @@ function AddAnimalPage() {
           onClose={() => navigate({ to: '/animals' })}
         />
       )}
-    </Layout>
+    </>
   );
 }

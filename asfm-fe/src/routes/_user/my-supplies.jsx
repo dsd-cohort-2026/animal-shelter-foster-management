@@ -1,10 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { ReusableTable } from '../../components/table_components';
-import { useMemo } from 'react';
-import { mockLoanedItems } from '../../features/mockLoanedItems';
+import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { ShoppingBag } from 'lucide-react';
 import { useBoundStore } from '@/store';
+import apiClient from '@/lib/axios';
+import { Spinner } from '@/components/ui/spinner';
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -19,66 +20,66 @@ export const Route = createFileRoute('/_user/my-supplies')({
 });
 
 function RouteComponent() {
-  const { user } = useBoundStore();
+  const user = useBoundStore((state) => state.user);
+  const session = useBoundStore((state) => state.session);
+  const token = session?.access_token;
 
-  const supplies = useMemo(
-    () => mockLoanedItems.filter((item) => item.userId === user?.id || item.userId === 'U-1024'),
-    [user?.id],
-  );
+  const [supplies, setSupplies] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+
+  async function fetchSupplies() {
+    try {
+      const response = await apiClient.get('/inventory-transactions');
+      setSupplies(response.data);
+    } catch (err) {
+      console.error(err);
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (user && token) {
+      fetchSupplies();
+    }
+  }, [user, token]);
 
   const suppliesColumns = [
     {
-      accessorKey: 'itemDescription',
+      accessorKey: 'item',
+      id: 'itemDescription',
       header: 'Item Description',
       sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[200px]',
+      cell: ({ row }) => row.original.item?.name ?? '—',
     },
     {
-      accessorKey: 'userId',
+      accessorKey: 'foster_user_id',
       header: 'User ID',
       sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[120px]',
     },
     {
-      accessorKey: 'animalId',
-      header: 'Animal ID',
-      sortable: true,
-      textSize: 'sm',
-      headClassName: 'min-w-[120px]',
-    },
-    {
-      accessorKey: 'loanedAt',
+      accessorKey: 'created_at',
       header: 'Loaned At',
       sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[130px]',
-      cell: ({ row }) => formatDate(row.original.loanedAt),
+      cell: ({ row }) => formatDate(row.original.created_at),
     },
     {
-      accessorKey: 'expectedReturnDate',
-      header: 'Expected Return Date',
-      sortable: true,
-      textSize: 'sm',
-      headClassName: 'min-w-[180px]',
-      cell: ({ row }) => {
-        const isCrate = row.original.itemDescription.toLowerCase().includes('crate');;
-        if (!isCrate)
-         
-          return <span className="invisible">{formatDate(row.original.expectedReturnDate)}</span>;;
-        return formatDate(row.original.expectedReturnDate);;
-      },
-    },
-    {
-      accessorKey: 'loanStatus',
+      accessorKey: 'status',
       header: 'Loan Status',
       sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[120px]',
     },
     {
-      accessorKey: 'inventoryTransactionId',
+      accessorKey: 'id',
       header: 'Inventory Transaction ID',
       sortable: true,
       textSize: 'sm',
@@ -86,8 +87,26 @@ function RouteComponent() {
     },
   ];
 
-  const activeCount = supplies.filter((s) => s.loanStatus === 'Active').length;
-  const returnedCount = supplies.filter((s) => s.loanStatus === 'Complete').length;
+  const activeCount = supplies.filter((s) => s.status === 'ACTIVE').length;
+  const completeCount = supplies.filter((s) => s.status === 'COMPLETE').length;
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center pt-10">
+        <Spinner className="size-12 text-primary" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen text-center px-4">
+        <h2 className="text-2xl font-semibold mb-4">Oops!</h2>
+        <p className="text-lg text-gray-700">Your supplies could not be loaded right now.</p>
+        <p className="mt-2 text-gray-500">Please try again later.</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -115,12 +134,12 @@ function RouteComponent() {
                   {activeCount} active
                 </Badge>
               )}
-              {returnedCount > 0 && (
+              {completeCount > 0 && (
                 <Badge
                   variant="outline"
                   className="font-medium border-blue-500/30 text-blue-600 bg-blue-500/5"
                 >
-                  {returnedCount} complete
+                  {completeCount} complete
                 </Badge>
               )}
             </div>
@@ -136,7 +155,7 @@ function RouteComponent() {
       <ReusableTable
         columns={suppliesColumns}
         data={supplies}
-        isLoading={false}
+        isLoading={isLoading}
         headerClassName="bg-secondary text-primary-foreground"
         tablebodyRowClassName="bg-white hover:bg-secondary/20"
         containerClassName="overflow-auto max-h-150 rounded-lg border border-pale-sky shadow-sm relative w-full"

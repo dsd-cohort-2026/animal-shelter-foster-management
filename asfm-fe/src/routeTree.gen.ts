@@ -15,6 +15,7 @@ import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as SignInRouteImport } from './routes/SignIn'
 import { Route as ExamplesRouteImport } from './routes/Examples'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MedicalLogsIndexRouteImport } from './routes/medical-logs/index'
 import { Route as SingleAnimalIdRouteImport } from './routes/single-animal.$id'
 import { Route as UserMySuppliesRouteImport } from './routes/_user/my-supplies'
 import { Route as UserMedicalLogsFosterRouteImport } from './routes/_user/medical-logs-foster'
@@ -80,6 +81,7 @@ const UserAddMedicalLogRoute = UserAddMedicalLogRouteImport.update({
   getParentRoute: () => UserRoute,
 } as any)
 const ProtectedMyAnimalsRoute = ProtectedMyAnimalsRouteImport.update({
+  id: '/_protected/my-animals',
   id: '/_protected/my-animals',
   path: '/my-animals',
   getParentRoute: () => rootRouteImport,
