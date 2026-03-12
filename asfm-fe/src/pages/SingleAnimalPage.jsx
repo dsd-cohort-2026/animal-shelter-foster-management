@@ -89,10 +89,6 @@ export default function SingleAnimalPage({ id }) {
     );
   }
 
-  const speciesLabel = formatLabel(viewAnimal?.species);
-  const sexLabel = formatLabel(viewAnimal?.sex);
-  const fixedLabel = viewAnimal?.altered ?? 'Unknown';
-
   return (
     <div className="space-y-6">
       <div className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-8">
@@ -108,15 +104,6 @@ export default function SingleAnimalPage({ id }) {
               An at-a-glance profile for foster care, daily check-ins, and medical history.
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-3">
-              <Badge variant="secondary" className="font-medium">
-                {speciesLabel}
-              </Badge>
-              <Badge variant="secondary" className="font-medium">
-                {sexLabel}
-              </Badge>
-              <Badge variant="outline" className="font-medium">
-                {fixedLabel}
-              </Badge>
               <Badge variant="outline" className="font-medium">
                 {animalLogs.length} medical {animalLogs.length === 1 ? 'log' : 'logs'}
               </Badge>
