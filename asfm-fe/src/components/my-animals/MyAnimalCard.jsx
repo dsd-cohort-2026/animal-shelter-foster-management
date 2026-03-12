@@ -4,6 +4,7 @@ import { buttonVariants } from '../ui/button';
 import { cn } from '@/lib/utils';
 import { Badge } from '../ui/badge';
 import { PawPrint } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
 
 const formatLabel = (value) => {
   if (!value) return 'Unknown';
@@ -66,15 +67,16 @@ export default function MyAnimalCard({ animal }) {
         </div>
 
         <div className="flex justify-end">
-          <a
-            href={`/single-animal/${animal.id}`}
+          <Link
+            to="/single-animal/$id"
+            params={{ id: animal.id }}
             className={cn(
               buttonVariants({ variant: 'outline' }),
               'rounded-full border-primary/20 bg-primary/5 px-5 hover:bg-primary/10'
             )}
           >
             View Profile
-          </a>
+          </Link>
         </div>
       </div>
     </Card>
