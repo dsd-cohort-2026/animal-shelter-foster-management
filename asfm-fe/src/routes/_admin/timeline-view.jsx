@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useMemo, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -155,34 +156,35 @@ function MedicalLogListPage() {
   return (
       <RoleGuard allowedRoles={['STAFF']}>
         <div className="space-y-6">
-          {/* Header */}
-          <div className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-8">
-            <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-start gap-4">
-                <div className="flex items-center justify-center size-12 sm:size-14 rounded-xl bg-secondary/20 shrink-0">
-                  <ClipboardList className="size-6 sm:size-7 text-primary" />
+          {/* Sticky Header + Filter Bar */}
+          <div className="sticky top-0 z-20 -mx-4 px-4 py-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/50">
+            {/* Header */}
+            <div className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-8 mb-4">
+              <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-4">
+                  <div className="flex items-center justify-center size-12 sm:size-14 rounded-xl bg-secondary/20 shrink-0">
+                    <ClipboardList className="size-6 sm:size-7 text-primary" />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                      Medical Logs
+                    </h1>
+                    <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+                      View and manage medical log entries for all animals.
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-                    Medical Logs
-                  </h1>
-                  <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-                    View and manage medical log entries for all animals.
-                  </p>
-                </div>
+                <Button
+                  onClick={() => navigate({ to: '/medical-logs-add' })}
+                  size="lg"
+                  className="shrink-0 sm:self-center gap-2"
+                >
+                  <Plus className="size-5" />
+                  Add Medical Log
+                </Button>
               </div>
-              <Button
-                onClick={() => navigate({ to: '/medical-logs-add' })}
-                size="lg"
-                className="shrink-0 sm:self-center gap-2"
-              >
-                <Plus className="size-5" />
-                Add Medical Log
-              </Button>
             </div>
-          </div>
 
-          <div className="space-y-4">
             <CompactMedicalLogFilterBar
               filters={filters}
               onFiltersChange={setFilters}
@@ -214,33 +216,45 @@ function MedicalLogListPage() {
               <div className="absolute left-4 top-0 bottom-0 w-px bg-border hidden sm:block" />
 
               {filtered.map((log) => (
-                <Card key={log.id} className="sm:ml-10 relative">
-                  {/* Timeline dot */}
-                  <div className="absolute -left-10 top-5 size-3 rounded-full bg-primary border-2 border-background hidden sm:block" />
-                  <CardContent className="p-5">
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <CustomBadge
-                        text={formatLogType(log.category)}
-                        badgeClassName={LOG_TYPE_COLORS[log.category] || 'bg-gray-100 text-gray-800'}
-                      />
-                      <span className="text-sm font-semibold">{log.animal_name}</span>
-                      <span className="text-xs text-muted-foreground ml-auto">
-                        {log.logged_at
-                          ? `${new Date(log.logged_at).toLocaleDateString()} ${new Date(log.logged_at).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}`
-                          : '—'}
-                      </span>
-                    </div>
-                    {log.general_notes && (
-                      <p className="text-sm text-foreground">{log.general_notes}</p>
-                    )}
-                    {log.behavior_notes && (
-                      <p className="text-sm text-muted-foreground mt-1">{log.behavior_notes}</p>
-                    )}
+                <motion.div
+                  key={log.id}
+                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: false, amount: 0.3, margin: "-50px" }}
+                  transition={{
+                    duration: 0.5,
+                    ease: [0.25, 0.46, 0.45, 0.94]
+                  }}
+                  className="sm:ml-10 relative"
+                >
+                  <Card className="relative transition-shadow duration-300 ">
+                    {/* Timeline dot */}
+                    <div className="absolute -left-10 top-5 size-3 rounded-full bg-primary border-2 border-background hidden sm:block" />
+                    <CardContent className="p-5">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <CustomBadge
+                          text={formatLogType(log.category)}
+                          badgeClassName={LOG_TYPE_COLORS[log.category] || 'bg-gray-100 text-gray-800'}
+                        />
+                        <span className="text-sm font-semibold">{log.animal_name}</span>
+                        <span className="text-xs text-muted-foreground ml-auto">
+                          {log.logged_at
+                            ? `${new Date(log.logged_at).toLocaleDateString()} ${new Date(log.logged_at).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}`
+                            : '—'}
+                        </span>
+                      </div>
+                      {log.general_notes && (
+                        <p className="text-sm text-foreground">{log.general_notes}</p>
+                      )}
+                      {log.behavior_notes && (
+                        <p className="text-sm text-muted-foreground mt-1">{log.behavior_notes}</p>
+                      )}
+                  <div className="space-y-1 mt-2">
                     {log.prescription && (
-                      <p className="text-xs text-muted-foreground mt-2">
+                      <p className="text-xs text-muted-foreground">
                         <span className="font-medium">Rx:</span> {log.prescription}
                       </p>
                     )}
@@ -251,7 +265,7 @@ function MedicalLogListPage() {
                       </p>
                     )}
                     {log.administered_at && (
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-xs text-muted-foreground">
                         <span className="font-medium">Administered:</span>{' '}
                         {new Date(log.administered_at).toLocaleDateString()} {new Date(log.administered_at).toLocaleTimeString([], {
                           hour: '2-digit',
@@ -259,8 +273,10 @@ function MedicalLogListPage() {
                         })}
                       </p>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               ))}
             </div>
           )}
