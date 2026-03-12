@@ -12,7 +12,7 @@ export default function FilterBar({
   };
 
   return (
-    <div className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg">
+    <div className="flex items-center gap-3 p-4 bg-card border border-border rounded-lg">
       {children}
       <Button onClick={handleClear} variant="outline">
         Clear

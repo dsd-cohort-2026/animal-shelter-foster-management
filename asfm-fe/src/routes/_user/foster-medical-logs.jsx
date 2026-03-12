@@ -8,7 +8,11 @@ import CustomBadge from '@/components/custom/CustomBadge';
 import { LOG_TYPE_COLORS, formatLogType } from '@/constants/medicalLogConstants';
 import { CompactMedicalLogFilterBar } from '@/components/CompactMedicalLogFilterBar';
 import apiClient from '@/lib/axios';
-import { formatDateTime, calculateLogStats, MEDICAL_LOG_BASE_COLUMNS } from '@/utils/medicalLogUtils';
+import {
+  formatDateTime,
+  calculateLogStats,
+  MEDICAL_LOG_BASE_COLUMNS,
+} from '@/utils/medicalLogUtils';
 
 export const Route = createFileRoute('/_user/foster-medical-logs')({
   component: FosterLogsPage,
@@ -65,7 +69,7 @@ function FosterLogsPage() {
       const assignedAnimals = assignedAnimalsResponse.data || [];
 
       // Build set of currently assigned animal IDs
-      const assignedIds = new Set(assignedAnimals.map(animal => animal.id));
+      const assignedIds = new Set(assignedAnimals.map((animal) => animal.id));
       setAssignedAnimalIds(assignedIds);
 
       if (assignedIds.size === 0) {
@@ -81,17 +85,15 @@ function FosterLogsPage() {
       const rawLogs = logsResponse.data || [];
 
       // Step 3: Filter logs to only those for current user's assigned animals
-      const assignedAnimalLogs = rawLogs.filter(log =>
-        assignedIds.has(log.animal_id)
-      );
+      const assignedAnimalLogs = rawLogs.filter((log) => assignedIds.has(log.animal_id));
 
       // Step 4: Build animal lookup from assigned animals
-      const animalMap = new Map(assignedAnimals.map(a => [a.id, a.name]));
+      const animalMap = new Map(assignedAnimals.map((a) => [a.id, a.name]));
 
       // Step 5: Enrich logs with animal names
       // Note: We don't fetch users list (STAFF-only API)
       // Foster user name is not displayed since these are the current user's own logs
-      const enrichedLogs = assignedAnimalLogs.map(log => {
+      const enrichedLogs = assignedAnimalLogs.map((log) => {
         const animalName = animalMap.get(log.animal_id);
         return {
           ...log,
@@ -104,10 +106,10 @@ function FosterLogsPage() {
       setAllLogs(enrichedLogs);
     } catch (err) {
       console.error('Error fetching medical logs:', err);
-      
+
       // Provide user-friendly error message based on error type
       let errorMessage = 'Failed to load medical logs. Please try again.';
-      
+
       if (err.response) {
         // Server responded with error status
         if (err.response.status === 401) {
@@ -121,7 +123,7 @@ function FosterLogsPage() {
         // Request made but no response (network error)
         errorMessage = 'Network error. Please check your connection.';
       }
-      
+
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -132,10 +134,13 @@ function FosterLogsPage() {
     fetchData();
   }, []);
 
-
-
   // Stats for header - logs for currently assigned animals only
-  const { total: totalLogs, medical: medicalCount, behavioral: behavioralCount, veterinary: veterinaryCount } = calculateLogStats(allLogs);
+  const {
+    total: totalLogs,
+    medical: medicalCount,
+    behavioral: behavioralCount,
+    veterinary: veterinaryCount,
+  } = calculateLogStats(allLogs);
 
   const columns = MEDICAL_LOG_BASE_COLUMNS;
 
@@ -150,7 +155,7 @@ function FosterLogsPage() {
     logTypeBadge: (
       <CustomBadge
         text={formatLogType(log.category)}
-        badgeClassName={LOG_TYPE_COLORS[log.category] || 'bg-gray-100 text-gray-800'}
+        badgeClassName={LOG_TYPE_COLORS[log.category] || 'bg-muted text-foreground'}
       />
     ),
     general_notes: log.general_notes || '—',
@@ -247,8 +252,8 @@ function FosterLogsPage() {
           data={tableData}
           isLoading={loading}
           headerClassName="bg-secondary text-primary-foreground"
-          tablebodyRowClassName="bg-white hover:bg-secondary/20"
-          containerClassName="rounded-lg border border-gray-200 shadow-sm relative w-full"
+          tablebodyRowClassName="bg-card hover:bg-secondary/20"
+          containerClassName="relative w-full rounded-lg border border-border bg-card text-card-foreground shadow-sm"
           enablePagination={true}
           enableColumnVisibility={false}
           pageSize={15}

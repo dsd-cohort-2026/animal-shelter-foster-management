@@ -202,7 +202,7 @@ export function ReusableTable({
                     {isSortable ? (
                       <button
                         onClick={() => handleSort(columnKey)}
-                        className="flex items-center gap-1 hover:text-gray-700 font-medium text-left w-full cursor-pointer"
+                        className="flex items-center gap-1 hover:text-primary font-medium text-left w-full cursor-pointer"
                         type="button"
                       >
                         {column.header}

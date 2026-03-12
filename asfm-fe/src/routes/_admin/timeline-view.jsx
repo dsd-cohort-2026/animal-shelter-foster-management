@@ -13,10 +13,14 @@ import { CompactMedicalLogFilterBar } from '@/components/CompactMedicalLogFilter
 import RoleGuard from '@/components/RoleGuard';
 import apiClient from '@/lib/axios';
 import { enrichMedicalLogs } from '@/utils/enrichMedicalLogs';
-import { formatDateTime, calculateLogStats, MEDICAL_LOG_BASE_COLUMNS } from '@/utils/medicalLogUtils';
+import {
+  formatDateTime,
+  calculateLogStats,
+  MEDICAL_LOG_BASE_COLUMNS,
+} from '@/utils/medicalLogUtils';
 
 const administeredAtColumnIndex = MEDICAL_LOG_BASE_COLUMNS.findIndex(
-  (column) => column.accessorKey === 'administered_at'
+  (column) => column.accessorKey === 'administered_at',
 );
 
 const TABLE_COLUMNS = [
@@ -45,10 +49,10 @@ function getMedicationFields(log) {
   const usesPrescriptionAsMedication = !linkedMedicationName && Boolean(prescriptionText);
   const hasMedicationContext = Boolean(
     linkedMedicationName ||
-      prescriptionText ||
-      log?.dose ||
-      log?.administered_at ||
-      log?.qty_administered != null
+    prescriptionText ||
+    log?.dose ||
+    log?.administered_at ||
+    log?.qty_administered != null,
   );
   const medicationDisplayName = linkedMedicationName
     ? linkedMedicationName
@@ -119,8 +123,12 @@ function MedicalLogListPage() {
       });
   }, [medicalLogs, filters]);
 
-  const { total: totalLogs, medical: medicalCount, behavioral: behavioralCount, veterinary: veterinaryCount } =
-    calculateLogStats(medicalLogs);
+  const {
+    total: totalLogs,
+    medical: medicalCount,
+    behavioral: behavioralCount,
+    veterinary: veterinaryCount,
+  } = calculateLogStats(medicalLogs);
 
   const tableData = useMemo(() => {
     return filteredLogs.map((log) => {
@@ -134,7 +142,7 @@ function MedicalLogListPage() {
         logTypeBadge: (
           <CustomBadge
             text={formatLogType(log.category)}
-            badgeClassName={LOG_TYPE_COLORS[log.category] || 'bg-gray-100 text-gray-800'}
+            badgeClassName={LOG_TYPE_COLORS[log.category] || 'bg-muted text-foreground'}
           />
         ),
         general_notes: log.general_notes || '—',
@@ -183,7 +191,7 @@ function MedicalLogListPage() {
             apiClient.get(`/animals/${id}`).catch((err) => {
               console.error('Failed to fetch animal', id, err);
               return null;
-            })
+            }),
           );
           const individualResponses = await Promise.all(individualFetches);
 
@@ -329,15 +337,17 @@ function MedicalLogListPage() {
 
         {isTableView ? (
           !loading && filteredLogs.length === 0 ? (
-            <p className="text-muted-foreground text-center py-12">No medical logs match your search.</p>
+            <p className="text-muted-foreground text-center py-12">
+              No medical logs match your search.
+            </p>
           ) : (
             <ReusableTable
               columns={TABLE_COLUMNS}
               data={tableData}
               isLoading={loading}
               headerClassName="bg-secondary text-primary-foreground"
-              tablebodyRowClassName="bg-white hover:bg-secondary/20"
-              containerClassName="rounded-lg border border-gray-200 shadow-sm relative w-full"
+              tablebodyRowClassName="bg-card text-card-foreground hover:bg-secondary/20"
+              containerClassName="relative w-full rounded-lg border border-border bg-card text-card-foreground shadow-sm"
               enablePagination={true}
               enableColumnVisibility={true}
               pageSize={15}
@@ -357,7 +367,9 @@ function MedicalLogListPage() {
             ))}
           </div>
         ) : filteredLogs.length === 0 ? (
-          <p className="text-muted-foreground text-center py-12">No medical logs match your search.</p>
+          <p className="text-muted-foreground text-center py-12">
+            No medical logs match your search.
+          </p>
         ) : (
           <div className="relative space-y-4">
             <div className="absolute left-4 top-0 bottom-0 w-px bg-border hidden sm:block" />
@@ -371,9 +383,7 @@ function MedicalLogListPage() {
                     : 'Staff log';
               const primaryNote = log.general_notes || log.behavior_notes || null;
               const secondaryNote =
-                log.general_notes &&
-                log.behavior_notes &&
-                log.behavior_notes !== log.general_notes
+                log.general_notes && log.behavior_notes && log.behavior_notes !== log.general_notes
                   ? log.behavior_notes
                   : null;
               const { medicationDisplayName, prescriptionText, usesPrescriptionAsMedication } =
@@ -397,13 +407,17 @@ function MedicalLogListPage() {
                       <div className="flex flex-wrap items-start gap-2">
                         <CustomBadge
                           text={formatLogType(log.category)}
-                          badgeClassName={LOG_TYPE_COLORS[log.category] || 'bg-gray-100 text-gray-800'}
+                          badgeClassName={
+                            LOG_TYPE_COLORS[log.category] || 'bg-muted text-foreground'
+                          }
                         />
-                        <p className="text-sm font-semibold leading-tight pt-0.5">{log.animal_name}</p>
+                        <p className="text-sm font-semibold leading-tight pt-0.5">
+                          {log.animal_name}
+                        </p>
                         <span className="text-xs text-muted-foreground ml-auto whitespace-nowrap">
                           {log.logged_at
                             ? `${new Date(log.logged_at).toLocaleDateString()} ${new Date(
-                                log.logged_at
+                                log.logged_at,
                               ).toLocaleTimeString([], {
                                 hour: '2-digit',
                                 minute: '2-digit',
@@ -412,9 +426,13 @@ function MedicalLogListPage() {
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1 mb-2">{creatorLabel}</p>
-                      {primaryNote && <p className="text-base text-foreground leading-relaxed">{primaryNote}</p>}
+                      {primaryNote && (
+                        <p className="text-base text-foreground leading-relaxed">{primaryNote}</p>
+                      )}
                       {secondaryNote && (
-                        <p className="text-base text-foreground leading-relaxed mt-1">{secondaryNote}</p>
+                        <p className="text-base text-foreground leading-relaxed mt-1">
+                          {secondaryNote}
+                        </p>
                       )}
                       <div className="space-y-1 mt-2">
                         {medicationDisplayName && (

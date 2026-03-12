@@ -8,7 +8,7 @@ export default function ChatMessage({ message }) {
         className={`max-w-[86%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap break-words shadow-sm ${
           isUser
             ? 'rounded-br-md bg-primary text-primary-foreground'
-            : 'rounded-bl-md border border-secondary/50 bg-white text-foreground'
+            : 'rounded-bl-md border border-secondary/50 bg-card text-foreground'
         }`}
       >
         <p

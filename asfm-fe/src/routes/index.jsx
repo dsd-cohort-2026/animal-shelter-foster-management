@@ -93,7 +93,7 @@ function RouteComponent() {
                 className="block w-[90%] md:w-full h-auto m-auto rounded-2xl"
                 loading="lazy"
               />
-              <div className="absolute bg-white/90 bottom-[10%] w-[90%] md:w-full min-h-50 px-2.5 py-5 left-[50%] md:left-0 translate-x-[-50%] md:translate-none">
+              <div className="absolute bg-card/90 bottom-[10%] w-[90%] md:w-full min-h-50 px-2.5 py-5 left-[50%] md:left-0 translate-x-[-50%] md:translate-none">
                 <h3 className="text-xl md:text-h2">1. Foster parent checks out supplies</h3>
                 <p className="text-sm md:text-md">
                   Crates, food, and medications are logged with animal's name
@@ -107,7 +107,7 @@ function RouteComponent() {
                 className="block w-[90%] md:w-full h-auto m-auto rounded-2xl"
                 loading="lazy"
               />
-              <div className="absolute bg-white/90 bottom-[10%] w-[90%] md:w-full min-h-50 px-2.5 py-5 left-[50%] md:left-0 translate-x-[-50%] md:translate-none">
+              <div className="absolute bg-card/90 bottom-[10%] w-[90%] md:w-full min-h-50 px-2.5 py-5 left-[50%] md:left-0 translate-x-[-50%] md:translate-none">
                 <h3 className="text-xl md:text-h2">2. Medical care gets recorded daily</h3>
                 <p className="text-sm md:text-md">
                   Foster parents log medications and behavior changes as they happen
@@ -121,7 +121,7 @@ function RouteComponent() {
                 className="block w-[90%] md:w-full h-auto m-auto rounded-2xl"
                 loading="lazy"
               />
-              <div className="absolute bg-white/90 bottom-[10%] w-[90%] md:w-full min-h-50 px-2.5 py-5 left-[50%] md:left-0 translate-x-[-50%] md:translate-none">
+              <div className="absolute bg-card/90 bottom-[10%] w-[90%] md:w-full min-h-50 px-2.5 py-5 left-[50%] md:left-0 translate-x-[-50%] md:translate-none">
                 <h3 className="text-xl md:text-h2">3. Animal returns with complete history</h3>
                 <p className="text-sm md:text-md">
                   The shelter has every detail needed to continue care without gaps

@@ -13,12 +13,12 @@ function ConfirmationDialog({ primaryText, secondaryText, button, onClose, type 
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg p-12 max-w-105 w-[90%] shadow-lg relative flex flex-col items-center text-center"
+        className="bg-card rounded-lg p-12 max-w-105 w-[90%] shadow-lg relative flex flex-col items-center text-center"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-4xl cursor-pointer w-9 h-9 text-gray-600 hover:text-gray-800"
+          className="absolute top-3 right-3 text-4xl cursor-pointer w-9 h-9 text-muted-foreground hover:text-foreground"
         >
           ×
         </button>
@@ -26,7 +26,7 @@ function ConfirmationDialog({ primaryText, secondaryText, button, onClose, type 
         <div className="mb-6 mt-2">{iconMap[type]}</div>
         <h2 className="text-xl font-semibold mb-3 mt-0">{primaryText}</h2>
 
-        <p className="text-sm text-gray-600 mb-8 leading-relaxed">{secondaryText}</p>
+        <p className="text-sm text-muted-foreground mb-8 leading-relaxed">{secondaryText}</p>
 
         <Button
           variant={type === 'success' ? 'secondary' : 'destructive'}
