@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useBoundStore } from '@/store';
-import heroImage from '@/assets/asfm-hero.jpeg';
+import heroImage from '@/assets/asfm-hero.webp';
 import checkoutImage from '@/assets/checkout.jpeg';
 import medicationImage from '@/assets/medication.jpeg';
 import historyImage from '@/assets/history.jpeg';
@@ -52,7 +52,7 @@ function RouteComponent() {
           </div>
           <img
             src={heroImage}
-            className="h-auto w-3xl aspect-square max-w-[90vw] md:max-w-[50vw] md:w-auto"
+            className="h-auto w-3xl aspect-square max-w-[90vw] md:max-w-[50vw] md:w-auto rounded-r-2xl"
             alt="woman sitting in chair with tablet adn petting a dog"
           />
         </div>
