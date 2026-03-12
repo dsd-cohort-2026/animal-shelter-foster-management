@@ -11,7 +11,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from './ui/sheet';
-import { Menu } from 'lucide-react';
+import { Menu, User, UserStar } from 'lucide-react';
 
 function NavBar() {
   const navigate = useNavigate();
@@ -91,18 +91,11 @@ function NavBar() {
                     </Button>
                   </SheetClose>
                   {user && (
-                    <>
-                      <div>
-                        <div className="bg-gray-200 px-4 py-2 rounded-2xl text-center">
-                          {userRole && userRole[0] + userRole.slice(1).toLowerCase()}
-                        </div>
-                      </div>
-                      <SheetClose asChild>
-                        <Button variant="outline" onClick={handleSignOut}>
-                          Sign Out
-                        </Button>
-                      </SheetClose>
-                    </>
+                    <SheetClose asChild>
+                      <Button variant="outline" onClick={handleSignOut}>
+                        Sign Out
+                      </Button>
+                    </SheetClose>
                   )}
                 </SheetContent>
               </Sheet>
@@ -174,18 +167,11 @@ function NavBar() {
                     </Button>
                   </SheetClose>
                   {user && (
-                    <>
-                      <div>
-                        <div className="bg-gray-200 px-4 py-2 rounded-2xl text-center">
-                          {userRole && userRole[0] + userRole.slice(1).toLowerCase()}
-                        </div>
-                      </div>
-                      <SheetClose asChild>
-                        <Button variant="outline" onClick={handleSignOut}>
-                          Sign Out
-                        </Button>
-                      </SheetClose>
-                    </>
+                    <SheetClose asChild>
+                      <Button variant="outline" onClick={handleSignOut}>
+                        Sign Out
+                      </Button>
+                    </SheetClose>
                   )}
                 </SheetContent>
               </Sheet>
@@ -218,7 +204,6 @@ function NavBar() {
         )}
       </div>
 
-
       {/* Authenticated Section*/}
       <div className="flex items-center gap-1 md:gap-3 ml-auto">
         {isLoading ? null : (
@@ -235,9 +220,11 @@ function NavBar() {
             {userRole && !showHamburger && (
               <>
                 <div>
-                  <div className="bg-gray-200 px-4 py-2 rounded-2xl">
-                    {userRole && userRole[0] + userRole.slice(1).toLowerCase()}
-                  </div>
+                  {userRole === 'USER' ? (
+                    <User size={28} className="text-primary" />
+                  ) : (
+                    <UserStar size={28} className="text-primary" />
+                  )}
                 </div>
                 <Button variant="outline" onClick={handleSignOut}>
                   Sign Out
