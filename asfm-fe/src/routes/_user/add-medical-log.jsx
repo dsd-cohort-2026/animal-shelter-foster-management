@@ -17,6 +17,7 @@ function AddMedicalLogPage() {
   const user = useBoundStore((state) => state.user);
 
   const [animals, setAnimals] = useState([]);
+  const [medications, setMedications] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [confirmation, setConfirmation] = useState(null);
@@ -26,24 +27,41 @@ function AddMedicalLogPage() {
     setLoadingAnimals(true);
     setSubmitError('');
     try {
-      const response = await apiClient.get('/animals');
-      const rawAnimals = response?.data || [];
+      const [animalsResponse, itemsResponse] = await Promise.all([
+        apiClient.get('/animals'),
+        apiClient.get('/items'),
+      ]);
+      const rawAnimals = animalsResponse?.data || [];
+      const rawItems = itemsResponse?.data || [];
 
       // Validate response is an array
       if (!Array.isArray(rawAnimals)) {
         throw new Error('Unexpected response format from server: expected array of animals');
       }
+      if (!Array.isArray(rawItems)) {
+        throw new Error('Unexpected response format from server: expected array of items');
+      }
 
       // Filter to show only fostered animals
       // Note: The backend will validate the active assignment when creating the log
-      const fosteredAnimals = rawAnimals.filter(animal => 
-        animal.foster_status === 'FOSTERED'
-      );
-      
+      const fosteredAnimals = rawAnimals.filter((animal) => animal.foster_status === 'FOSTERED');
+      const medicationOptions = rawItems
+        .filter((item) => item?.category === 'MEDICINE' && item?.medication_id)
+        .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+        .map((item) => ({
+          id: item.medication_id,
+          item_name: item.name,
+          item_brand: item.brand,
+          recommended_dose: item.medication?.recommended_dose || '',
+          administration_route: item.medication?.administration_route || '',
+          side_effects: item.medication?.side_effects || '',
+        }));
+
       setAnimals(fosteredAnimals);
+      setMedications(medicationOptions);
     } catch (err) {
       console.error('Error fetching animals:', err);
-      setSubmitError('Failed to load animals. Please try again.');
+      setSubmitError('Failed to load form options. Please try again.');
     } finally {
       setLoadingAnimals(false);
     }
@@ -74,6 +92,7 @@ function AddMedicalLogPage() {
           administered_at: new Date(formData.administered_at).toISOString() 
         }),
         ...(formData.prescription && { prescription: formData.prescription }),
+        ...(formData.medication_id && { medication_id: formData.medication_id }),
         // For foster users, include their ID to link to their foster account
         ...(user?.id && { foster_user_id: user.id }),
       };
@@ -133,6 +152,7 @@ function AddMedicalLogPage() {
                 formId="add-medical-log-form"
                 onSubmit={handleSubmit}
                 animals={animals}
+                medications={medications}
               />
               {submitError && <p className="text-sm text-red-500 mt-2">{submitError}</p>}
               <div className="flex justify-end gap-3 mt-6">
