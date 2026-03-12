@@ -23,6 +23,14 @@ function AddMedicalLogPage() {
   const [confirmation, setConfirmation] = useState(null);
   const [loadingAnimals, setLoadingAnimals] = useState(true);
 
+  const navigateBackToLogs = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      window.history.back();
+      return;
+    }
+    navigate({ to: '/timeline-view' });
+  };
+
   const fetchAnimals = async () => {
     setLoadingAnimals(true);
     try {
@@ -110,7 +118,7 @@ function AddMedicalLogPage() {
       <Button
         variant="ghost"
         className="-ml-2"
-        onClick={() => navigate({ to: '/admin-medical-logs' })}
+        onClick={navigateBackToLogs}
       >
         ← Back to Medical Logs
       </Button>
@@ -136,7 +144,7 @@ function AddMedicalLogPage() {
               <div className="flex justify-end gap-3 mt-6">
                 <Button
                   variant="outline"
-                  onClick={() => navigate({ to: '/admin-medical-logs' })}
+                  onClick={navigateBackToLogs}
                 >
                   Cancel
                 </Button>
@@ -154,7 +162,7 @@ function AddMedicalLogPage() {
         <ConfirmationDialog
           {...confirmation}
           button="Done"
-          onClose={() => navigate({ to: '/admin-medical-logs' })}
+          onClose={navigateBackToLogs}
         />
       )}
     </div>

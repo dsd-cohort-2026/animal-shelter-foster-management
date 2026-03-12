@@ -155,15 +155,7 @@ function NavBar() {
                   </SheetClose>
                   <SheetClose asChild>
                     <Button variant="outline" onClick={() => navigate({ to: '/timeline-view' })}>
-                      Med Log
-                    </Button>
-                  </SheetClose>
-                  <SheetClose asChild>
-                    <Button
-                      variant="outline"
-                      onClick={() => navigate({ to: '/admin-medical-logs' })}
-                    >
-                      Admin Logs
+                      Medical Logs
                     </Button>
                   </SheetClose>
                   {user && (
@@ -193,10 +185,7 @@ function NavBar() {
                   Loans
                 </Button>
                 <Button variant="outline" onClick={() => navigate({ to: '/timeline-view' })}>
-                  Med Log
-                </Button>
-                <Button variant="outline" onClick={() => navigate({ to: '/admin-medical-logs' })}>
-                  Admin Logs
+                  Medical Logs
                 </Button>
               </div>
             )}
