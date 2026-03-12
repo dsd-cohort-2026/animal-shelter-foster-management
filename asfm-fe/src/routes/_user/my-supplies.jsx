@@ -48,13 +48,12 @@ function RouteComponent() {
 
   const suppliesColumns = [
     {
-      accessorKey: 'item',
-      id: 'itemName',
-      header: 'Item Name',
+      accessorKey: 'created_at',
+      header: 'Loaned At',
       sortable: true,
       textSize: 'sm',
-      headClassName: 'min-w-[200px]',
-      cell: ({ row }) => row.original.item?.name ?? '—',
+      headClassName: 'min-w-[130px]',
+      cell: ({ row }) => formatDate(row.original.created_at),
     },
     {
       accessorKey: 'item',
@@ -67,20 +66,21 @@ function RouteComponent() {
     },
     {
       accessorKey: 'item',
+      id: 'itemName',
+      header: 'Item Name',
+      sortable: true,
+      textSize: 'sm',
+      headClassName: 'min-w-[200px]',
+      cell: ({ row }) => row.original.item?.name ?? '—',
+    },
+    {
+      accessorKey: 'item',
       id: 'itemDescription',
       header: 'Description',
       sortable: true,
       textSize: 'sm',
       headClassName: 'min-w-[200px]',
       cell: ({ row }) => row.original.item?.description ?? '—',
-    },
-    {
-      accessorKey: 'created_at',
-      header: 'Loaned At',
-      sortable: true,
-      textSize: 'sm',
-      headClassName: 'min-w-[130px]',
-      cell: ({ row }) => formatDate(row.original.created_at),
     },
     {
       accessorKey: 'status',
