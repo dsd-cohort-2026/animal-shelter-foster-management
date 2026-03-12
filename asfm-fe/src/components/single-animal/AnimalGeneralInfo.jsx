@@ -33,77 +33,75 @@ export function AnimalGeneralInfo({ isEditing, viewAnimal }) {
     ];
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-      <div className="space-y-6">
-        <Card className="overflow-hidden border-border/80 shadow-sm">
-          <CardHeader className="border-b bg-muted/20">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <HeartPulse className="size-[18px] text-primary" />
-              General Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-5">
-            <div className="grid gap-x-3 gap-y-4 sm:grid-cols-2 xl:grid-cols-3">
-              <AnimalInputGroup
-                isEditing={isEditing}
-                viewAnimal={viewAnimal}
-                htmlForLabel="species"
-                labelTitle="Species"
-                prop="species"
-              />
-              <AnimalInputGroup
-                isEditing={isEditing}
-                viewAnimal={viewAnimal}
-                htmlForLabel="sex"
-                labelTitle="Sex"
-                prop="sex"
-              />
-              <AnimalInputGroup
-                isEditing={isEditing}
-                viewAnimal={viewAnimal}
-                htmlForLabel="fixed-status"
-                labelTitle="Fixed Status"
-                prop="altered"
-              />
-              <AnimalInputGroup
-                isEditing={isEditing}
-                viewAnimal={viewAnimal}
-                htmlForLabel="age"
-                labelTitle="Age"
-                prop="age"
-                unit="yrs"
-              />
-              <AnimalInputGroup
-                isEditing={isEditing}
-                viewAnimal={viewAnimal}
-                htmlForLabel="weight"
-                labelTitle="Weight"
-                prop="weight"
-                unit="lbs"
-              />
-            </div>
-          </CardContent>
-        </Card>
+    <div className="grid items-start gap-6 xl:grid-cols-[1.2fr_0.8fr] xl:grid-rows-[auto_auto]">
+      <Card className="overflow-hidden border-border/80 shadow-sm xl:col-start-1 xl:row-start-1">
+        <CardHeader className="border-b bg-muted/20">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <HeartPulse className="size-[18px] text-primary" />
+            General Information
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-5">
+          <div className="grid gap-x-3 gap-y-4 sm:grid-cols-2 xl:grid-cols-3">
+            <AnimalInputGroup
+              isEditing={isEditing}
+              viewAnimal={viewAnimal}
+              htmlForLabel="species"
+              labelTitle="Species"
+              prop="species"
+            />
+            <AnimalInputGroup
+              isEditing={isEditing}
+              viewAnimal={viewAnimal}
+              htmlForLabel="sex"
+              labelTitle="Sex"
+              prop="sex"
+            />
+            <AnimalInputGroup
+              isEditing={isEditing}
+              viewAnimal={viewAnimal}
+              htmlForLabel="fixed-status"
+              labelTitle="Fixed Status"
+              prop="altered"
+            />
+            <AnimalInputGroup
+              isEditing={isEditing}
+              viewAnimal={viewAnimal}
+              htmlForLabel="age"
+              labelTitle="Age"
+              prop="age"
+              unit="yrs"
+            />
+            <AnimalInputGroup
+              isEditing={isEditing}
+              viewAnimal={viewAnimal}
+              htmlForLabel="weight"
+              labelTitle="Weight"
+              prop="weight"
+              unit="lbs"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
-        <Card className="overflow-hidden border-border/80 shadow-sm">
-          <CardHeader className="border-b bg-muted/20">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Sparkles className="size-[18px] text-primary" />
-              Personality & Favorites
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-5">
-            <div className="grid gap-2.5 md:grid-cols-3 xl:grid-cols-1">
-              {funFacts.map((fact) => (
-                <FunFact key={fact.label} label={fact.label} value={fact.value} />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="overflow-hidden border-border/80 shadow-sm xl:col-start-1 xl:row-start-2">
+        <CardHeader className="border-b bg-muted/20">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Sparkles className="size-[18px] text-primary" />
+            Personality & Favorites
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-5">
+          <div className="grid gap-2.5 md:grid-cols-3 xl:grid-cols-1">
+            {funFacts.map((fact) => (
+              <FunFact key={fact.label} label={fact.label} value={fact.value} />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-      <Card className="overflow-hidden border-border/80 py-0 gap-0 shadow-sm">
-        <div className="relative h-full min-h-full overflow-hidden bg-secondary/20">
+      <Card className="overflow-hidden border-border/80 py-0 gap-0 shadow-sm xl:col-start-2 xl:row-start-1 xl:row-span-2 xl:self-start">
+        <div className="relative aspect-[4/3] overflow-hidden bg-secondary/20 sm:aspect-[5/4] xl:h-[690px] xl:aspect-auto">
           <img
             src={imageUrl}
             alt={`${viewAnimal?.name ?? 'Animal'} profile`}
