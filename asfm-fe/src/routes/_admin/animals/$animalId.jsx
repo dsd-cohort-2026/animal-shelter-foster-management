@@ -150,9 +150,11 @@ function AnimalDetailPage() {
                   badgeClassName={STATUS_COLORS[animal.foster_status]}
                 />
               </div>
-              <div className="relative overflow-hidden rounded-lg w-50">
-                <img src={animal.picture} alt={`picture of ${animal.species} ${animal.name}`} />
-              </div>
+              {animal.picture && (
+                <div className="relative overflow-hidden rounded-lg w-50">
+                  <img src={animal.picture} alt={`picture of ${animal.species} ${animal.name}`} />
+                </div>
+              )}
             </div>
             <Button
               onClick={() => {
