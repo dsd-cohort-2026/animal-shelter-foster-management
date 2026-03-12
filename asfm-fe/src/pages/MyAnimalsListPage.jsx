@@ -1,5 +1,5 @@
 import MyAnimalCard from '@/components/my-animals/MyAnimalCard';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Spinner } from '@/components/ui/spinner';
 import { useBoundStore } from '@/store';
 import apiClient from '@/lib/axios';
@@ -10,6 +10,8 @@ import { PawPrint } from 'lucide-react';
 export default function MyAnimalsListPage() {
   const user = useBoundStore((state) => state.user);
   const [myAnimals, setMyAnimals] = useState([]);
+  const [userProfile, setUserProfile] = useState(null);
+  console.log('User profile:', userProfile);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const session = useBoundStore((state) => state.session);
@@ -19,23 +21,38 @@ export default function MyAnimalsListPage() {
     token = session.access_token;
   }
 
-  async function fetchMyAnimals() {
+  const fetchMyAnimals = useCallback(async () => {
+    if (!user?.id) return;
+
+    setIsLoading(true);
+    setIsError(false);
+
     try {
-      const response = await apiClient.get('/animals');
-      setMyAnimals(response.data);
+      const [animalsResponse, userResponse] = await Promise.all([
+        apiClient.get('/animals'),
+        apiClient.get(`/users/${user.id}`),
+      ]);
+
+      setMyAnimals(animalsResponse.data);
+      setUserProfile(userResponse.data);
     } catch (err) {
       console.error(err);
       setIsError(true);
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [user?.id]);
 
   useEffect(() => {
-    if (user && token) {
+    if (user?.id && token) {
       fetchMyAnimals();
     }
-  }, [user, token]);
+  }, [fetchMyAnimals, user?.id, token]);
+
+  const userDisplayName =
+    [userProfile?.first_name, userProfile?.last_name].filter(Boolean).join(' ') ||
+    user?.email ||
+    'your profile';
 
   if (isLoading)
     return (
@@ -73,7 +90,7 @@ export default function MyAnimalsListPage() {
               My Animals
             </h1>
             <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-              User ID: {user?.id} — animals currently assigned to your foster care.
+              Hello {userDisplayName}, these are the animals currently assigned to your foster care.
             </p>
             <div className="flex items-center gap-3 mt-3 flex-wrap">
               <Badge variant="secondary" className="font-medium">

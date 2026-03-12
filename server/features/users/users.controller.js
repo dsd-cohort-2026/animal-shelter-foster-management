@@ -13,6 +13,12 @@ exports.getAllUsers = async (req, res) => {
 exports.getUserById = async (req, res) => {
   try {
     const { id } = req.params;
+    const requester = req.user;
+
+    if (requester.role !== 'STAFF' && requester.id !== id) {
+      return res.status(403).json({ message: 'You are not permitted to access this user' });
+    }
+
     const user = await userService.getUserById(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
