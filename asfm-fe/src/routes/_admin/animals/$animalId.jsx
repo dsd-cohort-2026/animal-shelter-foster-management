@@ -141,13 +141,20 @@ function AnimalDetailPage() {
         </Button>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between gap-4 pb-4 border-b">
-            <div className="flex items-center gap-3">
-              <CardTitle className="text-2xl">{animal.name}</CardTitle>
-              <CustomBadge
-                text={formatStatus(animal.foster_status)}
-                badgeClassName={STATUS_COLORS[animal.foster_status]}
-              />
+          <CardHeader className="flex flex-row items-start justify-between gap-4 pb-4 border-b">
+            <div className="flex flex-col items-start gap-3 w-1/2 ">
+              <div className="flex gap-3 content-start">
+                <CardTitle className="text-2xl">{animal.name}</CardTitle>
+                <CustomBadge
+                  text={formatStatus(animal.foster_status)}
+                  badgeClassName={STATUS_COLORS[animal.foster_status]}
+                />
+              </div>
+              {animal.picture && (
+                <div className="relative overflow-hidden rounded-lg w-50">
+                  <img src={animal.picture} alt={`picture of ${animal.species} ${animal.name}`} />
+                </div>
+              )}
             </div>
             <Button
               onClick={() => {
