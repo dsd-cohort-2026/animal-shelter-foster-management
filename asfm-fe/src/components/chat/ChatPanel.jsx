@@ -101,7 +101,7 @@ export default function ChatPanel() {
       <CardHeader className="bg-gradient-to-r from-secondary/40 via-accent/30 to-transparent px-4 py-0 [&&]:grid-rows-[auto] [&&]:gap-0">
         <div className="flex items-center justify-between gap-3 border-b border-secondary/40 py-3">
           <div className="flex items-center gap-2.5">
-            <div className="grid h-9 w-9 place-items-center rounded-full border border-white/70 bg-white shadow-sm">
+            <div className="grid h-9 w-9 place-items-center rounded-full border border-border bg-card shadow-sm">
               <img src={logo} alt="ShelterSync logo" className="h-7 w-7 object-contain" loading="lazy" />
             </div>
             <div className="leading-tight">
@@ -111,7 +111,7 @@ export default function ChatPanel() {
               </p>
             </div>
           </div>
-          <span className="rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-medium text-primary">
+          <span className="rounded-full bg-card/80 px-2.5 py-1 text-[11px] font-medium text-primary">
             {roleBadgeLabel}
           </span>
         </div>
@@ -132,7 +132,7 @@ export default function ChatPanel() {
         <div ref={bottomRef} />
       </CardContent>
 
-      <CardFooter className="border-t border-secondary/40 bg-white/80 p-3">
+      <CardFooter className="border-t border-secondary/40 bg-card/80 p-3">
         <form onSubmit={handleSubmit} className="flex w-full items-center gap-2">
           <Input
             value={input}
@@ -140,7 +140,7 @@ export default function ChatPanel() {
             placeholder={isGuest ? 'Ask about app features or FAQs...' : 'Ask about ShelterSync data...'}
             disabled={isLoading}
             maxLength={500}
-            className="h-11 rounded-full border-secondary/60 bg-white"
+            className="h-11 rounded-full border-secondary/60 bg-card"
           />
           <Button
             type="submit"

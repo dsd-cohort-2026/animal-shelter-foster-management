@@ -16,7 +16,7 @@ export function CompactFilterBar({
 
   return (
     <div className={className}>
-      <div className="flex items-center gap-2 p-2.5 bg-white border border-gray-200 rounded-lg">
+      <div className="flex items-center gap-2 p-2.5 bg-card border border-border rounded-lg">
         {/* Filters */}
         <div className="flex items-center gap-2 flex-1 min-w-0">{children}</div>
 

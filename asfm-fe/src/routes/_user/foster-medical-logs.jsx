@@ -242,7 +242,7 @@ function FosterLogsPage() {
           data={tableData}
           isLoading={loading}
           headerClassName="bg-secondary text-primary-foreground"
-          tablebodyRowClassName="bg-white hover:bg-secondary/20"
+          tablebodyRowClassName="bg-card hover:bg-secondary/20"
           containerClassName="rounded-lg border border-gray-200 shadow-sm relative w-full"
           enablePagination={true}
           enableColumnVisibility={true}

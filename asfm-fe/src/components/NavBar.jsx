@@ -11,7 +11,8 @@ import {
   SheetTitle,
   SheetDescription,
 } from './ui/sheet';
-import { Menu } from 'lucide-react';
+import { Menu, Moon, Sun } from 'lucide-react';
+import { useTheme } from '@/hooks/useTheme';
 
 function NavBar() {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ function NavBar() {
   const signOut = useBoundStore((state) => state.signOut);
   const [showHamburger, setShowHamburger] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { theme, toggleTheme } = useTheme();
 
   const handleSignOut = () => {
     signOut();
@@ -220,6 +222,9 @@ function NavBar() {
 
       {/* Authenticated Section*/}
       <div className="flex items-center gap-1 md:gap-3 ml-auto">
+        <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
+          {theme === 'dark' ? <Sun className="size-5" /> : <Moon className="size-5" />}
+        </Button>
         {isLoading ? null : (
           <>
             {userRole !== 'STAFF' && userRole !== 'USER' && (
