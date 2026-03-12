@@ -6,6 +6,7 @@ import MedicalLogCard from '@/components/single-animal/MedicalLogCard';
 import { AnimalGeneralInfo } from '@/components/single-animal/AnimalGeneralInfo';
 import { fetchAnimal, fetchAnimalMedicalLogs } from '@/services/singleAnimalPageService';
 import { useBoundStore } from '@/store';
+import { PawPrint } from 'lucide-react';
 
 export default function SingleAnimalPage({ id }) {
   const [viewAnimal, setViewAnimal] = useState('');
@@ -64,10 +65,21 @@ export default function SingleAnimalPage({ id }) {
       </div>
     );
   }
-
   return (
     <>
-      <div className="max-w-7xl mx-auto py-20 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto  px-4 sm:px-6 lg:px-8">
+              <div className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-8">
+        <div className="flex items-start gap-4">
+          <div className="flex items-center justify-center size-12 sm:size-14 rounded-xl bg-secondary/20 shrink-0">
+            <PawPrint className="size-6 sm:size-7 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+              {viewAnimal.name}
+            </h1>
+          </div>
+        </div>
+      </div>
         <article>
           <AnimalGeneralInfo viewAnimal={viewAnimal} />
           <Card className="mt-10">
@@ -87,3 +99,4 @@ export default function SingleAnimalPage({ id }) {
     </>
   );
 }
+
