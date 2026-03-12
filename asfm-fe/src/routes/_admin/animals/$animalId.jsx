@@ -151,7 +151,7 @@ function AnimalDetailPage() {
                 />
               </div>
               <div className="relative overflow-hidden rounded-lg w-50">
-                <img src={animal.picture} className="" />
+                <img src={animal.picture} alt={`picture of ${animal.species} ${animal.name}`} />
               </div>
             </div>
             <Button
