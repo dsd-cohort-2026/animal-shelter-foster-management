@@ -65,21 +65,13 @@ function NavBar() {
                 <SheetTrigger asChild>
                   <Menu className="ml-auto" />
                 </SheetTrigger>
-                <SheetContent side="right" className="flex flex-col gap-3 pt-10">
+                <SheetContent side="right" className="flex flex-col gap-3 pt-10 px-4">
                   <SheetTitle className="text-lg font-semibold sr-only" sr-only="true">
                     User Menu
                   </SheetTitle>
                   <SheetDescription className="sr-only" sr-only="true">
                     Actions for navigating through your user resources
                   </SheetDescription>
-                  <SheetClose asChild>
-                    <Button
-                      variant="outline"
-                      onClick={() => navigate({ to: '/foster-medical-logs' })}
-                    >
-                      My Foster Logs
-                    </Button>
-                  </SheetClose>
                   <SheetClose asChild>
                     <Button variant="outline" onClick={() => navigate({ to: '/my-animals' })}>
                       My Animals
@@ -88,6 +80,14 @@ function NavBar() {
                   <SheetClose asChild>
                     <Button variant="outline" onClick={() => navigate({ to: '/my-supplies' })}>
                       My Supplies
+                    </Button>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Button
+                      variant="outline"
+                      onClick={() => navigate({ to: '/foster-medical-logs' })}
+                    >
+                      My Foster Logs
                     </Button>
                   </SheetClose>
                   {user && (
@@ -107,15 +107,15 @@ function NavBar() {
                 </SheetContent>
               </Sheet>
             ) : (
-              <div className="contents hidden lg:contents">
-                <Button variant="outline" onClick={() => navigate({ to: '/foster-medical-logs' })}>
-                  My Foster Logs
-                </Button>
+              <div className="hidden lg:contents">
                 <Button variant="outline" onClick={() => navigate({ to: '/my-animals' })}>
                   My Animals
                 </Button>
                 <Button variant="outline" onClick={() => navigate({ to: '/my-supplies' })}>
                   My Supplies
+                </Button>
+                <Button variant="outline" onClick={() => navigate({ to: '/foster-medical-logs' })}>
+                  My Foster Logs
                 </Button>
               </div>
             )}
@@ -128,7 +128,7 @@ function NavBar() {
                 <SheetTrigger asChild>
                   <Menu className="ml-auto" />
                 </SheetTrigger>
-                <SheetContent side="right" className="flex flex-col gap-3 pt-10">
+                <SheetContent side="right" className="flex flex-col gap-3 pt-10 px-4">
                   <SheetTitle className="text-lg font-semibold sr-only" sr-only="true">
                     Navbar Menu
                   </SheetTitle>
@@ -190,7 +190,7 @@ function NavBar() {
                 </SheetContent>
               </Sheet>
             ) : (
-              <div className="contents hidden lg:contents">
+              <div className="hidden lg:contents">
                 <Button variant="outline" onClick={() => navigate({ to: '/admin-portal' })}>
                   Admin Portal
                 </Button>
@@ -217,7 +217,6 @@ function NavBar() {
           </>
         )}
       </div>
-
 
       {/* Authenticated Section*/}
       <div className="flex items-center gap-1 md:gap-3 ml-auto">
