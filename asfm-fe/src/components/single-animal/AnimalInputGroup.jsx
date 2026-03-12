@@ -1,6 +1,5 @@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import handleChange from '@/utils/single-animal/handleAnimalForm';
 
 export default function AnimalInputGroup({
   isEditing,
@@ -10,6 +9,20 @@ export default function AnimalInputGroup({
   prop,
   unit,
 }) {
+  const rawValue = viewAnimal[prop];
+  const displayValue = rawValue || rawValue === 0 ? `${rawValue}${unit ? ` ${unit}` : ''}` : 'Unknown';
+
+  if (!isEditing) {
+    return (
+      <div className="rounded-2xl border bg-background px-4 py-4 shadow-sm">
+        <span className="block text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
+          {labelTitle}
+        </span>
+        <span className="mt-2 block text-base font-semibold text-foreground">{displayValue}</span>
+      </div>
+    );
+  }
+
   return (
     <div>
       <Label htmlFor={htmlForLabel} className={'pl-2 pb-1'}>
@@ -18,9 +31,9 @@ export default function AnimalInputGroup({
       <div className="relative">
         <Input
           id={htmlForLabel}
-          className={`${isEditing ? ' ' : 'focus-visible:border-none focus-visible:ring-0 bg-gray-100 cursor-text'}`}
+          className="bg-background"
           readOnly={!isEditing}
-          value={viewAnimal[prop] ?? ''}
+          value={rawValue ?? ''}
         />
         {unit && (
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
