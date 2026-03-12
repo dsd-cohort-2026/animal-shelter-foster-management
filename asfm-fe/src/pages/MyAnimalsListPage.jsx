@@ -11,7 +11,6 @@ export default function MyAnimalsListPage() {
   const user = useBoundStore((state) => state.user);
   const [myAnimals, setMyAnimals] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
-  console.log('User profile:', userProfile);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const session = useBoundStore((state) => state.session);
