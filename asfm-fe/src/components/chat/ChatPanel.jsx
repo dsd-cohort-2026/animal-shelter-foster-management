@@ -24,10 +24,15 @@ const LOG_PREFIX = '[ChatPanel]';
 export default function ChatPanel() {
   const session = useBoundStore((state) => state.session);
   const user = useBoundStore((state) => state.user);
+  const userRole = useBoundStore((state) => state.userRole);
   const isGuest = !session && !user;
-  const normalizedRole = typeof user?.role === 'string' ? user.role.toUpperCase() : null;
-  const roleLabel =
-    normalizedRole === 'STAFF' ? 'Staff' : normalizedRole === 'USER' ? 'User' : 'User';
+  const normalizedRole =
+    typeof userRole === 'string'
+      ? userRole.toUpperCase()
+      : typeof user?.role === 'string'
+        ? user.role.toUpperCase()
+        : null;
+  const roleLabel = normalizedRole === 'STAFF' ? 'Staff' : 'Foster';
   const roleBadgeLabel = isGuest ? 'Guest' : `Signed in as ${roleLabel}`;
 
   const [messages, setMessages] = useState(() => [

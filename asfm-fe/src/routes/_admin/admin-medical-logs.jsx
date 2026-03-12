@@ -174,16 +174,24 @@ function AdminLogsPage() {
   const { total: totalLogs, medical: medicalCount, behavioral: behavioralCount, veterinary: veterinaryCount } = calculateLogStats(allLogs);
 
   // Admin columns = base columns + created_by_type and creator_name after administered_at
+  const administeredAtColumnIndex = MEDICAL_LOG_BASE_COLUMNS.findIndex(
+    (column) => column.accessorKey === 'administered_at'
+  );
   const columns = [
-    ...MEDICAL_LOG_BASE_COLUMNS.slice(0, 5), // animal_name through administered_at
+    ...MEDICAL_LOG_BASE_COLUMNS.slice(0, administeredAtColumnIndex + 1),
     { accessorKey: 'created_by_type', header: 'Created By Type', textSize: 'sm' },
     { accessorKey: 'creator_name', header: 'Creator Name', textSize: 'sm' },
-    ...MEDICAL_LOG_BASE_COLUMNS.slice(5), // logged_at through behavior_notes
+    ...MEDICAL_LOG_BASE_COLUMNS.slice(administeredAtColumnIndex + 1),
   ];
 
   const tableData = filteredLogs.map((log) => ({
     ...log,
     animal_name: log.animal_name || '—',
+    medication_name:
+      log?.medication?.item?.name ||
+      (log?.dose || log?.prescription || log?.administered_at || log?.qty_administered != null
+        ? 'Medication not specified'
+        : '—'),
     logTypeBadge: (
       <CustomBadge
         text={formatLogType(log.category)}
@@ -294,6 +302,7 @@ function AdminLogsPage() {
           defaultVisibleColumns={[
             'animal_name',
             'logTypeBadge',
+            'medication_name',
             'administered_at',
             'created_by_type',
             'creator_name',

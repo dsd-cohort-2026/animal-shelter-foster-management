@@ -1,25 +1,22 @@
 import CustomBadge from '@/components/custom/CustomBadge';
-import { fetchMedicationItem } from '@/services/medicalLogCardService';
-import { useState, useEffect } from 'react';
 
 export default function MedicalLogCard({ log }) {
-  const [item, setItem] = useState('');
-  const logCategory = log?.category[0] + log?.category.slice(1).toLowerCase();
+  const logCategory =
+    typeof log?.category === 'string'
+      ? log.category[0] + log.category.slice(1).toLowerCase()
+      : 'Unknown';
   const formattedDate = new Date(log.logged_at).toUTCString();
-
-  useEffect(() => {
-    async function load() {
-      // This is broken, needs medical-log creation and BE services to be updated
-      const itemData = await fetchMedicationItem(log.medication_id);
-      if (!itemData) return setItem(null);
-      setItem(itemData);
-    }
-
-    // don't run due to 404 errors
-    // if (log.medication_id) {
-    //   load();
-    // }
-  }, [log.medication_id]);
+  const medicationName = log?.medication?.item?.name;
+  const administrationRoute = log?.medication?.administration_route;
+  const recommendedDose = log?.medication?.recommended_dose;
+  const hasMedicationData = Boolean(
+    medicationName ||
+      administrationRoute ||
+      recommendedDose ||
+      log?.dose ||
+      log?.prescription ||
+      log?.qty_administered != null,
+  );
 
   return (
     <div className="ring-1 p-2 rounded-lg">
@@ -35,12 +32,15 @@ export default function MedicalLogCard({ log }) {
       </div>
       <div className="pt-5">
         <span className="text-lg font-semibold">Medications:</span>
-        {item ? (
-          <span className="block pt-2">
-            {item.name} {log.dose && `- Dosage: ${log.dose} dose`}{' '}
-            {log.prescription && `- Prescription: ${log.prescription}`}{' '}
-            {item.medication && `- Administration Route: ${item.medication.administration_route}`}
-          </span>
+        {hasMedicationData ? (
+          <div className="block pt-2 space-y-1">
+            {medicationName && <p>{medicationName}</p>}
+            {log.dose && <p>Dosage: {log.dose}</p>}
+            {log.qty_administered != null && <p>Quantity Administered: {log.qty_administered}</p>}
+            {log.prescription && <p>Prescription: {log.prescription}</p>}
+            {administrationRoute && <p>Administration Route: {administrationRoute}</p>}
+            {recommendedDose && <p>Recommended Dose: {recommendedDose}</p>}
+          </div>
         ) : (
           <span className="block pt-2">None</span>
         )}

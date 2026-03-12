@@ -13,6 +13,7 @@ import { LOG_TYPE_OPTIONS } from '@/constants/medicalLogConstants';
 
 const EMPTY_DEFAULTS = {
   animal_id: '',
+  medication_id: '',
   category: '',
   logged_at: new Date().toISOString().slice(0, 16),
   general_notes: '',
@@ -30,7 +31,6 @@ import {
   ComboboxEmpty,
   ComboboxList,
   ComboboxCollection,
-  ComboboxValue,
 } from '@/components/ui/combobox';
 import { useBoundStore } from '@/store';
 
@@ -51,7 +51,13 @@ const notInFuture =
     return undefined;
   };
 
-export default function MedicalLogForm({ formId, onSubmit, initialValues = {}, animals = [] }) {
+export default function MedicalLogForm({
+  formId,
+  onSubmit,
+  initialValues = {},
+  animals = [],
+  medications = [],
+}) {
   const medicalLogs = useBoundStore((state) => state.medicalLogs) || [];
 
   // Get unique animal names from medical logs (fallback if no animals prop)
@@ -82,16 +88,7 @@ export default function MedicalLogForm({ formId, onSubmit, initialValues = {}, a
 
   const form = useForm({
     defaultValues: { ...EMPTY_DEFAULTS, ...initialValues },
-    onSubmit: async ({ value, formApi }) => {
-      // Validate all fields before submission
-      await formApi.validateAllFields('change');
-      
-      // Check if form has any errors
-      const state = formApi.getState();
-      if (state.isSubmitting || state.errors.length > 0) {
-        return; // Don't submit if there are validation errors
-      }
-      
+    onSubmit: async ({ value }) => {
       // Convert animal name to animal ID for submission
       const animalId = animalNameToIdMap.get(value.animal_id);
       
@@ -239,6 +236,31 @@ export default function MedicalLogForm({ formId, onSubmit, initialValues = {}, a
               placeholder="Any behavioral observations..."
               rows={2}
             />
+          </div>
+        )}
+      </form.Field>
+
+      {/* Medication */}
+      <form.Field name="medication_id">
+        {(field) => (
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium">Medication</label>
+            <Select
+              value={field.state.value || 'none'}
+              onValueChange={(value) => field.handleChange(value === 'none' ? '' : value)}
+            >
+              <SelectTrigger className="w-full" onBlur={field.handleBlur}>
+                <SelectValue placeholder="Select medication (optional)" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No linked medication</SelectItem>
+                {medications.map((medication) => (
+                  <SelectItem key={medication.id} value={medication.id}>
+                    {medication.item_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
       </form.Field>
