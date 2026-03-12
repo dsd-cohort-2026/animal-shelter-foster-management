@@ -7,7 +7,6 @@ import MedicalLogForm from '@/components/medical-logs/MedicalLogForm';
 import { Loader2 } from 'lucide-react';
 import apiClient from '@/lib/axios';
 import { useBoundStore } from '@/store';
-import { formatDateTime } from '@/utils/medicalLogUtils';
 
 export const Route = createFileRoute('/_admin/medical-logs-add')({
   id: '/admin-medical-logs-add',
@@ -18,6 +17,7 @@ function AddMedicalLogPage() {
   const navigate = useNavigate();
   const user = useBoundStore((state) => state.user);
   const [animals, setAnimals] = useState([]);
+  const [medications, setMedications] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [confirmation, setConfirmation] = useState(null);
@@ -26,18 +26,38 @@ function AddMedicalLogPage() {
   const fetchAnimals = async () => {
     setLoadingAnimals(true);
     try {
-      const response = await apiClient.get('/animals', { params: { limit: 10000 } });
-      const rawAnimals = response?.data || [];
+      const [animalsResponse, itemsResponse] = await Promise.all([
+        apiClient.get('/animals', { params: { limit: 10000 } }),
+        apiClient.get('/items'),
+      ]);
+      const rawAnimals = animalsResponse?.data || [];
+      const rawItems = itemsResponse?.data || [];
 
       // Validate response is an array
       if (!Array.isArray(rawAnimals)) {
         throw new Error('Unexpected response format from server: expected array of animals');
       }
+      if (!Array.isArray(rawItems)) {
+        throw new Error('Unexpected response format from server: expected array of items');
+      }
+
+      const medicationOptions = rawItems
+        .filter((item) => item?.category === 'MEDICINE' && item?.medication_id)
+        .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+        .map((item) => ({
+          id: item.medication_id,
+          item_name: item.name,
+          item_brand: item.brand,
+          recommended_dose: item.medication?.recommended_dose || '',
+          administration_route: item.medication?.administration_route || '',
+          side_effects: item.medication?.side_effects || '',
+        }));
 
       setAnimals(rawAnimals);
+      setMedications(medicationOptions);
     } catch (err) {
       console.error('Error fetching animals:', err);
-      setSubmitError('Failed to load animals. Please try again.');
+      setSubmitError('Failed to load form options. Please try again.');
     } finally {
       setLoadingAnimals(false);
     }
@@ -110,6 +130,7 @@ function AddMedicalLogPage() {
                 formId="add-medical-log-form"
                 onSubmit={handleSubmit}
                 animals={filteredAnimals}
+                medications={medications}
               />
               {submitError && <p className="text-sm text-red-500 mt-2">{submitError}</p>}
               <div className="flex justify-end gap-3 mt-6">

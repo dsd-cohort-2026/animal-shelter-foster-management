@@ -142,6 +142,11 @@ function FosterLogsPage() {
   const tableData = filteredLogs.map((log) => ({
     ...log,
     animal_name: log.animal_name || '—',
+    medication_name:
+      log?.medication?.item?.name ||
+      (log?.dose || log?.prescription || log?.administered_at || log?.qty_administered != null
+        ? 'Medication not specified'
+        : '—'),
     logTypeBadge: (
       <CustomBadge
         text={formatLogType(log.category)}
@@ -245,14 +250,16 @@ function FosterLogsPage() {
           tablebodyRowClassName="bg-white hover:bg-secondary/20"
           containerClassName="rounded-lg border border-gray-200 shadow-sm relative w-full"
           enablePagination={true}
-          enableColumnVisibility={true}
+          enableColumnVisibility={false}
           pageSize={15}
           defaultVisibleColumns={[
             'animal_name',
             'logTypeBadge',
+            'medication_name',
             'administered_at',
             'logged_at',
             'general_notes',
+            'behavior_notes',
             'dose',
           ]}
         />

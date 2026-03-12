@@ -1,6 +1,50 @@
 const medicalLogRepository = require('./medical-logs.repository');
 const prisma = require('../../connections/prisma-client');
 
+const mapMedication = (medication) => {
+  if (!medication) {
+    return null;
+  }
+
+  return {
+    id: medication.id,
+    item_id: medication.item_id,
+    recommended_dose: medication.recommended_dose,
+    side_effects: medication.side_effects,
+    administration_route: medication.administration_route,
+    item: medication.item
+      ? {
+          id: medication.item.id,
+          name: medication.item.name,
+          brand: medication.item.brand,
+          category: medication.item.category,
+          species: medication.item.species,
+          unit: medication.item.unit,
+          description: medication.item.description,
+          is_active: medication.item.is_active,
+        }
+      : null,
+  };
+};
+
+const mapMedicalLog = (medicalLog) => ({
+  id: medicalLog.id,
+  foster_user_id: medicalLog.foster_user_id,
+  animal_id: medicalLog.animal_id,
+  assignment_id: medicalLog.assignment_id,
+  logged_at: medicalLog.logged_at,
+  category: medicalLog.category,
+  general_notes: medicalLog.general_notes,
+  behavior_notes: medicalLog.behavior_notes,
+  medication_id: medicalLog.medication_id,
+  medication: mapMedication(medicalLog.medication),
+  qty_administered: medicalLog.qty_administered,
+  dose: medicalLog.dose,
+  administered_at: medicalLog.administered_at,
+  prescription: medicalLog.prescription,
+  documents: medicalLog.documents,
+});
+
 exports.getAllMedicalLogs = async (user) => {
   const where = {};
 
@@ -9,22 +53,7 @@ exports.getAllMedicalLogs = async (user) => {
   }
 
   const medicalLogs = await medicalLogRepository.findAll(where);
-  return medicalLogs.map(medicalLog => ({
-    id: medicalLog.id,
-    foster_user_id: medicalLog.foster_user_id,
-    animal_id: medicalLog.animal_id,
-    assignment_id: medicalLog.assignment_id,
-    logged_at: medicalLog.logged_at,
-    category: medicalLog.category,
-    general_notes: medicalLog.general_notes,
-    behavior_notes: medicalLog.behavior_notes,
-    medication_id: medicalLog.medication_id,
-    qty_administered: medicalLog.qty_administered,
-    dose: medicalLog.dose,
-    administered_at: medicalLog.administered_at,
-    prescription: medicalLog.prescription,
-    documents: medicalLog.documents
-  }));
+  return medicalLogs.map(mapMedicalLog);
 };
 
 exports.getMedicalLogById = async (id) => {
@@ -32,22 +61,7 @@ exports.getMedicalLogById = async (id) => {
   if (!medicalLog) {
     return null;
   }
-  return {
-    id: medicalLog.id,
-    foster_user_id: medicalLog.foster_user_id,
-    animal_id: medicalLog.animal_id,
-    assignment_id: medicalLog.assignment_id,
-    logged_at: medicalLog.logged_at,
-    category: medicalLog.category,
-    general_notes: medicalLog.general_notes,
-    behavior_notes: medicalLog.behavior_notes,
-    medication_id: medicalLog.medication_id,
-    qty_administered: medicalLog.qty_administered,
-    dose: medicalLog.dose,
-    administered_at: medicalLog.administered_at,
-    prescription: medicalLog.prescription,
-    documents: medicalLog.documents
-  };
+  return mapMedicalLog(medicalLog);
 };
 
 exports.createMedicalLog = async (body, user) => {
@@ -67,5 +81,6 @@ exports.createMedicalLog = async (body, user) => {
     }
   }
 
-  return medicalLogRepository.create(body);
+  const medicalLog = await medicalLogRepository.create(body);
+  return mapMedicalLog(medicalLog);
 };

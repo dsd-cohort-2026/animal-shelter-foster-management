@@ -14,6 +14,14 @@ exports.getAllItems = async () => {
       unit: item.unit,
       is_active: item.is_active,
       created_at: item.created_at,
+      medication_id: item.medication?.id || null,
+      medication: item.medication
+        ? {
+            recommended_dose: item.medication.recommended_dose,
+            side_effects: item.medication.side_effects,
+            administration_route: item.medication.administration_route,
+          }
+        : null,
     };
   });
 
@@ -35,5 +43,13 @@ exports.getItemById = async (id) => {
     unit: item.unit,
     is_active: item.is_active,
     created_at: item.created_at,
+    medication_id: item.medication?.id || null,
+    medication: item.medication
+      ? {
+          recommended_dose: item.medication.recommended_dose,
+          side_effects: item.medication.side_effects,
+          administration_route: item.medication.administration_route,
+        }
+      : null,
   };
 }
