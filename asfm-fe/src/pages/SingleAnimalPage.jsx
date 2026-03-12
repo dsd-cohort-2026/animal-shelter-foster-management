@@ -1,18 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
-import MedicalLogCard from '@/components/single-animal/MedicalLogCard';
 import { AnimalGeneralInfo } from '@/components/single-animal/AnimalGeneralInfo';
+import SingleAnimalMedicalLogs from '@/components/single-animal/SingleAnimalMedicalLogs';
 import { fetchAnimal, fetchAnimalMedicalLogs } from '@/services/singleAnimalPageService';
 import { useBoundStore } from '@/store';
-import { AlertCircle, ClipboardList, PawPrint } from 'lucide-react';
-
-const formatLabel = (value) => {
-  if (!value) return 'Unknown';
-  return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-};
+import { AlertCircle, PawPrint } from 'lucide-react';
 
 export default function SingleAnimalPage({ id }) {
   const [viewAnimal, setViewAnimal] = useState(null);
@@ -114,41 +108,7 @@ export default function SingleAnimalPage({ id }) {
 
       <article className="space-y-6">
         <AnimalGeneralInfo viewAnimal={viewAnimal} />
-
-        <Card className="overflow-hidden border-border/80 shadow-sm">
-          <CardHeader className="border-b bg-muted/20">
-            <CardTitle className="flex items-center gap-2 text-xl">
-              <ClipboardList className="size-5 text-primary" />
-              Medical Logs
-            </CardTitle>
-            <CardDescription>
-              Review recent entries, medications, and notes for this animal.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            {!user ? (
-              <div className="rounded-xl border border-dashed bg-muted/10 px-4 py-8 text-center text-sm text-muted-foreground">
-                Medical records are only available to foster users assigned to this animal.
-              </div>
-            ) : animalLogs.length > 0 ? (
-              <div className="space-y-4">
-                {animalLogs.map((log) => (
-                  <MedicalLogCard key={log.id ?? `${log.animal_id}-${log.logged_at}`} log={log} />
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-xl border border-dashed bg-muted/10 px-4 py-10 text-center">
-                <div className="mx-auto flex size-11 items-center justify-center rounded-xl bg-secondary/30">
-                  <ClipboardList className="size-5 text-primary" />
-                </div>
-                <h2 className="mt-4 text-lg font-semibold">No medical logs yet</h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Entries will appear here once care notes and treatments have been recorded.
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <SingleAnimalMedicalLogs animalLogs={animalLogs} canViewLogs={Boolean(user)} />
       </article>
     </div>
   );
