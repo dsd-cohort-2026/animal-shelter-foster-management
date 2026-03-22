@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useForm } from '@tanstack/react-form';
 import { useBoundStore } from '@/store';
 import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, Link } from '@tanstack/react-router';
 import { Route } from '@/routes/SignIn';
 
 function SignInForm() {
@@ -117,6 +117,9 @@ function SignInForm() {
             <Button type="submit" form="sign-in-form" className="w-[70%] m-auto">
               Sign In
             </Button>
+            <p className="text-sm text-center text-muted-foreground">
+              New User? <Link to="/SignUp" className="underline">Sign Up Here</Link>
+            </p>
           </FieldGroup>
         </CardFooter>
       </Card>

@@ -207,7 +207,7 @@ function NavBar() {
                 <Button variant="outline" onClick={() => navigate({ to: '/signin' })}>
                   Sign In
                 </Button>
-                <Button variant="outline">Sign Up</Button>
+                <Button variant="outline" onClick={() => navigate({ to: "/SignUp"})}>Sign Up</Button>
               </>
             )}
 
