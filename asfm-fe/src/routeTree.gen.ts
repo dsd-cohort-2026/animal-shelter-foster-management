@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as MedicalLogsRouteImport } from './routes/medical-logs'
 import { Route as UserRouteImport } from './routes/_user'
 import { Route as AdminRouteImport } from './routes/_admin'
+import { Route as SignUpRouteImport } from './routes/SignUp'
 import { Route as SignInRouteImport } from './routes/SignIn'
 import { Route as ExamplesRouteImport } from './routes/Examples'
 import { Route as IndexRouteImport } from './routes/index'
@@ -43,6 +44,11 @@ const UserRoute = UserRouteImport.update({
 } as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/_admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignUpRoute = SignUpRouteImport.update({
+  id: '/SignUp',
+  path: '/SignUp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignInRoute = SignInRouteImport.update({
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/Examples': typeof ExamplesRoute
   '/SignIn': typeof SignInRoute
+  '/SignUp': typeof SignUpRoute
   '/medical-logs': typeof MedicalLogsRoute
   '/admin-medical-logs': typeof AdminAdminMedicalLogsRoute
   '/admin-portal': typeof AdminAdminPortalRoute
@@ -167,6 +174,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/Examples': typeof ExamplesRoute
   '/SignIn': typeof SignInRoute
+  '/SignUp': typeof SignUpRoute
   '/medical-logs': typeof MedicalLogsRoute
   '/admin-medical-logs': typeof AdminAdminMedicalLogsRoute
   '/admin-portal': typeof AdminAdminPortalRoute
@@ -190,6 +198,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/Examples': typeof ExamplesRoute
   '/SignIn': typeof SignInRoute
+  '/SignUp': typeof SignUpRoute
   '/_admin': typeof AdminRouteWithChildren
   '/_user': typeof UserRouteWithChildren
   '/medical-logs': typeof MedicalLogsRoute
@@ -216,6 +225,7 @@ export interface FileRouteTypes {
     | '/'
     | '/Examples'
     | '/SignIn'
+    | '/SignUp'
     | '/medical-logs'
     | '/admin-medical-logs'
     | '/admin-portal'
@@ -238,6 +248,7 @@ export interface FileRouteTypes {
     | '/'
     | '/Examples'
     | '/SignIn'
+    | '/SignUp'
     | '/medical-logs'
     | '/admin-medical-logs'
     | '/admin-portal'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/'
     | '/Examples'
     | '/SignIn'
+    | '/SignUp'
     | '/_admin'
     | '/_user'
     | '/medical-logs'
@@ -285,6 +297,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ExamplesRoute: typeof ExamplesRoute
   SignInRoute: typeof SignInRoute
+  SignUpRoute: typeof SignUpRoute
   AdminRoute: typeof AdminRouteWithChildren
   UserRoute: typeof UserRouteWithChildren
   MedicalLogsRoute: typeof MedicalLogsRoute
@@ -311,6 +324,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/SignUp': {
+      id: '/SignUp'
+      path: '/SignUp'
+      fullPath: '/SignUp'
+      preLoaderRoute: typeof SignUpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/SignIn': {
@@ -501,6 +521,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ExamplesRoute: ExamplesRoute,
   SignInRoute: SignInRoute,
+  SignUpRoute: SignUpRoute,
   AdminRoute: AdminRouteWithChildren,
   UserRoute: UserRouteWithChildren,
   MedicalLogsRoute: MedicalLogsRoute,
