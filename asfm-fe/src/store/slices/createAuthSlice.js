@@ -62,6 +62,11 @@ export const createAuthSlice = (set, get) => ({
     return null;
   },
 
+  signUp: async () => {
+    // TODO add some shit
+    return null;
+  },
+
   initializeAuth: async () => {
     set({ loading: true });
     const {
